@@ -5,14 +5,16 @@
 **Công cụ thu thập dữ liệu Training Needs Analysis (TNA) cho Instructional Designers**, xây dựng theo phương pháp Action Mapping (Cathy Moore — *Map It*). Một file HTML duy nhất, chạy offline, không cần cài đặt, không gửi dữ liệu đi đâu.
 
 
-**▶ Dùng ngay:** https://[username].github.io/discovery-hub/ *(cập nhật link sau khi bật GitHub Pages)*
+**▶ Dùng ngay:** https://ngolinhtrang2011-dot.github.io/discovery-hub/   
 **▶ Hoặc tải file:** tải `discovery-hub.html` → mở bằng Chrome/Edge
 
 ---
 
 ## Vì sao có công cụ này?
 
-Làm TNA tử tế cần rất nhiều loại dữ liệu: biên bản chốt goal, dữ liệu vận hành, phỏng vấn nhân viên, phỏng vấn SME, learner profile... Cách truyền thống là hàng chục file rời — điền tay, nhập lại, tổng hợp thủ công. Discovery Hub gom tất cả về một chỗ theo nguyên tắc **nhập một lần — dữ liệu chảy vào mọi tài liệu đầu ra**.
+Làm TNA tử tế cần rất nhiều loại dữ liệu: biên bản chốt goal, dữ liệu vận hành, phỏng vấn nhân viên, phỏng vấn SME, learner profile...  
+Cách truyền thống là hàng chục file rời — điền tay, nhập lại, tổng hợp thủ công.  
+Discovery Hub gom tất cả về một chỗ theo nguyên tắc **nhập một lần — dữ liệu chảy vào mọi tài liệu đầu ra**.
 
 ## Tính năng chính
 
@@ -77,7 +79,7 @@ flowchart LR
 
 ## Đóng góp & phản hồi
 
-Báo lỗi hoặc đề xuất tính năng: [tạo Issue](../../issues) hoặc điền form phản hồi *(thêm link Google Form)*. Khi báo lỗi, vui lòng ghi rõ: trình duyệt + thiết bị + số version (xem footer app).
+Báo lỗi hoặc đề xuất tính năng: [tạo Issue](../../issues) hoặc điền [form phản hồi](https://forms.gle/hHo6virmGAQAnaccA). Khi báo lỗi, vui lòng ghi rõ: trình duyệt + thiết bị + số version (xem footer app).
 
 ## Phiên bản
 
@@ -87,7 +89,7 @@ Xem [CHANGELOG.md](CHANGELOG.md). Luôn tải bản mới nhất tại trang nà
 
 Phát hành theo giấy phép **CC BY 4.0** — bạn được tự do sử dụng, chia sẻ và chỉnh sửa, miễn là ghi nguồn.
 
-Thiết kế bởi **Trang Ngo, CPTD** — Instructional Designer & L&D Consultant
+Thiết kế bởi **Trang Ngo, CPTD** — Instructional Designer & L&D Consultant  
 Phương pháp: Action Mapping © Cathy Moore (*Map It: The hands-on guide to strategic training design*)
 
 *Nếu công cụ này hữu ích với bạn, một lượt ⭐ star repo hoặc một lời giới thiệu đến đồng nghiệp L&D là sự động viên lớn.*
