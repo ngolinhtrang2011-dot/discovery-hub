@@ -1,0 +1,2370 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Discovery Hub</title>
+<style>
+/* ===== Reset & tokens ===== */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --paper:#F5F3EE; --surface:#FFFFFF; --surface-2:#FBFAF7;
+  --ink:#20242B; --ink-2:#5C6470; --ink-3:#8A9098;
+  --line:#E4E1D8; --line-2:#EEEBE3;
+  --brand:#1C4E4A; --brand-2:#16413D; --brand-tint:#E7EEEC;
+  --terracotta:#B85C38; --teal:#2A7F84; --moss:#5E7A4F; --gold:#B4832B;
+  --danger:#B23B3B; --danger-tint:#F6E7E4; --ok:#2E7D4F; --ok-tint:#E4F0E8;
+  --warn:#B4832B; --warn-tint:#F6EEDD;
+  --font-sans:-apple-system,"Segoe UI",system-ui,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-mono:"Cascadia Code","Consolas",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:10px; --r-sm:7px; --topbar-h:60px; --bottombar-h:62px;
+  --sh-1:0 1px 2px rgba(30,34,40,.05),0 1px 3px rgba(30,34,40,.06);
+  --sh-2:0 6px 24px rgba(30,34,40,.10);
+}
+html,body{background:var(--paper);color:var(--ink);font-family:var(--font-sans);font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased}
+body{overflow-x:hidden}
+a{color:var(--brand);text-decoration:none}
+button{font-family:inherit;font-size:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:15px;color:var(--ink);background:var(--surface)}
+::selection{background:#d7e3e0}
+:focus-visible{outline:2.5px solid var(--brand);outline-offset:2px;border-radius:4px}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);font-family:var(--font-mono)}
+
+/* ===== App shell ===== */
+.app{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:40;height:var(--topbar-h);display:flex;align-items:center;gap:14px;
+  padding:0 20px;background:rgba(245,243,238,.9);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand-mark{width:30px;height:30px;flex:0 0 auto;border-radius:8px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800;font-family:var(--font-mono);font-size:15px;letter-spacing:-.04em}
+.brand-name{font-weight:750;letter-spacing:-.01em;white-space:nowrap}
+.brand-sub{font-size:11px;color:var(--ink-3);white-space:nowrap}
+.topbar-project{margin-left:6px;padding-left:16px;border-left:1px solid var(--line);min-width:0;overflow:hidden}
+.topbar-project .pn{font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:38vw}
+.topbar-project .pc{font-size:11.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-spacer{flex:1}
+.saveflag{font-size:11.5px;color:var(--ink-3);font-family:var(--font-mono);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.saveflag .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.saveflag.saving .dot{background:var(--gold)}
+.langtoggle{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.langtoggle button{padding:6px 12px;font-size:12.5px;font-weight:700;color:var(--ink-3);min-height:34px}
+.langtoggle button.on{background:var(--brand);color:#fff}
+.hdr-icon{width:38px;height:38px;flex:0 0 auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink-2);display:grid;place-items:center}
+.hdr-icon:hover{border-color:#cfcabd;background:var(--surface-2);color:var(--ink)}
+.hdr-icon svg{width:19px;height:19px}
+/* data-management modal */
+.modal-overlay{position:fixed;inset:0;z-index:90;background:rgba(20,24,28,.5);display:none;overflow-y:auto;padding:24px 16px}
+.modal-overlay.open{display:flex;align-items:flex-start;justify-content:center}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh-2);width:100%;max-width:540px;margin:auto;padding:22px}
+.modal h2{font-size:18px;font-weight:760;letter-spacing:-.01em}
+.modal .m-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.modal .m-card{border:1px solid var(--line);border-radius:var(--r-sm);padding:15px;margin-bottom:14px;background:var(--surface-2)}
+.modal .m-card h3{font-size:14.5px;font-weight:720}
+.modal .m-card p{font-size:12.5px;color:var(--ink-2);margin:5px 0 12px}
+.modal .part-list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.part-chk{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);font-size:13px;min-height:42px;cursor:pointer}
+.part-chk input{width:18px;height:18px;accent-color:var(--brand);flex:0 0 auto}
+.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn.danger:hover{background:#9c3232;border-color:#9c3232}
+.btn.danger[disabled]{opacity:.45;cursor:not-allowed;background:var(--danger);border-color:var(--danger)}
+.m-warn{background:var(--danger-tint);border:1px solid #e6c6c0;color:#8f2f2f;border-radius:var(--r-sm);padding:12px 14px;font-size:13px;line-height:1.5;margin-bottom:14px}
+.m-check{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--ink-2);margin:12px 0}
+.m-check input{width:18px;height:18px;margin-top:1px;accent-color:var(--brand)}
+.confirm-in{width:100%;min-height:44px;padding:10px 12px;border:1.5px solid var(--danger);border-radius:var(--r-sm);font-size:15px;letter-spacing:.15em;font-weight:700;text-transform:uppercase;margin:8px 0 14px}
+@media (max-width:480px){ .modal .part-list{grid-template-columns:1fr} }
+.readpill{display:flex;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;border:1px solid transparent}
+.readpill .lamp{width:11px;height:11px;border-radius:50%;box-shadow:0 0 0 3px rgba(0,0,0,.05)}
+.readpill.lock{background:var(--danger-tint);color:#8f2f2f;border-color:#eccfca}
+.readpill.lock .lamp{background:var(--danger)}
+.readpill.go{background:var(--ok-tint);color:#1f6540;border-color:#cbe4d4}
+.readpill.go .lamp{background:var(--ok);box-shadow:0 0 0 3px rgba(46,125,79,.18)}
+
+.shell{flex:1;display:flex;align-items:flex-start;width:100%}
+.sidenav{position:sticky;top:var(--topbar-h);align-self:flex-start;width:264px;flex:0 0 264px;height:calc(100dvh - var(--topbar-h));overflow-y:auto;
+  padding:18px 14px 28px;border-right:1px solid var(--line)}
+.nav-group{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-family:var(--font-mono);padding:0 10px;margin:16px 0 7px}
+.nav-group:first-child{margin-top:0}
+.navitem{display:flex;align-items:center;gap:11px;width:100%;padding:9px 11px;border-radius:var(--r-sm);color:var(--ink-2);font-weight:550;min-height:44px;text-align:left;position:relative}
+.navitem:hover{background:var(--surface-2)}
+.navitem.on{background:var(--brand-tint);color:var(--brand-2);font-weight:700}
+.navitem.on::before{content:"";position:absolute;left:-14px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--brand)}
+.navitem .ico{width:19px;height:19px;flex:0 0 auto;color:currentColor;opacity:.85}
+.navitem .lbl{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.navitem .num{font-family:var(--font-mono);font-size:12px;font-weight:700;width:20px;text-align:center;color:var(--ink-3)}
+.navitem.on .num{color:var(--brand)}
+.navmeter{width:34px;height:4px;border-radius:2px;background:var(--line);overflow:hidden;flex:0 0 auto}
+.navmeter i{display:block;height:100%;background:var(--brand);border-radius:2px;transition:width .3s}
+.navmeter i.full{background:var(--ok)}
+
+.content{flex:1;min-width:0;padding:26px 30px 60px}
+.wrap{max-width:1120px;margin:0 auto}
+
+/* ===== Bottom bar (mobile) ===== */
+.bottombar{display:none}
+.sheet-backdrop{position:fixed;inset:0;z-index:60;background:rgba(20,24,28,.42);display:none}
+.sheet-backdrop.open{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--surface);border-radius:18px 18px 0 0;
+  padding:8px 14px calc(18px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .26s ease;max-height:82dvh;overflow-y:auto}
+.sheet.open{transform:translateY(0)}
+.sheet-grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:8px auto 12px}
+
+/* ===== Typography blocks ===== */
+.view-head{margin-bottom:22px}
+.view-head h1{font-size:26px;font-weight:760;letter-spacing:-.02em;line-height:1.14}
+.view-head .lead{color:var(--ink-2);margin-top:7px;max-width:none;font-size:14.5px}
+.step-tag{display:inline-flex;align-items:center;gap:8px;margin-bottom:10px}
+.step-tag .n{font-family:var(--font-mono);font-weight:800;font-size:12px;color:#fff;background:var(--brand);border-radius:6px;padding:3px 8px;letter-spacing:.02em}
+.step-tag .of{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase}
+
+/* ===== Cards / sections ===== */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh-1)}
+.section{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh-1);padding:20px 20px 22px;margin-bottom:18px}
+.section>.sec-head{display:flex;align-items:baseline;gap:10px;margin:-2px 0 16px;flex-wrap:wrap}
+.section>.sec-head h2{font-size:15.5px;font-weight:720;letter-spacing:-.01em}
+.section>.sec-head .hint{font-size:12.5px;color:var(--ink-3)}
+.sec-num{font-family:var(--font-mono);font-size:12px;color:var(--brand);font-weight:700}
+
+/* ===== Forms ===== */
+.grid{display:grid;gap:14px 18px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field.col-2{grid-column:span 2}
+.field.col-all{grid-column:1/-1}
+label.lab,.lab{font-size:12.5px;font-weight:650;color:var(--ink-2)}
+.lab .req{color:var(--terracotta);font-weight:700}
+.lab .sub{display:block;font-weight:400;color:var(--ink-3);font-size:11.5px;margin-top:2px}
+.control{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);transition:border-color .15s,box-shadow .15s}
+.control:hover{border-color:#d2cec3}
+.control:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(28,78,74,.13)}
+.control.req-miss{border-color:#dca79b;background:#fdf6f4}
+.control.req-miss:focus{border-color:var(--brand);background:var(--surface)}
+.check.req-miss-check{border-color:#dca79b;background:#fdf6f4}
+.chips.req-miss-chips{outline:1.5px solid #dca79b;outline-offset:5px;border-radius:8px}
+textarea.control{resize:vertical;min-height:76px;line-height:1.5}
+select.control{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235C6470' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.goal-formula{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end}
+.goal-formula .op{display:none}
+
+/* checkbox / toggle */
+.check{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);min-height:44px;cursor:pointer}
+.check input{width:19px;height:19px;margin-top:1px;accent-color:var(--brand);flex:0 0 auto}
+.check .ct{font-size:13.5px;color:var(--ink)}
+.check .ct b{font-weight:650}
+.check .ct .s{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;min-height:44px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:13.5px;font-weight:600;color:var(--ink-2);user-select:none}
+.chip input{position:absolute;opacity:0;width:0;height:0}
+.chip.on{border-color:var(--brand);background:var(--brand-tint);color:var(--brand-2)}
+.chip .bx{width:16px;height:16px;border:1.5px solid var(--ink-3);border-radius:5px;display:grid;place-items:center}
+.chip.on .bx{background:var(--brand);border-color:var(--brand)}
+.chip.on .bx::after{content:"";width:8px;height:8px;background:#fff;clip-path:polygon(14% 52%,0 66%,42% 100%,100% 22%,86% 8%,40% 70%)}
+
+/* ===== Callouts ===== */
+.callout{display:flex;gap:12px;padding:13px 15px;border-radius:var(--r-sm);font-size:13px;line-height:1.5;border:1px solid}
+.callout .ci{flex:0 0 auto;width:18px;height:18px;margin-top:1px}
+.callout.warn{background:var(--warn-tint);border-color:#e7d5ab;color:#7a5b18}
+.callout.danger{background:var(--danger-tint);border-color:#e6c6c0;color:#8f2f2f}
+.callout.info{background:var(--brand-tint);border-color:#c9dbd7;color:var(--brand-2)}
+.callout.ok{background:var(--ok-tint);border-color:#cbe4d4;color:#1f6540}
+.callout b{font-weight:700}
+
+/* ===== Buttons ===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:var(--r-sm);
+  font-weight:650;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);transition:.14s}
+.btn:hover{border-color:#cfcabd;background:var(--surface-2)}
+.btn .bi{width:17px;height:17px}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{background:var(--brand-2)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--brand)}
+.btn.ghost:hover{background:var(--brand-tint)}
+.btn.sm{min-height:38px;padding:0 12px;font-size:13px}
+.btn.danger-ghost{color:var(--danger);border-color:transparent}
+.btn.danger-ghost:hover{background:var(--danger-tint)}
+.btn.block{width:100%}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+
+/* ===== Dynamic rows / tables ===== */
+.rowlist{display:flex;flex-direction:column;gap:12px}
+.rowcard{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);padding:13px 13px 14px;position:relative}
+.rowcard .rc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.rowcard .rc-n{font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:var(--ink-3);letter-spacing:.06em}
+.dtable-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-sm)}
+.dtable{width:100%;border-collapse:collapse;min-width:520px}
+.dtable th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);
+  background:var(--surface-2);padding:9px 11px;border-bottom:1px solid var(--line);font-family:var(--font-mono)}
+.dtable td{padding:7px 9px;border-bottom:1px solid var(--line-2);vertical-align:top}
+.dtable tr:last-child td{border-bottom:0}
+.dtable .control{min-height:40px;padding:8px 10px}
+.dtable td.act{width:44px;text-align:center}
+.iconbtn{width:36px;height:36px;border-radius:8px;display:inline-grid;place-items:center;color:var(--ink-3)}
+.iconbtn:hover{background:var(--danger-tint);color:var(--danger)}
+.iconbtn .bi{width:16px;height:16px}
+.empty{text-align:center;color:var(--ink-3);font-size:13px;padding:22px;border:1px dashed var(--line);border-radius:var(--r-sm);background:var(--surface-2)}
+
+/* ===== Dashboard ===== */
+.dash-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:start}
+.stat-wall{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:15px 15px 13px;box-shadow:var(--sh-1);position:relative;overflow:hidden}
+.stat .sv{font-family:var(--font-mono);font-size:34px;font-weight:750;line-height:1;letter-spacing:-.03em}
+.stat .sl{font-size:12px;color:var(--ink-2);margin-top:8px;font-weight:600}
+.stat .sk{position:absolute;right:12px;top:11px;width:9px;height:9px;border-radius:50%}
+.stat.t-env .sv{color:var(--terracotta)} .stat.t-know .sv{color:var(--teal)}
+.stat.t-skill .sv{color:var(--moss)} .stat.t-conf .sv{color:var(--gold)}
+.gate{padding:20px}
+.gate .lamp-xl{width:64px;height:64px;border-radius:50%;margin-bottom:14px;display:grid;place-items:center;transition:.4s}
+.gate.lock .lamp-xl{background:var(--danger-tint);box-shadow:0 0 0 6px rgba(178,59,59,.08)}
+.gate.lock .lamp-xl .core{width:26px;height:26px;border-radius:50%;background:var(--danger)}
+.gate.go .lamp-xl{background:var(--ok-tint);box-shadow:0 0 0 6px rgba(46,125,79,.14),0 0 24px rgba(46,125,79,.25)}
+.gate.go .lamp-xl .core{width:26px;height:26px;border-radius:50%;background:var(--ok)}
+.gate h3{font-size:17px;font-weight:740;letter-spacing:-.01em}
+.gate .gsub{font-size:13px;color:var(--ink-2);margin-top:6px;line-height:1.5}
+.gate-req{display:flex;gap:8px;margin-top:15px}
+.gate-req .gr{flex:1;text-align:center;padding:9px 4px;border-radius:var(--r-sm);border:1px solid var(--line);font-size:11.5px;font-weight:650}
+.gate-req .gr .p{font-family:var(--font-mono);font-size:16px;font-weight:750;display:block}
+.gate-req .gr.done{background:var(--ok-tint);border-color:#cbe4d4;color:#1f6540}
+.gate-req .gr.done .p{color:var(--ok)}
+.progress-list{display:flex;flex-direction:column;gap:2px}
+.prow{display:flex;align-items:center;gap:13px;padding:11px 8px;border-radius:var(--r-sm);cursor:pointer}
+.prow:hover{background:var(--surface-2)}
+.prow .pn{font-family:var(--font-mono);font-weight:750;font-size:13px;width:22px;color:var(--ink-3);text-align:center}
+.prow .ptxt{flex:1;min-width:0}
+.prow .ptxt .pt{font-weight:650;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prow .bar{height:7px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:6px}
+.prow .bar i{display:block;height:100%;background:var(--brand);border-radius:4px;transition:width .4s}
+.prow .bar i.full{background:var(--ok)}
+.prow .pp{font-family:var(--font-mono);font-weight:750;font-size:13px;width:42px;text-align:right;color:var(--ink-2)}
+.prow.req .pn{color:var(--brand)}
+.mini-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-3);margin-top:4px}
+.mini-legend span{display:inline-flex;align-items:center;gap:6px}
+.mini-legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
+
+/* ===== Insight capture ===== */
+.tag-dot{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+.t-environment{--tc:var(--terracotta)} .t-knowledge{--tc:var(--teal)}
+.t-skill{--tc:var(--moss)} .t-confidence{--tc:var(--gold)}
+.capture{position:sticky;bottom:0;z-index:20;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:var(--sh-2);padding:14px;margin-top:6px}
+.capture .cap-in{width:100%;min-height:48px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r-sm);font-size:15.5px}
+.capture .cap-in:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(28,78,74,.13)}
+.tagbtns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:11px}
+.tagbtn{min-height:46px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11.5px;font-weight:700;color:var(--ink-2);padding:5px 4px;line-height:1.15;text-align:center}
+.tagbtn .sw{width:14px;height:14px;border-radius:4px;background:var(--tc)}
+.tagbtn.on{border-color:var(--tc);background:color-mix(in srgb,var(--tc) 12%,#fff);color:var(--ink)}
+.tagbtn.on .sw{box-shadow:0 0 0 3px color-mix(in srgb,var(--tc) 25%,#fff)}
+.cap-row2{display:flex;gap:10px;margin-top:11px;flex-wrap:wrap;align-items:center}
+.cap-row2 .src{flex:1;min-width:150px}
+.cap-toggles{display:flex;gap:8px}
+.captog{min-height:44px;padding:0 13px;border:1.5px solid var(--line);border-radius:999px;font-size:12.5px;font-weight:650;color:var(--ink-2);display:inline-flex;align-items:center;gap:7px}
+.captog.on{border-color:var(--gold);background:var(--warn-tint);color:#7a5b18}
+.captog.on.bank{border-color:var(--teal);background:#e3efef;color:#1d5a5e}
+.cap-hint{font-size:11.5px;color:var(--ink-3);margin-top:9px}
+.cap-hint.err{color:var(--danger);font-weight:600}
+
+.ins-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.ins-filters .control{min-height:40px}
+.ins-list{display:flex;flex-direction:column;gap:9px}
+.ins{display:flex;gap:11px;padding:12px 13px;border:1px solid var(--line);border-left:4px solid var(--tc);border-radius:var(--r-sm);background:var(--surface)}
+.ins .ic-body{flex:1;min-width:0}
+.ins .ic-txt{font-size:14px;line-height:1.45}
+.ins .ic-meta{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:7px;font-size:11.5px;color:var(--ink-3)}
+.ins .ic-tag{font-family:var(--font-mono);font-weight:700;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--tc);
+  background:color-mix(in srgb,var(--tc) 10%,#fff);border:1px solid color-mix(in srgb,var(--tc) 25%,#fff);padding:2px 7px;border-radius:5px}
+.ins .ic-src{display:inline-flex;align-items:center;gap:5px}
+.ins .badge{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:5px}
+.ins .badge.d{background:var(--warn-tint);color:#7a5b18}
+.ins .badge.b{background:#e3efef;color:#1d5a5e}
+.ins .ic-acts{display:flex;flex-direction:column;gap:5px;flex:0 0 auto}
+.tglbtn{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;border:1px solid var(--line);font-size:14px;color:var(--ink-3);background:var(--surface)}
+.tglbtn.on{border-color:var(--gold);background:var(--warn-tint)}
+.tglbtn.on.bank{border-color:var(--teal);background:#e3efef}
+.tglbtn.del:hover{border-color:var(--danger);background:var(--danger-tint);color:var(--danger)}
+
+/* scenario cards */
+.scn{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:15px;margin-bottom:12px;position:relative}
+.scn.dist{border-color:#e7d5ab;box-shadow:0 0 0 1px #e7d5ab inset}
+.scn .scn-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;align-items:center}
+.scn-flag{font-size:11px;font-weight:700;color:#7a5b18;background:var(--warn-tint);padding:3px 9px;border-radius:6px;display:inline-flex;gap:6px;align-items:center}
+
+/* ===== AI extract ===== */
+.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.codebox{font-family:var(--font-mono);font-size:12.5px;line-height:1.55;background:#1e2329;color:#d7dbe0;border-radius:var(--r-sm);padding:14px;
+  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;border:1px solid #2c333b}
+.ai-preview{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px}
+.ai-preview .pv{font-family:var(--font-mono)}
+.ai-preview .pv b{font-size:24px;font-weight:750}
+
+/* ===== Documents ===== */
+.doc-list{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.doc-card{display:flex;gap:14px;padding:16px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);box-shadow:var(--sh-1);align-items:flex-start}
+.doc-card .dnum{font-family:var(--font-mono);font-weight:800;font-size:13px;color:#fff;background:var(--brand);border-radius:7px;width:30px;height:30px;display:grid;place-items:center;flex:0 0 auto}
+.doc-card .dc-body{flex:1;min-width:0}
+.doc-card .dc-t{font-weight:700;font-size:14.5px;letter-spacing:-.01em}
+.doc-card .dc-s{font-size:12px;color:var(--ink-3);margin-top:3px}
+.doc-card .dc-src{font-size:10.5px;color:var(--ink-3);font-family:var(--font-mono);margin-top:6px;text-transform:uppercase;letter-spacing:.05em}
+.doc-card .dc-act{margin-top:11px;display:flex;gap:8px}
+
+.doc-overlay{position:fixed;inset:0;z-index:80;background:rgba(20,24,28,.5);display:none;overflow-y:auto;padding:0}
+.doc-overlay.open{display:block}
+.doc-toolbar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:10px;justify-content:flex-end;
+  padding:12px 18px;background:rgba(245,243,238,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.doc-toolbar .dt-title{margin-right:auto;font-weight:700;font-size:14px}
+.doc-scroll{padding:26px 16px 60px;display:flex;justify-content:center}
+
+/* A4 paper */
+.doc-paper{background:#fff;color:#1a1a1a;width:210mm;max-width:100%;min-height:297mm;padding:22mm 20mm;box-shadow:0 10px 40px rgba(0,0,0,.25);
+  font-size:11pt;line-height:1.5;font-family:var(--font-sans)}
+.doc-paper h1{font-size:20pt;letter-spacing:-.01em;line-height:1.15;margin-bottom:2mm}
+.doc-paper h2{font-size:12.5pt;margin:8mm 0 3mm;padding-bottom:2mm;border-bottom:1.5px solid #1a1a1a;letter-spacing:-.01em}
+.doc-paper h3{font-size:11pt;margin:5mm 0 2mm}
+.doc-paper p{margin:0 0 2.5mm}
+.doc-head{border-bottom:2.5px solid #1a1a1a;padding-bottom:5mm;margin-bottom:6mm}
+.doc-brand{font-family:var(--font-mono);font-size:9pt;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#666;margin-bottom:3mm}
+.doc-meta{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5mm 8mm;margin-top:4mm;font-size:9.5pt}
+.doc-meta .dm{display:flex;gap:5px}
+.doc-meta .dm .k{color:#666;min-width:24mm}
+.doc-meta .dm .v{font-weight:600}
+.doc-table{width:100%;border-collapse:collapse;margin:3mm 0 4mm;font-size:9.5pt}
+.doc-table th{background:#f2f0ea;text-align:left;padding:2.2mm 3mm;border:.5pt solid #bbb;font-size:8.5pt;text-transform:uppercase;letter-spacing:.04em;color:#333}
+.doc-table td{padding:2.2mm 3mm;border:.5pt solid #ccc;vertical-align:top}
+.doc-kv{display:grid;grid-template-columns:42mm 1fr;gap:1.5mm 4mm;margin:2mm 0 4mm;font-size:10pt}
+.doc-kv .k{color:#555;font-weight:600}
+.doc-kv .v{white-space:pre-wrap}
+.doc-quote{border-left:3px solid #999;padding:1mm 0 1mm 4mm;margin:2mm 0;font-style:italic;color:#333}
+.doc-strong-row td{font-weight:700;background:#faf6ea}
+.doc-note{font-size:9pt;color:#777;font-style:italic}
+.sign-block{margin-top:14mm;display:grid;grid-template-columns:1fr 1fr;gap:8mm 14mm}
+.sign{margin-top:12mm}
+.sign .line{border-bottom:1px solid #1a1a1a;height:14mm}
+.sign .sl{font-size:9pt;color:#555;margin-top:2mm}
+.doc-section{break-inside:avoid}
+.badge-dist{font-size:8pt;font-weight:700;color:#8a6a1a;border:1px solid #d8bd7e;background:#f6eedd;padding:.5mm 2mm;border-radius:3px;margin-left:3mm}
+.doc-empty{color:#999;font-style:italic;font-size:9.5pt}
+
+/* ===== Step 0 — Screening ===== */
+.scr-q{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);padding:14px}
+.scr-q+.scr-q{margin-top:12px}
+.scr-q .q-txt{font-size:14px;font-weight:600;margin-bottom:11px;display:flex;gap:9px;line-height:1.4}
+.scr-q .q-n{font-family:var(--font-mono);font-weight:800;color:var(--brand);flex:0 0 auto}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.segbtn{min-height:46px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface);font-weight:650;font-size:13.5px;color:var(--ink-2);display:flex;align-items:center;justify-content:center;gap:8px}
+.segbtn .sd{width:9px;height:9px;border-radius:50%;background:currentColor;opacity:.4}
+.segbtn.yes.on{border-color:var(--moss);background:color-mix(in srgb,var(--moss) 13%,#fff);color:#3E6B4F}
+.segbtn.no.on{border-color:var(--terracotta);background:color-mix(in srgb,var(--terracotta) 13%,#fff);color:#A4462D}
+.segbtn.unclear.on{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 16%,#fff);color:#8a6414}
+.segbtn.on .sd{opacity:1}
+.verdict{border-radius:var(--r);padding:18px;border:1px solid;display:flex;flex-direction:column;gap:8px}
+.verdict .vb{display:flex;align-items:center;gap:13px}
+.verdict .vlamp{width:42px;height:42px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center}
+.verdict .vlamp .c{width:16px;height:16px;border-radius:50%}
+.verdict h3{font-size:17px;font-weight:760;letter-spacing:-.01em}
+.verdict .vd{font-size:13px;line-height:1.5}
+.v-go{background:#eaf1ec;border-color:#c3dccb;color:#2f5740}
+.v-go .vlamp{background:#d6e6db}.v-go .vlamp .c{background:#3E6B4F}
+.v-cond{background:#f7efdb;border-color:#e6d3a3;color:#7a5714}
+.v-cond .vlamp{background:#efe1bd}.v-cond .vlamp .c{background:#B9862E}
+.v-nogo{background:#f7e5df;border-color:#e6c4b6;color:#8a3a22}
+.v-nogo .vlamp{background:#f0d2c6}.v-nogo .vlamp .c{background:#A4462D}
+.v-unset{background:var(--surface-2);border-color:var(--line);color:var(--ink-2)}
+.v-unset .vlamp{background:#e9e7e0}.v-unset .vlamp .c{background:var(--ink-3)}
+.cond-list{display:flex;flex-direction:column;gap:8px}
+.cond{display:flex;gap:11px;align-items:flex-start;padding:11px 13px;border:1px solid #e6d3a3;background:#fbf6ea;border-radius:var(--r-sm);font-size:12.5px;line-height:1.45;cursor:pointer}
+.cond input{width:20px;height:20px;margin-top:1px;accent-color:var(--gold);flex:0 0 auto}
+.cond.done{opacity:.55;border-color:var(--line);background:var(--surface-2)}
+.alt-list{display:grid;gap:10px}
+.alt{padding:12px 14px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface)}
+.alt .at{font-weight:700;font-size:13.5px;margin-bottom:3px}
+.alt .ad{font-size:12.5px;color:var(--ink-2)}
+.dash-verdict{margin-bottom:18px;cursor:pointer;box-shadow:var(--sh-1)}
+.dash-verdict .vb{margin:0}
+.tna-cta{display:flex;align-items:center;gap:18px;justify-content:space-between;flex-wrap:wrap;
+  padding:20px 22px;margin-bottom:18px;background:linear-gradient(0deg,var(--brand-tint),var(--brand-tint)),var(--surface);border-color:#c9dbd7}
+.tna-cta .tna-body h3{font-size:18px;font-weight:760;letter-spacing:-.01em;margin-top:3px}
+.tna-cta .tna-body p{font-size:13px;color:var(--ink-2);margin-top:5px;max-width:60ch}
+.btn.lg{min-height:52px;padding:0 22px;font-size:15px;flex:0 0 auto}
+@media (max-width:560px){ .tna-cta .btn.lg{width:100%} }
+
+/* ===== v2: files, recording, contenteditable, RCA, highlight, step nav ===== */
+.dr-card{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);padding:13px}
+.dr-foot{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:10px}
+.file-chip{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:12.5px}
+.file-chip .fn{font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-chip .fs{color:var(--ink-3);font-size:11px}
+.file-up{cursor:pointer}
+.recbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface)}
+.rec-dot{width:10px;height:10px;border-radius:50%;background:var(--danger);display:inline-block;flex:0 0 auto}
+.rec-dot.on{animation:recpulse 1.2s infinite}
+@keyframes recpulse{0%,100%{opacity:1}50%{opacity:.3}}
+.rec-live.paused .rec-dot{animation:none;opacity:.4}
+.rec-timer{font-size:14px;font-weight:700;color:var(--ink-2)}
+.rec-badge{font-size:11px;font-weight:700;color:var(--danger);background:var(--danger-tint);padding:3px 9px;border-radius:6px}
+.rec-audio{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+.rec-audio audio{max-width:100%;flex:1;min-width:180px}
+.stt-note{margin-top:8px}
+.stt-msg{font-size:12px;color:var(--ink-3);display:inline-block;padding:6px 10px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm)}
+.ce{min-height:52px;cursor:text;overflow-wrap:anywhere}
+.ce:empty:before{content:attr(data-ph);color:var(--ink-3)}
+.ce:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(28,78,74,.13)}
+mark.pp{background:color-mix(in srgb,var(--terracotta) 22%,#fff);color:inherit;border-radius:3px;padding:0 1px;box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--terracotta) 45%,#fff)}
+.hl-btn{position:absolute;z-index:120;background:var(--ink);color:#fff;border-radius:999px;padding:8px 14px;font-size:12.5px;font-weight:700;box-shadow:var(--sh-2);white-space:nowrap;min-height:38px}
+.hl-btn:hover{background:#000}
+.stepnav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:24px 0 8px}
+.stepnav-hint{flex:1;text-align:center;font-size:12px;color:var(--gold);font-weight:600;line-height:1.5}
+.stepnav-hint .miss-names{display:inline;color:#a8721f;font-weight:600}
+.rca-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.dist{display:flex;flex-direction:column;gap:9px}
+.dist-row{display:flex;align-items:center;gap:12px}
+.dist-l{flex:0 0 150px;font-size:12.5px;font-weight:700;font-family:var(--font-mono)}
+.dist-bar{flex:1;height:12px;border-radius:6px;background:var(--line);overflow:hidden}
+.dist-bar i{display:block;height:100%;border-radius:6px;transition:width .4s}
+.dist-n{width:34px;text-align:right;font-weight:700;font-size:13px}
+.rca-list{display:flex;flex-direction:column;gap:12px}
+.rca-card{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:14px}
+.rca-card.unclassified{border-color:#e6d3a3;background:#fdfaf2}
+.rca-top{display:flex;gap:10px;align-items:flex-start}
+.rca-top .control{flex:1}
+.rca-meta{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin:9px 0}
+.rca-src{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--ink-3);border:1px solid var(--line);border-radius:6px;padding:3px 8px;background:var(--surface-2)}
+.rca-src:hover{border-color:var(--brand);color:var(--brand)}
+.rca-sug{font-size:11.5px;color:var(--ink-3)}
+.rca-tags{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.rca-tag{min-height:44px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface);display:flex;align-items:center;justify-content:center;gap:7px;font-size:12px;font-weight:700;color:var(--ink-2);padding:5px 6px;text-align:center;line-height:1.15}
+.rca-tag .sw{width:12px;height:12px;border-radius:4px;flex:0 0 auto}
+.rca-toggles{display:flex;gap:8px;margin-top:10px}
+@media (max-width:480px){
+  .rca-stats{grid-template-columns:repeat(2,1fr)}
+  .rca-tags{grid-template-columns:repeat(2,1fr)}
+  .dist-l{flex-basis:110px}
+  .stepnav{flex-wrap:wrap}
+  .stepnav-hint{order:3;flex-basis:100%}
+}
+
+/* ===== Responsive ===== */
+@media (max-width:1024px){
+  .content{padding:22px 22px 40px}
+  .dash-grid{grid-template-columns:1fr}
+  .ai-grid{grid-template-columns:1fr}
+  .sidenav{position:sticky;top:var(--topbar-h);width:100%;flex-basis:100%;height:auto;overflow-x:auto;overflow-y:hidden;
+    display:flex;gap:6px;padding:9px 14px;border-right:0;border-bottom:1px solid var(--line);background:var(--surface-2)}
+  .shell{flex-direction:column}
+  .nav-group{display:none}
+  .navitem{width:auto;flex:0 0 auto;padding:8px 13px;white-space:nowrap;border:1px solid transparent}
+  .navitem.on::before{display:none}
+  .navitem.on{border-color:#c9dbd7}
+  .navmeter{display:none}
+  .navitem .lbl{max-width:130px}
+  .stat-wall{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:820px){
+  .g4{grid-template-columns:repeat(2,1fr)}
+  .goal-formula{grid-template-columns:repeat(2,1fr)}
+  .doc-list{grid-template-columns:1fr}
+}
+@media (max-width:480px){
+  :root{--topbar-h:56px}
+  .content{padding:18px 15px calc(22px + var(--bottombar-h))}
+  .topbar{padding:0 13px;gap:9px}
+  .brand-sub{display:none}
+  .topbar-project{display:none}
+  .readpill span.rt{display:none}
+  .readpill{padding:8px}
+  .sidenav{display:none}
+  .g2,.g3,.g4,.goal-formula{grid-template-columns:1fr}
+  .field.col-2{grid-column:auto}
+  .view-head h1{font-size:22px}
+  .stat-wall{grid-template-columns:repeat(2,1fr)}
+  .section{padding:16px 14px 18px}
+  .tagbtns{grid-template-columns:repeat(2,1fr)}
+  .bottombar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;height:calc(var(--bottombar-h) + env(safe-area-inset-bottom));
+    padding-bottom:env(safe-area-inset-bottom);background:var(--surface);border-top:1px solid var(--line);align-items:stretch}
+  .btab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--ink-3);font-size:10.5px;font-weight:650;min-height:44px}
+  .btab .bi{width:21px;height:21px}
+  .btab.on{color:var(--brand)}
+  .capture{bottom:calc(var(--bottombar-h) + env(safe-area-inset-bottom));margin-left:-15px;margin-right:-15px;border-radius:14px 14px 0 0;padding:12px 15px}
+  .ai-preview{gap:12px}
+  .doc-scroll{padding:16px 0 40px}
+  .doc-paper{padding:12mm 9mm;box-shadow:none}
+  .sign-block{grid-template-columns:1fr}
+}
+@media (min-width:481px){.bottombar,.sheet,.sheet-backdrop{display:none!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ===== Print ===== */
+@media print{
+  @page{size:A4;margin:0}
+  html,body{background:#fff}
+  .app,.bottombar,.sheet,.sheet-backdrop,.doc-toolbar,.no-print{display:none!important}
+  .doc-overlay.open{position:static;display:block!important;background:#fff;overflow:visible;padding:0}
+  .doc-scroll{padding:0;display:block}
+  .doc-paper{width:100%;max-width:none;min-height:auto;box-shadow:none;padding:14mm 14mm;font-size:10.5pt}
+  .doc-section{break-inside:avoid}
+  table,tr,td,th{break-inside:avoid}
+  h2,h3{break-after:avoid}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="topbar no-print">
+    <div class="brand">
+      <div class="brand-mark">DH</div>
+      <div>
+        <div class="brand-name" id="brandName">Discovery Hub</div>
+        <div class="brand-sub" data-i18n="appTagline"></div>
+      </div>
+    </div>
+    <div class="topbar-project" id="topProject"></div>
+    <div class="topbar-spacer"></div>
+    <div class="saveflag" id="saveFlag"><span class="dot"></span><span data-i18n="save_saved"></span></div>
+    <div class="langtoggle" role="group" aria-label="Language">
+      <button data-action="lang" data-lang="vi" id="langVi">VI</button>
+      <button data-action="lang" data-lang="en" id="langEn">EN</button>
+    </div>
+    <button class="hdr-icon" id="dataBtn" data-action="open-data" aria-label="Data management" title="">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-2.7 1.1V21a2 2 0 11-4 0v-.1A1.6 1.6 0 006 19.4l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00-1.1-2.7H2a2 2 0 110-4h.1A1.6 1.6 0 004.6 6l-.1-.1a2 2 0 112.8-2.8l.1.1A1.6 1.6 0 0010 4.6V4a2 2 0 114 0v.1a1.6 1.6 0 002.7 1.1l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 001.1 2.7H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg>
+    </button>
+    <button class="readpill lock" id="readPill" data-action="nav" data-view="dashboard">
+      <span class="lamp"></span><span class="rt" id="readPillText"></span>
+    </button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidenav no-print" id="sideNav" aria-label="Sections"></nav>
+    <main class="content"><div class="wrap" id="view"></div></main>
+  </div>
+
+  <nav class="bottombar no-print" id="bottomBar" aria-label="Primary"></nav>
+</div>
+
+<div class="sheet-backdrop no-print" id="sheetBackdrop" data-action="close-sheet"></div>
+<div class="sheet no-print" id="sheet" role="dialog" aria-modal="true"><div class="sheet-grab"></div><div id="sheetBody"></div></div>
+
+<div class="doc-overlay" id="docOverlay" role="dialog" aria-modal="true">
+  <div class="doc-toolbar no-print">
+    <span class="dt-title" id="docTitle"></span>
+    <button class="btn sm" data-action="print-doc"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V3h12v6M6 18H4v-6a2 2 0 012-2h12a2 2 0 012 2v6h-2M8 14h8v7H8z"/></svg><span data-i18n="btn_print"></span></button>
+    <button class="btn sm" data-action="close-doc"><span data-i18n="btn_close"></span></button>
+  </div>
+  <div class="doc-scroll"><div class="doc-paper" id="docPaper"></div></div>
+</div>
+
+<div class="modal-overlay no-print" id="dataModal" role="dialog" aria-modal="true">
+  <div class="modal" id="dataModalBox"></div>
+</div>
+
+<input type="file" id="importFile" accept="application/json,.json" style="display:none">
+
+<script>
+/* =========================================================================
+   Discovery Hub — single-file discovery tool for Action Mapping (Cathy Moore)
+   No frameworks, no CDN, offline-first. Data = single source of truth.
+   ========================================================================= */
+"use strict";
+
+/* ------------------------------------------------------------------ *
+ *  I18N dictionary — every UI string lives here (add a language = add a key)
+ * ------------------------------------------------------------------ */
+const I18N = {
+vi:{
+  appTagline:"Công cụ thu thập dữ liệu Training Needs Analysis",
+  save_saved:"Đã lưu", save_saving:"Đang lưu…",
+  readiness_go:"Đủ điều kiện vẽ Map", readiness_lock:"Chưa đủ điều kiện",
+  // nav
+  group_flow:"Quy trình", group_tools:"Công cụ",
+  nav_dashboard:"Dashboard", nav_ai:"AI Extract", nav_docs:"Tài liệu", nav_steps:"7 Bước", nav_rca:"Phân tích RCA",
+  bt_home:"Tổng quan", bt_steps:"Bước", bt_ai:"AI", bt_docs:"Tài liệu",
+  // step names
+  s1:"Mục tiêu kinh doanh", s2:"Dữ liệu vận hành", s3:"Phỏng vấn trực tiếp",
+  s4:"Chân dung người học", s5:"Phỏng vấn SME & High performer", s6:"Ràng buộc", s7:"Cam kết",
+  s1_short:"Business Goal", s2_short:"Ops Data", s3_short:"Interviews",
+  s4_short:"Learner", s5_short:"SME & Scenarios", s6_short:"Constraints", s7_short:"Commitment",
+  // common
+  btn_add:"Thêm", btn_remove:"Xóa", btn_view:"Xem", btn_print:"In / Lưu PDF", btn_close:"Đóng",
+  btn_copy:"Sao chép", btn_copied:"Đã sao chép!", none_yet:"Chưa có mục nào — bấm “Thêm”.",
+  of:"trong", required_short:"bắt buộc", step_word:"Bước",
+  yes:"Có", no:"Không", ok:"OK", issue:"Có vấn đề", pick:"— Chọn —",
+  // dashboard
+  dash_title:"Discovery Dashboard",
+  dash_lead:"Nhập một lần, dữ liệu tự cập nhật vào mọi tài liệu đầu ra. Hoàn tất Bước 1–3 để thiết lập Action Map.",
+  project_info:"Thông tin dự án",
+  f_projectName:"Tên dự án", f_client:"Client / Khách hàng", f_collector:"Người thu thập", f_startDate:"Ngày bắt đầu",
+  ph_projectName:"VD: Onboarding Nhân viên Kho", ph_client:"VD: Công ty ABC", ph_collector:"Tên bạn",
+  progress_title:"Tiến độ 7 bước", progress_hint:"% trường bắt buộc đã điền",
+  counters_title:"Thống kê nhanh",
+  c_insights:"Pain point", c_quotes:"Quote / Scenario", c_distractors:"Distractor tiềm năng", c_interviews:"Buổi phỏng vấn",
+  gate_title:"Điều kiện vẽ Map",
+  gate_go_h:"Sẵn sàng vẽ Action Map", gate_lock_h:"Chưa đủ điều kiện",
+  gate_go_desc:"Bước 0 = GO và Bước 1, 2, 3 đã hoàn tất 100% trường bắt buộc. Bạn có thể bắt đầu vẽ Action Map với sponsor.",
+  gate_lock_desc:"Đèn chỉ bật xanh khi Bước 0 cho verdict GO VÀ Bước 1 (Mục tiêu), Bước 2 (Dữ liệu hành vi), Bước 3 (Nguyên nhân gốc) đạt 100% trường bắt buộc.",
+  warn_step5:"Nhắc: Hoàn thành Bước 5 (Scenario Bank) trước khi viết bất kỳ scenario nào — thoại và tình huống thật phải đến từ SME.",
+  legend_full:"Đủ 100%", legend_part:"Đang điền", req_badge:"BB",
+  // step1
+  s1_lead:"Xác định business goal đo lường được cùng sponsor. Không có con số → không có Map.",
+  s1_sponsor:"Sponsor / Người bảo trợ",
+  f_sponsorName:"Tên sponsor", f_sponsorTitle:"Chức danh",
+  s1_success:"Câu hỏi mấu chốt",
+  f_successAnswer:"“Nếu dự án thành công, con số nào sẽ thay đổi?” — chép nguyên văn câu trả lời của sponsor",
+  ph_successAnswer:"Nguyên văn lời sponsor…",
+  s1_goal:"Công thức mục tiêu", s1_goal_hint:"Chỉ số + Baseline → Target + Deadline",
+  f_metric:"Chỉ số (Metric)", f_baseline:"Baseline (hiện tại)", f_target:"Target (mục tiêu)", f_deadline:"Deadline",
+  ph_metric:"Nhập tên chỉ số…", ph_baseline:"Nhập giá trị hiện tại…", ph_target:"Nhập giá trị mục tiêu…",
+  s1_confirm:"Xác nhận bằng văn bản",
+  f_confirmed:"Sponsor đã xác nhận mục tiêu bằng văn bản",
+  f_confirmDate:"Ngày xác nhận", f_confirmForm:"Hình thức",
+  ph_confirmForm:"VD: Email / Biên bản họp có chữ ký",
+  s1_kickoff:"Ghi chú họp Kickoff",
+  f_kickoffAttendees:"Người tham dự", f_kickoffDecisions:"Quyết định chính",
+  ph_kickoffAttendees:"Liệt kê người dự & vai trò", ph_kickoffDecisions:"Các quyết định đã chốt trong buổi kickoff",
+  f_isSolutionRequest:"Tự đánh giá: mục tiêu này thực chất chỉ là “yêu cầu giải pháp” (VD: “làm một khóa e-learning”), chưa phải con số kinh doanh",
+  s1_warn_solution:"Cảnh báo: Đây là yêu cầu giải pháp, không phải business goal. Hãy quay lại hỏi sponsor: con số kinh doanh nào sẽ thay đổi? Nếu không có, dự án chưa nên bắt đầu.",
+  // step2
+  s2_lead:"Thu thập bằng chứng về hành vi hiện tại. Cần dữ liệu thật, không phải phỏng đoán.",
+  s2_drl:"Data Request List", s2_drl_hint:"Danh sách dữ liệu cần yêu cầu",
+  f_dr_item:"Mục dữ liệu", f_dr_provider:"Người cung cấp", f_dr_deadline:"Deadline", f_dr_status:"Trạng thái nhận",
+  dr_pending:"Chưa nhận", dr_partial:"Nhận một phần", dr_received:"Đã nhận",
+  s2_beh:"Phát hiện hành vi", s2_beh_hint:"Hành vi sai/thiếu quan sát được",
+  f_beh_desc:"Mô tả hành vi sai/thiếu", f_beh_freq:"Tần suất", f_beh_impact:"Ảnh hưởng (1–5)", f_beh_source:"Nguồn dữ liệu",
+  ph_beh_desc:"VD: Không kiểm tra nhãn trước khi dán", ph_beh_freq:"VD: 15 vụ/tuần",
+  // step3
+  s3_lead:"Chẩn đoán vì sao hành vi xảy ra. Phần lớn vấn đề hiệu suất KHÔNG đến từ thiếu kiến thức.",
+  s3_interviews:"Buổi phỏng vấn",
+  f_iv_person:"Người phỏng vấn", f_iv_role:"Vai trò", f_iv_date:"Ngày",
+  role_employee:"Nhân viên", role_supervisor:"Giám sát", role_teamlead:"Trưởng Nhóm", role_deptmanager:"Quản lý Bộ phận", role_board:"Ban Giám đốc", role_other:"Others",
+  s3_env:"5 yếu tố môi trường", s3_env_hint:"Đánh giá từng yếu tố",
+  env_tools:"Công cụ / Thiết bị", env_process:"Quy trình – SOP", env_people:"Nhân sự",
+  env_policy:"Chính sách – Phân quyền", env_reward:"Khen thưởng – Động lực",
+  f_env_status:"Đánh giá", f_env_note:"Ghi chú",
+  ph_env_note:"Yếu tố này có cản trở hành vi đúng không?",
+  // insight capture
+  cap_title:"Insight Capture", cap_hint_speed:"Gõ 1 câu → chọn 1 tag → Enter. Nhanh nhất có thể.",
+  cap_ph:"Gõ nhanh một insight rồi Enter…",
+  tag_environment:"MÔI TRƯỜNG", tag_knowledge:"KIẾN THỨC", tag_skill:"KỸ NĂNG", tag_confidence:"TỰ TIN – ĐỘNG LỰC",
+  cap_source:"Nguồn", cap_source_ph:"Từ buổi PV / dữ liệu nào?",
+  cap_distractor:"Distractor", cap_bank:"Scenario Bank",
+  cap_add:"Ghi lại (Enter)", cap_need_tag:"Hãy chọn 1 tag trước khi lưu.",
+  cap_need_text:"Nhập nội dung insight.",
+  ins_list_title:"Insight đã ghi", ins_filter_tag:"Lọc theo tag", ins_filter_src:"Lọc theo nguồn",
+  filter_all_tags:"Tất cả tag", filter_all_src:"Tất cả nguồn",
+  ins_empty:"Chưa có insight nào. Dùng ô Capture bên trên.",
+  ins_none_match:"Không có insight khớp bộ lọc.",
+  src_unknown:"(chưa rõ nguồn)",
+  // step4
+  s4_lead:"Hiểu người học để thiết kế nội dung phù hợp với thực tế công việc của họ.",
+  f_role:"Vai trò công việc", f_size:"Quy mô (số người)", f_tenure:"Thâm niên TB (năm)", f_turnover:"Turnover (%/năm)",
+  f_shift:"Điều kiện ca kíp", f_devices:"Thiết bị học", f_freeTime:"Thời gian rảnh thực tế/ca (phút)",
+  f_priorTraining:"Đào tạo đã có", f_baseKnowledge:"Kiến thức nền",
+  ph_shift:"VD: 3 ca luân phiên, đứng máy liên tục", ph_priorTraining:"Các khóa/hướng dẫn đã trải qua",
+  ph_baseKnowledge:"Học vấn, khả năng đọc hiểu, ngoại ngữ…",
+  dev_phone:"Điện thoại cá nhân", dev_shared:"Máy trạm dùng chung", dev_tablet:"Tablet", dev_desktop:"Máy tính bàn riêng", dev_kiosk:"Kiosk / Màn hình xưởng",
+  // step5
+  s5_lead:"Khai thác SME & high performer để lấy tình huống thật — nguyên liệu cho practice activity.",
+  s5_smes:"SME / High performer", f_sme_name:"Tên", f_sme_role:"Vai trò / Chuyên môn",
+  ph_sme_role:"VD: Tổ trưởng QC 8 năm kinh nghiệm",
+  s5_scenarios:"Ngân hàng tình huống", s5_scn_hint:"Mỗi tình huống = 1 card",
+  f_scn_sme:"Nguồn (SME)", f_scn_context:"Bối cảnh", f_scn_decision:"Quyết định khó",
+  f_scn_mistake:"Sai lầm phổ biến", f_scn_consequence:"Hậu quả thật", f_scn_quote:"Thoại nguyên văn",
+  f_scn_distractor:"Distractor candidate",
+  ph_scn_context:"Tình huống xảy ra khi nào, ở đâu?", ph_scn_decision:"Người làm phải quyết định điều gì?",
+  ph_scn_mistake:"Người mới thường làm sai thế nào?", ph_scn_consequence:"Điều gì thực sự xảy ra sau đó?",
+  ph_scn_quote:"Câu nói nguyên văn của SME…",
+  scn_word:"Tình huống",
+  // step6
+  s6_lead:"Xác định ràng buộc thực tế trước khi thiết kế — để không đề xuất điều bất khả thi.",
+  f_maxTime:"Thời gian học tối đa / người / kỳ", f_timeApproved:"Đã được duyệt chính thức",
+  f_infra:"Hạ tầng phân phối (LMS…)", f_budget:"Ngân sách", f_authoring:"Công cụ authoring", f_maintainer:"Người maintain nội dung",
+  ph_maxTime:"VD: 45 phút", ph_infra:"VD: LMS Moodle, mạng nội bộ", ph_budget:"VD: 50 triệu",
+  ph_authoring:"VD: Articulate Storyline / Rise", ph_maintainer:"Ai cập nhật khi quy trình đổi?",
+  // step7
+  s7_lead:"Chốt cam kết: những vấn đề môi trường phải được bàn giao, và nguyên tắc cắt nội dung.",
+  s7_env_issues:"Bàn giao vấn đề môi trường", s7_env_hint:"Vấn đề không giải quyết bằng đào tạo",
+  f_ei_issue:"Vấn đề", f_ei_owner:"Owner", f_ei_timeline:"Timeline", f_ei_status:"Trạng thái cam kết",
+  cs_committed:"Đã cam kết", cs_progress:"Đang xử lý", cs_done:"Hoàn tất", cs_atrisk:"Rủi ro",
+  f_cutPrinciples:"Đã thống nhất nguyên tắc cắt nội dung (chỉ giữ nội dung phục vụ hành vi & mục tiêu)",
+  s7_measure:"Kế hoạch đo lường (L3–L4)",
+  f_mp_metric:"Chỉ số", f_mp_source:"Nguồn dữ liệu", f_mp_freq:"Tần suất", f_mp_collector:"Người thu thập",
+  s7_approver:"Duyệt & Review", f_mapApprover:"Người duyệt Map", f_reviewSchedule:"Lịch review",
+  ph_reviewSchedule:"VD: Review nháp Map ngày 20/07",
+  // AI extract
+  ai_title:"AI Extract", ai_lead:"Dán transcript phỏng vấn thô (hoặc complaint log) → tạo prompt hoàn chỉnh cho Claude → dán JSON kết quả vào Hub.",
+  ai_step1:"1 · Dán transcript", ai_transcript_ph:"Dán nội dung phỏng vấn / khiếu nại thô ở đây…",
+  ai_session:"Tên buổi / nguồn", ai_session_ph:"VD: PV Tổ trưởng kho 08/07",
+  ai_genbtn:"Tạo prompt trích xuất & sao chép",
+  ai_step2:"2 · Prompt cho Claude", ai_prompt_note:"Prompt (đã kèm schema + ví dụ + transcript) đã được sao chép. Dán vào Claude.",
+  ai_prompt_empty:"Bấm nút “Tạo prompt” để sinh prompt.",
+  ai_need_transcript:"Hãy dán transcript trước.",
+  ai_step3:"3 · Dán JSON kết quả", ai_result_ph:"Dán JSON Claude trả về ở đây…",
+  ai_import:"Nhập vào Hub", ai_import_note:"Sẽ thêm dữ liệu, đánh dấu nguồn = “AI extract + tên buổi”.",
+  ai_bad_json:"JSON không hợp lệ. Kiểm tra lại nội dung dán.",
+  ai_no_data:"Không tìm thấy pain point / scenario trong JSON.",
+  ai_preview_ins:"pain point", ai_preview_scn:"scenario", ai_imported:"Đã nhập {i} pain point và {s} scenario vào khu RCA.",
+  ai_review:"Sẽ thêm:",
+  // documents
+  docs_title:"Trình sinh tài liệu", docs_lead:"10 tài liệu tự lắp từ dữ liệu đã nhập. Xem và In/Save-PDF trên khổ A4. Đổi ngôn ngữ để đổi ngôn ngữ tài liệu.",
+  doc_prepared:"Người thực hiện", doc_generated:"Ngày lập", doc_project:"Dự án", doc_client:"Client",
+  doc_sign_sponsor:"Chữ ký Sponsor", doc_sign_id:"Chữ ký Instructional Designer", doc_date:"Ngày",
+  doc_empty_field:"………………………",
+  d1:"Project Charter / Business Goal", d1_s:"Tuyên bố mục tiêu kinh doanh — Bước 1",
+  d2:"Biên bản Kickoff", d2_s:"Người dự, quyết định — Bước 1",
+  d3:"Data Request List", d3_s:"Danh sách yêu cầu dữ liệu — Bước 2",
+  d4:"Current-State Data Summary", d4_s:"Hành vi hiện tại, sắp theo mức ảnh hưởng — Bước 2",
+  d5:"Root Cause Analysis Report", d5_s:"Insight gom theo 4 nhóm + 5 yếu tố môi trường — Bước 3",
+  d6:"Danh sách bàn giao ngoài đào tạo", d6_s:"Insight MÔI TRƯỜNG + cam kết — Bước 3 & 7",
+  d7:"Learner Profile", d7_s:"Chân dung người học — Bước 4",
+  d8:"Scenario Bank", d8_s:"Tình huống theo SME, distractor in đậm — Bước 5",
+  d9:"Constraints Sheet", d9_s:"Ràng buộc dự án — Bước 6",
+  d10:"Commitment Agreement + Measurement Plan", d10_s:"Cam kết + đo lường, có chữ ký — Bước 7",
+  // doc bodies
+  dh_goal_statement:"Tuyên bố mục tiêu", dh_sponsor:"Sponsor", dh_success_metric:"Câu trả lời thành công",
+  dh_goal_formula:"Công thức mục tiêu", dh_metric:"Chỉ số", dh_baseline:"Baseline", dh_target:"Target", dh_deadline:"Deadline",
+  dh_confirm_status:"Trạng thái xác nhận", dh_confirmed_on:"Xác nhận ngày", dh_confirm_form:"Hình thức",
+  dh_not_confirmed:"Chưa xác nhận bằng văn bản",
+  dh_kickoff:"Ghi chú Kickoff", dh_attendees:"Người tham dự", dh_decisions:"Quyết định",
+  dh_solution_warning:"CẢNH BÁO: Mục tiêu hiện được đánh dấu là “yêu cầu giải pháp”, chưa phải con số kinh doanh.",
+  dh_behaviors:"Phát hiện hành vi hiện tại", dh_behavior:"Hành vi", dh_frequency:"Tần suất", dh_impact:"Ảnh hưởng", dh_source:"Nguồn",
+  dh_provider:"Người cung cấp", dh_status:"Trạng thái", dh_item:"Mục dữ liệu",
+  dh_rca_intro:"Phân tích nguyên nhân gốc theo 4 nhóm insight và 5 yếu tố môi trường.",
+  dh_group:"Nhóm", dh_count:"Số insight", dh_insight:"Insight", dh_env_factor:"Yếu tố môi trường", dh_assessment:"Đánh giá", dh_note:"Ghi chú",
+  dh_env_total:"Tổng số insight môi trường (cần giải quyết ngoài đào tạo)",
+  dh_handoff_intro:"Các vấn đề dưới đây không giải quyết được bằng đào tạo và cần được bàn giao cho chủ sở hữu quy trình.",
+  dh_env_insights:"Insight thuộc nhóm Môi trường", dh_commitment_table:"Bảng cam kết bàn giao",
+  dh_issue:"Vấn đề", dh_owner:"Owner", dh_timeline:"Timeline",
+  dh_learner_role:"Vai trò", dh_learner_size:"Quy mô", dh_tenure:"Thâm niên TB", dh_turnover:"Turnover",
+  dh_shift:"Điều kiện ca kíp", dh_devices:"Thiết bị học", dh_freetime:"Thời gian rảnh/ca", dh_prior:"Đào tạo đã có", dh_baseknow:"Kiến thức nền",
+  dh_context:"Bối cảnh", dh_decision:"Quyết định khó", dh_mistake:"Sai lầm phổ biến", dh_consequence:"Hậu quả", dh_quote:"Thoại",
+  dh_no_sme:"Chưa gán SME", dh_measure_plan:"Kế hoạch đo lường L3–L4",
+  dh_max_time:"Thời gian học tối đa", dh_approved:"Đã duyệt chính thức", dh_infra:"Hạ tầng phân phối",
+  dh_budget:"Ngân sách", dh_authoring:"Công cụ authoring", dh_maintainer:"Người maintain",
+  dh_cut_agreed:"Nguyên tắc cắt nội dung đã thống nhất", dh_map_approver:"Người duyệt Map", dh_review:"Lịch review",
+  dh_min:"phút", dh_people:"người", dh_years:"năm",
+  // misc
+  confirm_del:"Xóa mục này?",
+  imported_ok:"Đã nhập & merge dữ liệu thành công.",
+  import_bad:"File không hợp lệ.",
+  export_hint:"Tải file .json để backup / chuyển máy / merge nhiều người.",
+  backup_title:"Sao lưu & Đồng bộ",
+  btn_export:"Xuất JSON", btn_import:"Nhập / Merge JSON",
+  // Step 0 — screening
+  s0:"Sàng lọc dự án", s0_short:"Screening",
+  s0_lead:"Trước khi thu thập bất cứ điều gì: dự án này có thực sự phù hợp với Action Mapping không? Trả lời 7 câu, verdict tính tự động.",
+  scr_questions:"7 câu hỏi sàng lọc", scr_note:"Ghi chú (tùy chọn)",
+  ans_yes:"Có", ans_no:"Không", ans_unclear:"Chưa rõ",
+  q1:"Dự án nhằm thay đổi điều mọi người LÀM trong công việc (không phải chỉ “biết” hay “nhận thức”)?",
+  q2:"Có business goal đo lường được — hoặc sponsor sẵn sàng cùng chốt một goal như vậy?",
+  q3:"Có xác định được nhóm người thực hiện cụ thể và hành vi của họ quan sát được trên công việc?",
+  q4:"Có tiếp cận được sponsor, SME và người làm việc thực tế để phỏng vấn?",
+  q5:"Stakeholder chấp nhận khả năng giải pháp cuối KHÔNG phải là khóa học (job aid, sửa quy trình, chính sách)?",
+  q6:"Có đủ thời gian làm discovery (không phải kiểu “cần khóa học tuần sau, nội dung có sẵn rồi”)?",
+  q7:"Đây KHÔNG phải nội dung chỉ-để-phổ-biến theo yêu cầu pháp lý/tuân thủ hình thức, hoặc giáo dục kiến thức thuần túy kiểu trường học?",
+  scr_verdict:"Kết quả sàng lọc",
+  verdict_unset:"Chưa đánh giá", verdict_unset_desc:"Trả lời đủ 7 câu hỏi để nhận verdict.",
+  verdict_go:"GO — Phù hợp", verdict_go_desc:"Action mapping phù hợp với dự án này. Bạn có thể bắt đầu discovery.",
+  verdict_cond:"GO CÓ ĐIỀU KIỆN", verdict_cond_desc:"Phù hợp, nhưng có điều kiện phải xử lý. Tick “Đã xử lý” cho từng mục — khi hết, verdict tự nâng lên GO.",
+  verdict_nogo:"NO-GO — Chưa phù hợp", verdict_nogo_desc:"Không có hành vi công việc để map. Cân nhắc hướng đi thay thế bên dưới.",
+  scr_conditions:"Điều kiện cần xử lý", scr_handled:"Đã xử lý", scr_alt:"Khuyến nghị hướng đi thay thế",
+  cond_q1:"Làm rõ với sponsor: dự án có nhằm thay đổi hành vi công việc không, trước khi tiếp tục.",
+  cond_q2:"Phải chốt một business goal đo lường được với sponsor — xem Bước 1.",
+  cond_q3:"Chưa xác định rõ nhóm người thực hiện & hành vi quan sát được — làm rõ ở Bước 2 & 4.",
+  cond_q4:"Phải đàm phán quyền tiếp cận sponsor/SME/người làm việc trước khi làm Bước 3 và 5.",
+  cond_q5:"Phải để sponsor/stakeholder chấp nhận giải pháp có thể không phải khóa học — thống nhất ở Bước 7.",
+  cond_q6:"Phải có đủ thời gian cho discovery — thương lượng lại timeline trước khi bắt đầu.",
+  cond_q7:"Xác nhận đây không phải nội dung tuân thủ hình thức / giáo dục thuần kiến thức — nếu có, cân nhắc hướng thay thế.",
+  alt1_t:"Nội dung phổ biến thông tin", alt1_d:"→ Communication campaign / tài liệu tham khảo / job aid, không cần khóa học.",
+  alt2_t:"Giáo dục kiến thức nền", alt2_d:"→ Thiết kế theo learning objectives truyền thống (không dùng action mapping).",
+  alt3_t:"Vấn đề thuần môi trường / hệ thống", alt3_d:"→ Bàn giao cho vận hành sửa quy trình / công cụ / chính sách, không cần training.",
+  banner_nogo:"Screening cho kết quả NO-GO — cân nhắc lại trước khi tiếp tục thu thập.",
+  d0:"Phiếu đánh giá phù hợp (Go/No-Go)", d0_s:"Kết quả screening Bước 0",
+  dh_scr_question:"Câu hỏi", dh_scr_answer:"Trả lời", dh_scr_note:"Ghi chú",
+  dh_scr_conditions:"Điều kiện cần xử lý", dh_scr_alt:"Khuyến nghị thay thế",
+  doc_sign_assessor:"Chữ ký người đánh giá",
+  // --- v2 refactor ---
+  nav_back:"Quay lại", nav_next:"Tiếp theo", nav_incomplete:"Còn thiếu {n} trường bắt buộc:", scr_q_short:"Câu",
+  s2_lead:"Thu thập dữ liệu vận hành thật và ghi nhận con số/quan sát.",
+  s3_lead:"Phỏng vấn nhân viên & quản lý. Ghi chú, transcript, ghi âm.",
+  s5_lead:"Phỏng vấn SME & high performer để lấy tình huống thật.",
+  s2_ops:"Ghi nhận dữ liệu vận hành", s2_ops_hint:"Nội dung + nguồn + tần suất/mức độ",
+  f_ops_content:"Nội dung", f_ops_source:"Nguồn", f_ops_level:"Tần suất / Mức độ",
+  ph_ops_content:"VD: 15 khiếu nại giao sai địa chỉ trong tháng 6", ph_ops_level:"VD: 15 vụ/tháng · nặng",
+  f_attach:"File đính kèm", btn_upload:"Tải file lên", btn_download:"Tải xuống",
+  file_toobig:"File vượt quá 5MB — không đính kèm được.", file_none:"Chưa có file",
+  file_idb_fail:"Không lưu được file (trình duyệt chặn IndexedDB).",
+  iv_session:"Buổi phỏng vấn", f_iv_notes:"Ghi chú", f_iv_transcript:"Transcript", iv_add:"Thêm buổi phỏng vấn",
+  rec_start:"Ghi âm", rec_pause:"Tạm dừng", rec_resume:"Tiếp tục", rec_stop:"Dừng",
+  rec_recording:"Đang ghi", rec_download:"Tải audio", rec_delete:"Xóa bản ghi", rec_saved:"Bản ghi đã lưu",
+  rec_perm_denied:"Bạn đã từ chối quyền micro — không ghi âm được. Vẫn có thể nhập transcript bằng tay.",
+  rec_no_support:"Trình duyệt không hỗ trợ ghi âm (MediaRecorder).",
+  stt_listening:"🔴 Đang nghe & chuyển thành chữ…",
+  stt_unavailable:"Transcript tự động không khả dụng (cần Chrome/Edge + internet) — ghi âm vẫn được lưu, bạn có thể nhập transcript bằng tay sau.",
+  export_with_files:"Xuất kèm file (base64)", export_data_only:"Xuất chỉ dữ liệu", export_files_warn:"Kèm file sẽ làm JSON lớn hơn nhiều.",
+  dh_level:"Tần suất / Mức độ", dh_content:"Nội dung",
+  d4_s:"Dữ liệu vận hành, theo nguồn — Bước 2",
+  // TNA package
+  tna_cta_eyebrow:"Đầu ra chính", tna_cta_title:"Gói dữ liệu TNA cho AI",
+  tna_cta_desc:"Xuất 1 file .md chứa toàn bộ dữ liệu đã thu thập + hướng dẫn để AI vẽ Action Map.",
+  tna_export_btn:"Xuất TNA Package", tna_exported:"Đã xuất TNA Package (.md).",
+  tna_empty:"(chưa thu thập)",
+  c_dataitems:"Mục dữ liệu", c_scenarios:"Scenario", c_files:"File / Audio",
+  // data management
+  dm_title:"Quản lý dữ liệu", dm_open:"Quản lý dữ liệu",
+  dm_new_h:"Bắt đầu dự án mới", dm_new_desc:"Xóa toàn bộ dữ liệu để bắt đầu một dự án TNA mới.", dm_new_btn:"Bắt đầu dự án mới",
+  dm_warn:"Toàn bộ dữ liệu đã nhập, file đính kèm và ghi âm sẽ bị xóa vĩnh viễn. Không thể hoàn tác.",
+  dm_backup_btn:"Tải bản backup JSON trước khi xóa",
+  dm_reset_settings:"Xóa cả API key & cài đặt (bỏ chọn để giữ nguyên ngôn ngữ)",
+  dm_continue:"Tiếp tục", dm_back:"Quay lại",
+  dm_type_confirm:"Gõ {w} vào ô dưới để xác nhận xóa:", dm_confirm_word:"XOA",
+  dm_confirm_new:"Xóa vĩnh viễn & bắt đầu mới", dm_new_done:"Đã xóa dữ liệu — dự án mới sẵn sàng.",
+  dm_partial_h:"Xóa từng phần", dm_partial_desc:"Chọn phần muốn xóa; các phần còn lại giữ nguyên.",
+  dm_part_files:"File đính kèm", dm_part_audio:"Ghi âm",
+  dm_delete_selected:"Xóa các phần đã chọn", dm_none_selected:"Chưa chọn phần nào.",
+  dm_pconfirm_h:"Xác nhận xóa các phần sau:", dm_confirm_delete:"Xác nhận xóa", dm_deleted:"Đã xóa các phần đã chọn."
+},
+en:{
+  appTagline:"Training Needs Analysis data-collection tool",
+  save_saved:"Saved", save_saving:"Saving…",
+  readiness_go:"Ready to draw the Map", readiness_lock:"Not ready yet",
+  group_flow:"Workflow", group_tools:"Tools",
+  nav_dashboard:"Dashboard", nav_ai:"AI Extract", nav_docs:"Documents", nav_steps:"7 Steps", nav_rca:"RCA Analysis",
+  bt_home:"Home", bt_steps:"Steps", bt_ai:"AI", bt_docs:"Docs",
+  s1:"Business Goal", s2:"Operational Data", s3:"Front-line Interviews", s4:"Learner Profile",
+  s5:"SME & High-performer Interviews", s6:"Constraints", s7:"Commitment",
+  s1_short:"Business Goal", s2_short:"Ops Data", s3_short:"Interviews",
+  s4_short:"Learner", s5_short:"SME & Scenarios", s6_short:"Constraints", s7_short:"Commitment",
+  btn_add:"Add", btn_remove:"Remove", btn_view:"View", btn_print:"Print / Save PDF", btn_close:"Close",
+  btn_copy:"Copy", btn_copied:"Copied!", none_yet:"Nothing yet — click “Add”.",
+  of:"of", required_short:"required", step_word:"Step",
+  yes:"Yes", no:"No", ok:"OK", issue:"Problem", pick:"— Select —",
+  dash_title:"Discovery Dashboard",
+  dash_lead:"Enter once, data flows into every output document. Complete Steps 1–3 to set up the Action Map.",
+  project_info:"Project info",
+  f_projectName:"Project name", f_client:"Client", f_collector:"Collected by", f_startDate:"Start date",
+  ph_projectName:"e.g. Warehouse Staff Onboarding", ph_client:"e.g. ABC Corp", ph_collector:"Your name",
+  progress_title:"7-step progress", progress_hint:"% of required fields filled",
+  counters_title:"Quick counts",
+  c_insights:"Pain points", c_quotes:"Quotes / Scenarios", c_distractors:"Distractor candidates", c_interviews:"Interviews",
+  gate_title:"Map readiness",
+  gate_go_h:"Ready to draw the Action Map", gate_lock_h:"Not ready yet",
+  gate_go_desc:"Step 0 = GO and Steps 1, 2 and 3 have 100% of required fields. You can start drawing the Action Map with the sponsor.",
+  gate_lock_desc:"The lamp turns green only when Step 0 returns GO AND Step 1 (Goal), Step 2 (Behavior data) and Step 3 (Root cause) reach 100% of required fields.",
+  warn_step5:"Reminder: Finish Step 5 (Scenario Bank) before writing any scenario — real dialogue and situations must come from SMEs.",
+  legend_full:"100% done", legend_part:"In progress", req_badge:"REQ",
+  s1_lead:"Define a measurable business goal with the sponsor. No number → no Map.",
+  s1_sponsor:"Sponsor",
+  f_sponsorName:"Sponsor name", f_sponsorTitle:"Job title",
+  s1_success:"The key question",
+  f_successAnswer:"“If this project succeeds, which number changes?” — record the sponsor's answer verbatim",
+  ph_successAnswer:"Sponsor's exact words…",
+  s1_goal:"Goal formula", s1_goal_hint:"Metric + Baseline → Target + Deadline",
+  f_metric:"Metric", f_baseline:"Baseline (current)", f_target:"Target", f_deadline:"Deadline",
+  ph_metric:"Enter the metric name…", ph_baseline:"Enter current value…", ph_target:"Enter target value…",
+  s1_confirm:"Written confirmation",
+  f_confirmed:"Sponsor confirmed the goal in writing",
+  f_confirmDate:"Confirmed on", f_confirmForm:"Form",
+  ph_confirmForm:"e.g. Email / signed minutes",
+  s1_kickoff:"Kickoff notes",
+  f_kickoffAttendees:"Attendees", f_kickoffDecisions:"Key decisions",
+  ph_kickoffAttendees:"List attendees & roles", ph_kickoffDecisions:"Decisions locked in the kickoff",
+  f_isSolutionRequest:"Self-check: this goal is really just a “solution request” (e.g. “build an e-learning course”), not a business number",
+  s1_warn_solution:"Warning: This is a solution request, not a business goal. Go back to the sponsor: which business number will change? Without one, the project shouldn't start.",
+  s2_lead:"Gather evidence of current behavior. Use real data, not guesses.",
+  s2_drl:"Data Request List", s2_drl_hint:"Data to request",
+  f_dr_item:"Data item", f_dr_provider:"Provider", f_dr_deadline:"Deadline", f_dr_status:"Received status",
+  dr_pending:"Not received", dr_partial:"Partial", dr_received:"Received",
+  s2_beh:"Behavior findings", s2_beh_hint:"Observed wrong/missing behavior",
+  f_beh_desc:"Wrong/missing behavior", f_beh_freq:"Frequency", f_beh_impact:"Impact (1–5)", f_beh_source:"Data source",
+  ph_beh_desc:"e.g. Skips label check before applying", ph_beh_freq:"e.g. 15 cases/week",
+  s3_lead:"Diagnose why the behavior happens. Most performance problems are NOT a knowledge gap.",
+  s3_interviews:"Interviews",
+  f_iv_person:"Interviewee", f_iv_role:"Role", f_iv_date:"Date",
+  role_employee:"Employee", role_supervisor:"Supervisor", role_teamlead:"Team Leader", role_deptmanager:"Department Manager", role_board:"Executive Board", role_other:"Others",
+  s3_env:"5 environment factors", s3_env_hint:"Assess each factor",
+  env_tools:"Tools / Equipment", env_process:"Process – SOP", env_people:"Staffing",
+  env_policy:"Policy – Authority", env_reward:"Incentives – Motivation",
+  f_env_status:"Assessment", f_env_note:"Note",
+  ph_env_note:"Does this factor block the right behavior?",
+  cap_title:"Insight Capture", cap_hint_speed:"Type a sentence → pick a tag → Enter. As fast as possible.",
+  cap_ph:"Quickly type an insight then Enter…",
+  tag_environment:"ENVIRONMENT", tag_knowledge:"KNOWLEDGE", tag_skill:"SKILL", tag_confidence:"CONFIDENCE – MOTIVATION",
+  cap_source:"Source", cap_source_ph:"From which interview / data?",
+  cap_distractor:"Distractor", cap_bank:"Scenario Bank",
+  cap_add:"Capture (Enter)", cap_need_tag:"Pick a tag before saving.",
+  cap_need_text:"Enter the insight text.",
+  ins_list_title:"Captured insights", ins_filter_tag:"Filter by tag", ins_filter_src:"Filter by source",
+  filter_all_tags:"All tags", filter_all_src:"All sources",
+  ins_empty:"No insights yet. Use the capture box above.",
+  ins_none_match:"No insights match the filter.",
+  src_unknown:"(source unknown)",
+  s4_lead:"Understand the learner to design content that fits their real work.",
+  f_role:"Job role", f_size:"Size (headcount)", f_tenure:"Avg tenure (years)", f_turnover:"Turnover (%/yr)",
+  f_shift:"Shift conditions", f_devices:"Learning devices", f_freeTime:"Real free time/shift (min)",
+  f_priorTraining:"Prior training", f_baseKnowledge:"Baseline knowledge",
+  ph_shift:"e.g. 3 rotating shifts, standing at the line", ph_priorTraining:"Courses/guides already taken",
+  ph_baseKnowledge:"Education, literacy, language…",
+  dev_phone:"Personal phone", dev_shared:"Shared workstation", dev_tablet:"Tablet", dev_desktop:"Own desktop", dev_kiosk:"Kiosk / Floor screen",
+  s5_lead:"Mine SMEs & high performers for real situations — the raw material for practice activities.",
+  s5_smes:"SME / High performer", f_sme_name:"Name", f_sme_role:"Role / Expertise",
+  ph_sme_role:"e.g. QC lead, 8 years experience",
+  s5_scenarios:"Scenario Bank", s5_scn_hint:"Each situation = one card",
+  f_scn_sme:"Source (SME)", f_scn_context:"Context", f_scn_decision:"Hard decision",
+  f_scn_mistake:"Common mistake", f_scn_consequence:"Real consequence", f_scn_quote:"Verbatim quote",
+  f_scn_distractor:"Distractor candidate",
+  ph_scn_context:"When & where does it happen?", ph_scn_decision:"What must the person decide?",
+  ph_scn_mistake:"How do newcomers get it wrong?", ph_scn_consequence:"What actually happens next?",
+  ph_scn_quote:"The SME's exact words…",
+  scn_word:"Scenario",
+  s6_lead:"Pin down real constraints before design — so you never propose the impossible.",
+  f_maxTime:"Max learning time / person / period", f_timeApproved:"Officially approved",
+  f_infra:"Delivery infrastructure (LMS…)", f_budget:"Budget", f_authoring:"Authoring tool", f_maintainer:"Content maintainer",
+  ph_maxTime:"e.g. 45 minutes", ph_infra:"e.g. Moodle LMS, intranet", ph_budget:"e.g. $2,000",
+  ph_authoring:"e.g. Articulate Storyline / Rise", ph_maintainer:"Who updates it when the process changes?",
+  s7_lead:"Lock commitments: which environment problems get handed off, and the content-cutting principle.",
+  s7_env_issues:"Environment problem handoff", s7_env_hint:"Not solvable by training",
+  f_ei_issue:"Problem", f_ei_owner:"Owner", f_ei_timeline:"Timeline", f_ei_status:"Commitment status",
+  cs_committed:"Committed", cs_progress:"In progress", cs_done:"Done", cs_atrisk:"At risk",
+  f_cutPrinciples:"Agreed the content-cutting principle (keep only content that serves behavior & goal)",
+  s7_measure:"Measurement plan (L3–L4)",
+  f_mp_metric:"Metric", f_mp_source:"Data source", f_mp_freq:"Frequency", f_mp_collector:"Collected by",
+  s7_approver:"Approval & Review", f_mapApprover:"Map approver", f_reviewSchedule:"Review schedule",
+  ph_reviewSchedule:"e.g. Review Map draft on Jul 20",
+  ai_title:"AI Extract", ai_lead:"Paste a raw interview transcript (or complaint log) → generate a complete prompt for Claude → paste the JSON result back into the Hub.",
+  ai_step1:"1 · Paste transcript", ai_transcript_ph:"Paste the raw interview / complaint text here…",
+  ai_session:"Session / source name", ai_session_ph:"e.g. Warehouse lead interview Jul 8",
+  ai_genbtn:"Generate extraction prompt & copy",
+  ai_step2:"2 · Prompt for Claude", ai_prompt_note:"The prompt (with schema + example + transcript) was copied. Paste it into Claude.",
+  ai_prompt_empty:"Click “Generate prompt” to build the prompt.",
+  ai_need_transcript:"Paste a transcript first.",
+  ai_step3:"3 · Paste result JSON", ai_result_ph:"Paste the JSON Claude returns here…",
+  ai_import:"Import into Hub", ai_import_note:"Adds data, tagged source = “AI extract + session name”.",
+  ai_bad_json:"Invalid JSON. Check what you pasted.",
+  ai_no_data:"No pain points / scenarios found in the JSON.",
+  ai_preview_ins:"pain point", ai_preview_scn:"scenario", ai_imported:"Imported {i} pain point(s) and {s} scenario(s) into RCA.",
+  ai_review:"Will add:",
+  docs_title:"Document generator", docs_lead:"10 documents auto-assembled from your data. View and Print/Save-PDF on A4. Switch language to switch the document language.",
+  doc_prepared:"Prepared by", doc_generated:"Generated", doc_project:"Project", doc_client:"Client",
+  doc_sign_sponsor:"Sponsor signature", doc_sign_id:"Instructional Designer signature", doc_date:"Date",
+  doc_empty_field:"………………………",
+  d1:"Project Charter / Business Goal", d1_s:"Business goal statement — Step 1",
+  d2:"Kickoff Minutes", d2_s:"Attendees, decisions — Step 1",
+  d3:"Data Request List", d3_s:"Data request list — Step 2",
+  d4:"Current-State Data Summary", d4_s:"Current behavior, sorted by impact — Step 2",
+  d5:"Root Cause Analysis Report", d5_s:"Insights grouped by 4 tags + 5 env factors — Step 3",
+  d6:"Non-Training Handoff List", d6_s:"Environment insights + commitments — Step 3 & 7",
+  d7:"Learner Profile", d7_s:"Learner profile — Step 4",
+  d8:"Scenario Bank", d8_s:"Scenarios by SME, distractors in bold — Step 5",
+  d9:"Constraints Sheet", d9_s:"Project constraints — Step 6",
+  d10:"Commitment Agreement + Measurement Plan", d10_s:"Commitment + measurement, with signatures — Step 7",
+  dh_goal_statement:"Goal statement", dh_sponsor:"Sponsor", dh_success_metric:"Success answer",
+  dh_goal_formula:"Goal formula", dh_metric:"Metric", dh_baseline:"Baseline", dh_target:"Target", dh_deadline:"Deadline",
+  dh_confirm_status:"Confirmation status", dh_confirmed_on:"Confirmed on", dh_confirm_form:"Form",
+  dh_not_confirmed:"Not confirmed in writing",
+  dh_kickoff:"Kickoff notes", dh_attendees:"Attendees", dh_decisions:"Decisions",
+  dh_solution_warning:"WARNING: The goal is currently flagged as a “solution request”, not a business number.",
+  dh_behaviors:"Current behavior findings", dh_behavior:"Behavior", dh_frequency:"Frequency", dh_impact:"Impact", dh_source:"Source",
+  dh_provider:"Provider", dh_status:"Status", dh_item:"Data item",
+  dh_rca_intro:"Root cause analysis across 4 insight groups and 5 environment factors.",
+  dh_group:"Group", dh_count:"Insights", dh_insight:"Insight", dh_env_factor:"Environment factor", dh_assessment:"Assessment", dh_note:"Note",
+  dh_env_total:"Total environment insights (to resolve outside training)",
+  dh_handoff_intro:"The problems below cannot be solved by training and must be handed off to the process owner.",
+  dh_env_insights:"Environment-group insights", dh_commitment_table:"Handoff commitment table",
+  dh_issue:"Problem", dh_owner:"Owner", dh_timeline:"Timeline",
+  dh_learner_role:"Role", dh_learner_size:"Size", dh_tenure:"Avg tenure", dh_turnover:"Turnover",
+  dh_shift:"Shift conditions", dh_devices:"Learning devices", dh_freetime:"Free time/shift", dh_prior:"Prior training", dh_baseknow:"Baseline knowledge",
+  dh_context:"Context", dh_decision:"Hard decision", dh_mistake:"Common mistake", dh_consequence:"Consequence", dh_quote:"Quote",
+  dh_no_sme:"No SME assigned", dh_measure_plan:"L3–L4 measurement plan",
+  dh_max_time:"Max learning time", dh_approved:"Officially approved", dh_infra:"Delivery infrastructure",
+  dh_budget:"Budget", dh_authoring:"Authoring tool", dh_maintainer:"Maintainer",
+  dh_cut_agreed:"Content-cutting principle agreed", dh_map_approver:"Map approver", dh_review:"Review schedule",
+  dh_min:"min", dh_people:"people", dh_years:"yrs",
+  confirm_del:"Delete this item?",
+  imported_ok:"Data imported & merged successfully.",
+  import_bad:"Invalid file.",
+  export_hint:"Download a .json to back up / move machines / merge collectors.",
+  backup_title:"Backup & Sync",
+  btn_export:"Export JSON", btn_import:"Import / Merge JSON",
+  // Step 0 — screening
+  s0:"Project screening", s0_short:"Screening",
+  s0_lead:"Before capturing anything: is this project actually a fit for Action Mapping? Answer 7 questions, the verdict is computed live.",
+  scr_questions:"7 screening questions", scr_note:"Note (optional)",
+  ans_yes:"Yes", ans_no:"No", ans_unclear:"Unclear",
+  q1:"Is the project about changing what people DO on the job (not just what they “know” or are “aware of”)?",
+  q2:"Is there a measurable business goal — or is the sponsor willing to agree one with you?",
+  q3:"Can you name the specific group who does the work, with behavior that is observable on the job?",
+  q4:"Can you reach the sponsor, SMEs and actual workers to interview them?",
+  q5:"Do stakeholders accept that the final solution might NOT be a course (job aid, process fix, policy)?",
+  q6:"Is there enough time to do discovery (not “we need a course next week, content's already written”)?",
+  q7:"Is this NOT purely awareness/compliance content required for its own sake, or pure school-style knowledge education?",
+  scr_verdict:"Screening result",
+  verdict_unset:"Not assessed", verdict_unset_desc:"Answer all 7 questions to get a verdict.",
+  verdict_go:"GO — Good fit", verdict_go_desc:"Action mapping fits this project. You can start discovery.",
+  verdict_cond:"CONDITIONAL GO", verdict_cond_desc:"A fit, but with conditions to resolve. Tick “Handled” on each — once all are handled, the verdict upgrades to GO.",
+  verdict_nogo:"NO-GO — Not a fit", verdict_nogo_desc:"There is no on-the-job behavior to map. Consider an alternative path below.",
+  scr_conditions:"Conditions to resolve", scr_handled:"Handled", scr_alt:"Recommended alternative paths",
+  cond_q1:"Clarify with the sponsor whether the project aims to change on-the-job behavior before continuing.",
+  cond_q2:"You must agree a measurable business goal with the sponsor — see Step 1.",
+  cond_q3:"The target group & observable behavior aren't clear yet — clarify in Steps 2 & 4.",
+  cond_q4:"Negotiate access to sponsor/SMEs/workers before doing Steps 3 and 5.",
+  cond_q5:"Get the sponsor/stakeholders to accept a non-course solution — agree it in Step 7.",
+  cond_q6:"You need enough time for discovery — renegotiate the timeline before starting.",
+  cond_q7:"Confirm this isn't tick-box compliance / pure knowledge education — if it is, consider an alternative path.",
+  alt1_t:"Awareness / information content", alt1_d:"→ Communication campaign / reference material / job aid, no course needed.",
+  alt2_t:"Foundational knowledge education", alt2_d:"→ Design around traditional learning objectives (not action mapping).",
+  alt3_t:"Pure environment / system problem", alt3_d:"→ Hand off to operations to fix process / tools / policy, no training needed.",
+  banner_nogo:"Screening returned NO-GO — reconsider before continuing to collect data.",
+  d0:"Fit Assessment (Go/No-Go)", d0_s:"Step 0 screening result",
+  dh_scr_question:"Question", dh_scr_answer:"Answer", dh_scr_note:"Note",
+  dh_scr_conditions:"Conditions to resolve", dh_scr_alt:"Recommended alternatives",
+  doc_sign_assessor:"Assessor signature",
+  // --- v2 refactor ---
+  nav_back:"Back", nav_next:"Next", nav_incomplete:"{n} required field(s) left:", scr_q_short:"Q",
+  s2_lead:"Collect real operational data and record the numbers/observations.",
+  s3_lead:"Interview front-line staff & managers. Notes, transcript, recording.",
+  s5_lead:"Interview SMEs & high performers for real situations.",
+  s2_ops:"Operational data log", s2_ops_hint:"Content + source + frequency/severity",
+  f_ops_content:"Content", f_ops_source:"Source", f_ops_level:"Frequency / Severity",
+  ph_ops_content:"e.g. 15 wrong-address delivery complaints in June", ph_ops_level:"e.g. 15/month · severe",
+  f_attach:"Attachment", btn_upload:"Upload file", btn_download:"Download",
+  file_toobig:"File exceeds 5MB — cannot attach.", file_none:"No file",
+  file_idb_fail:"Couldn't save file (browser blocked IndexedDB).",
+  iv_session:"Interview session", f_iv_notes:"Notes", f_iv_transcript:"Transcript", iv_add:"Add interview session",
+  rec_start:"Record", rec_pause:"Pause", rec_resume:"Resume", rec_stop:"Stop",
+  rec_recording:"Recording", rec_download:"Download audio", rec_delete:"Delete recording", rec_saved:"Recording saved",
+  rec_perm_denied:"You denied microphone access — can't record. You can still type the transcript by hand.",
+  rec_no_support:"This browser doesn't support recording (MediaRecorder).",
+  stt_listening:"🔴 Listening & transcribing…",
+  stt_unavailable:"Automatic transcript unavailable (needs Chrome/Edge + internet) — the recording is still saved; you can type the transcript by hand later.",
+  export_with_files:"Export with files (base64)", export_data_only:"Export data only", export_files_warn:"Including files makes the JSON much larger.",
+  dh_level:"Frequency / Severity", dh_content:"Content",
+  d4_s:"Operational data, by source — Step 2",
+  // TNA package
+  tna_cta_eyebrow:"Primary output", tna_cta_title:"TNA data package for AI",
+  tna_cta_desc:"Export one .md file with all collected data + instructions for an AI to draw the Action Map.",
+  tna_export_btn:"Export TNA Package", tna_exported:"TNA Package (.md) exported.",
+  tna_empty:"(not collected)",
+  c_dataitems:"Data items", c_scenarios:"Scenarios", c_files:"Files / Audio",
+  // data management
+  dm_title:"Data management", dm_open:"Data management",
+  dm_new_h:"Start new project", dm_new_desc:"Erase all data to start a fresh TNA project.", dm_new_btn:"Start new project",
+  dm_warn:"All entered data, attachments and recordings will be permanently deleted. This cannot be undone.",
+  dm_backup_btn:"Download JSON backup before deleting",
+  dm_reset_settings:"Also delete API key & settings (uncheck to keep your language)",
+  dm_continue:"Continue", dm_back:"Back",
+  dm_type_confirm:"Type {w} below to confirm deletion:", dm_confirm_word:"DELETE",
+  dm_confirm_new:"Permanently delete & start new", dm_new_done:"Data erased — new project ready.",
+  dm_partial_h:"Delete selected parts", dm_partial_desc:"Pick what to delete; the rest stays intact.",
+  dm_part_files:"Attachments", dm_part_audio:"Recordings",
+  dm_delete_selected:"Delete selected parts", dm_none_selected:"Nothing selected.",
+  dm_pconfirm_h:"Confirm deletion of:", dm_confirm_delete:"Confirm delete", dm_deleted:"Selected parts deleted."
+}
+};
+let LANG = "vi";
+function t(k){ const d=I18N[LANG]; return (d&&d[k]!=null)?d[k]:(I18N.vi[k]!=null?I18N.vi[k]:k); }
+function tf(k,map){ let s=t(k); for(const x in map) s=s.replace("{"+x+"}",map[x]); return s; }
+
+/* ------------------------------------------------------------------ *
+ *  Constants
+ * ------------------------------------------------------------------ */
+const TAGS = ["environment","knowledge","skill","confidence"];
+const DEVICES = ["dev_phone","dev_shared","dev_tablet","dev_desktop","dev_kiosk"];
+const IV_ROLES = ["role_employee","role_supervisor","role_teamlead","role_deptmanager","role_board","role_other"];
+const DR_STATUS = ["dr_pending","dr_partial","dr_received"];
+const CS_STATUS = ["cs_committed","cs_progress","cs_done","cs_atrisk"];
+const ENV_FACTORS = ["tools","process","people","policy","reward"];
+const ENV_LABEL = {tools:"env_tools",process:"env_process",people:"env_people",policy:"env_policy",reward:"env_reward"};
+const ENV_STATUS = ["ok","issue"];
+
+// nav / step order (TNA data collection: Step 0–5 only)
+const STEPS = [0,1,2,3,4,5];
+const NAV = [
+  {id:"dashboard", grp:"flow", key:"nav_dashboard", icon:"grid"},
+  {id:"step0", grp:"flow", step:0, key:"s0", icon:"filter"},
+  {id:"step1", grp:"flow", step:1, key:"s1", icon:"target"},
+  {id:"step2", grp:"flow", step:2, key:"s2", icon:"activity"},
+  {id:"step3", grp:"flow", step:3, key:"s3", icon:"search"},
+  {id:"step4", grp:"flow", step:4, key:"s4", icon:"user"},
+  {id:"step5", grp:"flow", step:5, key:"s5", icon:"book"},
+  {id:"docs", grp:"tools", key:"nav_docs", icon:"docs"}
+];
+const ICONS = {
+  grid:'<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>',
+  target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/>',
+  activity:'<path d="M3 12h4l3 8 4-16 3 8h4"/>',
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>',
+  book:'<path d="M5 4h11a2 2 0 012 2v14H7a2 2 0 01-2-2z"/><path d="M5 4v14"/>',
+  lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',
+  check:'<path d="M4 12l5 5L20 6"/>',
+  spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
+  docs:'<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 12h5M10 16h5"/>',
+  filter:'<path d="M3 5h18l-7 8v6l-4-2v-4z"/>',
+  rca:'<circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="12" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/><path d="M12 7.4v4M12 11.4H5v4M12 11.4h7v4M12 11.4v4"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/>'
+};
+const DOCS = ["d0","d1","d2","d3","d4","d7","d8"];
+
+// list default-row factories, keyed by state path
+const ROW_FACTORY = {
+  "step2.dataRequests":()=>normDR({}),
+  "step2.opsData":()=>normOps({}),
+  "step3.interviews":()=>normIv({}),
+  "step5.interviews":()=>normIv({}),
+  "step5.scenarios":()=>normScn({})
+};
+
+/* required-field schema per step (drives % + readiness). Each returns filled/total */
+const REQUIRED = {
+  0:(s)=>{const a=s.screening.answers; let done=["q1","q2","q3","q4","q5","q6","q7"].filter(q=>a[q]).length; return {done,total:7};},
+  1:(s)=>{const f=[s.step1.sponsorName,s.step1.sponsorTitle,s.step1.successAnswer,s.step1.metric,s.step1.baseline,s.step1.target,s.step1.deadline];
+          let done=f.filter(v=>String(v||"").trim()).length + (s.step1.confirmed?1:0); return {done,total:8};},
+  2:(s)=>{let done=(s.step2.dataRequests.some(r=>r.item.trim())?1:0)+(s.step2.opsData.some(r=>r.content.trim())?1:0); return {done,total:2};},
+  3:(s)=>{let done=(s.step3.interviews.some(r=>r.person.trim())?1:0); return {done,total:1};},
+  4:(s)=>{const f=[s.step4.role,s.step4.size,s.step4.tenure,s.step4.turnover,s.step4.shift,s.step4.freeTime,s.step4.priorTraining,s.step4.baseKnowledge];
+          let done=f.filter(v=>String(v||"").trim()).length + (s.step4.devices.length?1:0); return {done,total:9};},
+  5:(s)=>{let done=(s.step5.interviews.some(r=>r.person.trim())?1:0)+(s.step5.scenarios.some(r=>r.context.trim())?1:0); return {done,total:2};}
+};
+function stepPct(n){const r=REQUIRED[n](state);return r.total?Math.round(r.done/r.total*100):0;}
+
+/* ------------------------------------------------------------------ *
+ *  State — the single source of truth (persisted to localStorage)
+ * ------------------------------------------------------------------ */
+const APP_PREFIX = "dhub_";
+const LS_KEY = APP_PREFIX + "state";
+const LS_KEY_OLD = "discoveryHub.v1";   // pre-prefix key — migrated on load
+function clearAppLocalStorage(){
+  try{
+    const del=[];
+    for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k&&k.indexOf(APP_PREFIX)===0) del.push(k); }
+    del.forEach(k=>localStorage.removeItem(k));
+    localStorage.removeItem(LS_KEY_OLD);
+  }catch(e){}
+}
+function defaults(){
+  return {
+    meta:{projectName:"",client:"",collector:"",startDate:"",lang:"vi"},
+    screening:{answers:{q1:"",q2:"",q3:"",q4:"",q5:"",q6:"",q7:""},
+               notes:{q1:"",q2:"",q3:"",q4:"",q5:"",q6:"",q7:""},
+               handled:{q1:false,q2:false,q3:false,q4:false,q5:false,q6:false,q7:false}},
+    step1:{sponsorName:"",sponsorTitle:"",successAnswer:"",metric:"",baseline:"",target:"",deadline:"",
+           confirmed:false,confirmDate:"",confirmForm:"",kickoffAttendees:"",kickoffDecisions:"",isSolutionRequest:false},
+    step2:{dataRequests:[],opsData:[]},
+    step3:{interviews:[]},
+    step4:{role:"",size:"",tenure:"",turnover:"",shift:"",devices:[],freeTime:"",priorTraining:"",baseKnowledge:""},
+    step5:{interviews:[],scenarios:[]}
+  };
+}
+let state = defaults();
+// transient UI state (not persisted)
+const ui = {view:"dashboard"};
+let _seq = Date.now();
+function uid(){ return "i"+(_seq++).toString(36); }
+
+/* deep merge loaded data onto a fresh defaults() skeleton (schema-safe) */
+function hydrate(saved){
+  const base = defaults();
+  if(!saved || typeof saved!=="object") return base;
+  const merge=(dst,src)=>{
+    for(const k in dst){
+      if(!(k in src)) continue;
+      const dv=dst[k], sv=src[k];
+      if(Array.isArray(dv)){ if(Array.isArray(sv)) dst[k]=sv; }
+      else if(dv && typeof dv==="object"){ if(sv && typeof sv==="object") merge(dv,sv); }
+      else if(sv!=null){ dst[k]=sv; }
+    }
+  };
+  merge(base,saved);
+  migrateLoaded(saved, base);
+  return base;
+}
+/* Pain point — classification (tag) happens in RCA, not at capture.
+   Migrates old "insights" (which had a tag) into classified pain points. */
+function normPain(o){
+  let src=o.source;
+  if(typeof src==="string") src={view:"", label:src};
+  else if(!src||typeof src!=="object") src={view:"",label:""};
+  return {id:o.id||uid(), text:String(o.text||""), quote:String(o.quote||""),
+    source:{view:src.view||"", label:String(src.label||"")},
+    tag:TAGS.includes(o.tag)?o.tag:"", isDistractor:!!o.isDistractor, inBank:!!o.inBank,
+    tagSuggested:TAGS.includes(o.tagSuggested)?o.tagSuggested:"", origin:o.origin||"manual", ts:o.ts||Date.now()};
+}
+function normDR(o){o=o||{};return {id:o.id||uid(),item:String(o.item||""),provider:String(o.provider||""),deadline:String(o.deadline||""),status:DR_STATUS.includes(o.status)?o.status:"dr_pending",file:o.file||null};}
+function normOps(o){o=o||{};return {id:o.id||uid(),content:String(o.content||""),source:String(o.source||""),level:String(o.level||"")};}
+function normIv(o){o=o||{};return {id:o.id||uid(),person:String(o.person||""),role:IV_ROLES.includes(o.role)?o.role:"role_employee",date:String(o.date||""),notes:String(o.notes||""),transcript:String(o.transcript||""),audio:o.audio||null};}
+function normScn(o){o=o||{};return {id:o.id||uid(),sme:String(o.sme||""),context:String(o.context||""),decision:String(o.decision||""),mistake:String(o.mistake||""),consequence:String(o.consequence||""),quote:String(o.quote||""),isDistractor:!!o.isDistractor};}
+function migrateLoaded(saved,base){
+  // NOTE: old painPoints / rca / step6 / step7 fields are intentionally ignored (TNA-only app now).
+  // step2 ops data from new opsData, else old behaviors
+  if(saved.step2&&Array.isArray(saved.step2.opsData)) base.step2.opsData=saved.step2.opsData.map(normOps);
+  else if(saved.step2&&Array.isArray(saved.step2.behaviors)) base.step2.opsData=saved.step2.behaviors.map(b=>normOps({content:b.desc,source:b.source,level:(b.impact?"★"+b.impact:"")+(b.freq?" · "+b.freq:"")}));
+  if(saved.step2&&Array.isArray(saved.step2.dataRequests)) base.step2.dataRequests=saved.step2.dataRequests.map(normDR);
+  if(saved.step3&&Array.isArray(saved.step3.interviews)) base.step3.interviews=saved.step3.interviews.map(normIv);
+  // step5 interviews from new, else old smes
+  if(saved.step5&&Array.isArray(saved.step5.interviews)) base.step5.interviews=saved.step5.interviews.map(normIv);
+  else if(saved.step5&&Array.isArray(saved.step5.smes)) base.step5.interviews=saved.step5.smes.map(m=>normIv({person:m.name,role:m.role}));
+  if(saved.step5&&Array.isArray(saved.step5.scenarios)) base.step5.scenarios=saved.step5.scenarios.map(normScn);
+}
+
+/* path get/set (supports numeric array indices: "step2.behaviors.0.desc") */
+function getPath(root,path){ return path.split(".").reduce((o,k)=>o==null?o:o[k], root); }
+function setPath(root,path,val){
+  const p=path.split("."); let o=root;
+  for(let i=0;i<p.length-1;i++) o=o[p[i]];
+  o[p[p.length-1]]=val;
+}
+
+/* autosave (debounced) */
+let saveTimer=null;
+function scheduleSave(){
+  setSaveFlag(true);
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{ persist(); setSaveFlag(false); }, 500);
+}
+function persist(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
+function setSaveFlag(saving){
+  const el=document.getElementById("saveFlag"); if(!el) return;
+  el.classList.toggle("saving",saving);
+  el.querySelector("span:last-child").textContent = saving? t("save_saving"):t("save_saved");
+}
+function load(){
+  try{
+    let raw=localStorage.getItem(LS_KEY);
+    if(!raw){ const old=localStorage.getItem(LS_KEY_OLD); if(old) raw=old; }  // migrate pre-prefix data
+    if(raw) state=hydrate(JSON.parse(raw));
+  }catch(e){ state=defaults(); }
+  LANG = (state.meta&&state.meta.lang)||"vi";
+}
+
+/* counts used across dashboard + nav */
+function counts(){
+  return {
+    dataItems: state.step2.dataRequests.filter(r=>r.item&&r.item.trim()).length + state.step2.opsData.filter(r=>r.content&&r.content.trim()).length,
+    interviews: state.step3.interviews.filter(r=>r.person&&r.person.trim()).length + state.step5.interviews.filter(r=>r.person&&r.person.trim()).length,
+    scenarios: state.step5.scenarios.filter(s=>s.context&&s.context.trim()).length,
+    files: state.step2.dataRequests.filter(r=>r.file).length + state.step3.interviews.filter(r=>r.audio).length + state.step5.interviews.filter(r=>r.audio).length
+  };
+}
+function step2HasData(){ return state.step2.dataRequests.some(r=>r.item.trim()) || state.step2.opsData.some(r=>r.content.trim()); }
+function step3HasData(){ return state.step3.interviews.some(r=>r.person.trim()); }
+function step5HasData(){ return state.step5.interviews.some(r=>r.person.trim()) || state.step5.scenarios.some(r=>r.context.trim()); }
+/* Step 0 verdict: unset | go | conditional | nogo */
+function screeningVerdict(){
+  const a=state.screening.answers, all=["q1","q2","q3","q4","q5","q6","q7"];
+  if(all.some(q=>!a[q])) return {v:"unset", unmet:[]};
+  if(a.q1==="no"||a.q3==="no") return {v:"nogo", unmet:[]};
+  if(all.every(q=>a[q]==="yes")) return {v:"go", unmet:[]};
+  const unmet=all.filter(q=>a[q]!=="yes");
+  const allHandled=unmet.every(q=>state.screening.handled[q]);
+  return {v: allHandled?"go":"conditional", unmet, allHandled};
+}
+function isReady(){ return screeningVerdict().v==="go" && stepPct(1)===100 && step2HasData() && step3HasData() && step5HasData(); }
+
+/* merge another full state (import file) — append lists, fill only-empty scalars */
+function mergeState(incoming){
+  const inc=hydrate(incoming);
+  // scalars: fill only if current empty
+  const fillScalars=(dst,src)=>{
+    for(const k in dst){
+      const dv=dst[k], sv=src[k];
+      if(Array.isArray(dv)) continue;
+      if(dv && typeof dv==="object"){ fillScalars(dv,sv||{}); }
+      else if((dv===""||dv===false||dv==null) && sv!=null && sv!=="" ){ dst[k]=sv; }
+    }
+  };
+  fillScalars(state.meta, inc.meta);
+  fillScalars(state.screening, inc.screening);
+  [ "step1","step4" ].forEach(s=>fillScalars(state[s], inc[s]));
+  // append list items
+  state.step2.dataRequests.push(...inc.step2.dataRequests);
+  state.step2.opsData.push(...inc.step2.opsData);
+  state.step3.interviews.push(...inc.step3.interviews);
+  state.step5.interviews.push(...inc.step5.interviews);
+  state.step5.scenarios.push(...inc.step5.scenarios);
+  persist();
+}
+
+/* ------------------------------------------------------------------ *
+ *  Render helpers
+ * ------------------------------------------------------------------ */
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function val(p){const v=getPath(state,p);return v==null?"":v;}
+function phAttr(k){return k?` placeholder="${esc(t(k))}"`:"";}
+function optsEnum(keys){return keys.map(k=>({v:k,label:t(k)}));}
+const TRASH='<svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M6 7l1 13h10l1-13"/></svg>';
+
+function field(labelKey,control,o){o=o||{};
+  const sub=o.sub?`<span class="sub">${esc(t(o.sub))}</span>`:"";
+  const rq=o.req?` <span class="req">*</span>`:"";
+  return `<div class="field${o.col?" col-"+o.col:""}"><label class="lab">${esc(t(labelKey))}${rq}${sub}</label>${control}</div>`;
+}
+function reqAttrs(o){ // data-req flag + red-border class when a required field is empty
+  if(!o.req) return {a:"",c:""};
+  const empty=!String(val(o._path)||"").trim();
+  return {a:" data-req=\"1\"", c:empty?" req-miss":""};
+}
+function tField(path,labelKey,o){o=o||{}; o._path=path;
+  const v=esc(val(path)), r=reqAttrs(o);
+  const control=o.area
+    ? `<textarea class="control${r.c}" data-model="${path}"${r.a} rows="${o.rows||3}"${phAttr(o.ph)}>${v}</textarea>`
+    : `<input class="control${r.c}" type="${o.type||"text"}" data-model="${path}"${r.a} value="${v}"${phAttr(o.ph)}${o.inputmode?` inputmode="${o.inputmode}"`:""}>`;
+  return field(labelKey,control,o);
+}
+function sField(path,labelKey,opts,o){o=o||{}; o._path=path;
+  const cur=val(path), r=reqAttrs(o);
+  const empty=o.noEmpty?"":`<option value=""${cur===""?" selected":""}>${esc(t("pick"))}</option>`;
+  const options=opts.map(op=>`<option value="${op.v}"${op.v===cur?" selected":""}>${esc(op.label)}</option>`).join("");
+  return field(labelKey,`<select class="control${r.c}" data-model="${path}"${r.a}>${empty}${options}</select>`,o);
+}
+function checkField(path,labelKey,o){o=o||{};
+  const on=getPath(state,path);
+  const miss=(o.req&&!on)?" req-miss-check":"";
+  return `<label class="check${miss}"><input type="checkbox" data-model="${path}"${on?" checked":""}>
+    <span class="ct"><b>${esc(t(labelKey))}</b>${o.sub?`<span class="s">${esc(t(o.sub))}</span>`:""}</span></label>`;
+}
+function addBtn(path){return `<button class="btn sm" data-action="add" data-list="${path}">＋ ${esc(t("btn_add"))}</button>`;}
+function delBtn(path,i){return `<button class="iconbtn" data-action="del" data-list="${path}" data-index="${i}" aria-label="${esc(t("btn_remove"))}">${TRASH}</button>`;}
+
+/* generic scrollable data table for list state */
+function dtable(path,cols){
+  const arr=getPath(state,path);
+  const head=cols.map(c=>`<th${c.width?` style="min-width:${c.width}"`:""}>${esc(t(c.labelKey))}</th>`).join("")+`<th class="act"></th>`;
+  let body;
+  if(!arr.length){ body=`<tr><td colspan="${cols.length+1}" style="border:0"><div class="empty">${esc(t("none_yet"))}</div></td></tr>`; }
+  else body=arr.map((row,i)=>{
+    const tds=cols.map(c=>{
+      const p=`${path}.${i}.${c.key}`, rv=row[c.key];
+      let ctrl;
+      if(c.opts) ctrl=`<select class="control" data-model="${p}">${c.opts.map(op=>`<option value="${op.v}"${op.v===rv?" selected":""}>${esc(op.label)}</option>`).join("")}</select>`;
+      else if(c.area) ctrl=`<textarea class="control" data-model="${p}" rows="2"${phAttr(c.ph)}>${esc(rv)}</textarea>`;
+      else ctrl=`<input class="control" type="${c.type||"text"}" data-model="${p}" value="${esc(rv)}"${phAttr(c.ph)}>`;
+      return `<td>${ctrl}</td>`;
+    }).join("");
+    return `<tr>${tds}<td class="act">${delBtn(path,i)}</td></tr>`;
+  }).join("");
+  return `<div class="dtable-wrap"><table class="dtable"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+function sectionHead(num,titleKey,hintKey){
+  return `<div class="sec-head">${num?`<span class="sec-num">${num}</span>`:""}<h2>${esc(t(titleKey))}</h2>${hintKey?`<span class="hint">${esc(t(hintKey))}</span>`:""}</div>`;
+}
+function stepHeader(step,leadKey){
+  const banner = screeningVerdict().v==="nogo"
+    ? `<div class="callout danger" style="margin-bottom:16px">${warnIcon()}<div>${esc(t("banner_nogo"))}</div></div>` : "";
+  return banner+`<div class="view-head"><div class="step-tag"><span class="n">${t("step_word")} ${step}</span><span class="of">${t("of")} 7 · ${esc(t("s"+step+"_short"))}</span></div>
+    <h1>${esc(t("s"+step))}</h1><p class="lead">${esc(t(leadKey))}</p></div>`;
+}
+function verdictMeta(v){
+  return ({
+    go:{cls:"v-go",label:t("verdict_go"),desc:t("verdict_go_desc")},
+    conditional:{cls:"v-cond",label:t("verdict_cond"),desc:t("verdict_cond_desc")},
+    nogo:{cls:"v-nogo",label:t("verdict_nogo"),desc:t("verdict_nogo_desc")},
+    unset:{cls:"v-unset",label:t("verdict_unset"),desc:t("verdict_unset_desc")}
+  })[v];
+}
+function verdictPanel(sv){
+  const meta=verdictMeta(sv.v);
+  let extra="";
+  if(sv.v==="conditional"){
+    const items=sv.unmet.map(q=>{const done=state.screening.handled[q];
+      return `<label class="cond${done?" done":""}"><input type="checkbox" data-model="screening.handled.${q}"${done?" checked":""}><span><b>${esc(t(q))}</b><br>${esc(t("cond_"+q))}</span></label>`;
+    }).join("");
+    extra=`<div><div class="eyebrow" style="margin-bottom:8px">${esc(t("scr_conditions"))}</div><div class="cond-list">${items}</div></div>`;
+  }else if(sv.v==="nogo"){
+    extra=`<div><div class="eyebrow" style="margin-bottom:8px">${esc(t("scr_alt"))}</div><div class="alt-list">
+      <div class="alt"><div class="at">${esc(t("alt1_t"))}</div><div class="ad">${esc(t("alt1_d"))}</div></div>
+      <div class="alt"><div class="at">${esc(t("alt2_t"))}</div><div class="ad">${esc(t("alt2_d"))}</div></div>
+      <div class="alt"><div class="at">${esc(t("alt3_t"))}</div><div class="ad">${esc(t("alt3_d"))}</div></div></div></div>`;
+  }
+  return `<div class="verdict ${meta.cls}">
+    <div class="vb"><div class="vlamp"><div class="c"></div></div>
+      <div><div class="eyebrow">${esc(t("scr_verdict"))}</div><h3>${esc(meta.label)}</h3></div></div>
+    <div class="vd">${esc(meta.desc)}</div>${extra}</div>`;
+}
+function renderStep0(){
+  const a=state.screening.answers, sv=screeningVerdict();
+  const qs=["q1","q2","q3","q4","q5","q6","q7"].map((q,i)=>{
+    const seg=["yes","no","unclear"].map(v=>`<button class="segbtn ${v}${a[q]===v?" on":""}" data-action="screen-ans" data-q="${q}" data-v="${v}" type="button"><span class="sd"></span>${esc(t("ans_"+v))}</button>`).join("");
+    return `<div class="scr-q">
+      <div class="q-txt"><span class="q-n">${i+1}</span><span>${esc(t(q))}</span></div>
+      <div class="seg">${seg}</div>
+      <textarea class="control" data-model="screening.notes.${q}" rows="2" placeholder="${esc(t("scr_note"))}">${esc(state.screening.notes[q])}</textarea>
+    </div>`;
+  }).join("");
+  return `<div class="view-head"><div class="step-tag"><span class="n" style="background:var(--moss)">${t("step_word")} 0</span><span class="of">${t("of")} 7 · ${esc(t("s0_short"))}</span></div>
+    <h1>${esc(t("s0"))}</h1><p class="lead">${esc(t("s0_lead"))}</p></div>
+    ${verdictPanel(sv)}
+    <div class="section" style="margin-top:18px">${sectionHead("0.1","scr_questions")}${qs}</div>`;
+}
+
+/* ------------------------------------------------------------------ *
+ *  Interview sessions (record + transcript) + contenteditable field
+ * ------------------------------------------------------------------ */
+function srcIcon(){return '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:-1px"><path d="M4 5h16M4 12h16M4 19h10"/></svg>';}
+/* contenteditable rich field bound to a state HTML string (notes / transcript / ops content) */
+function ceField(path,o){o=o||{};
+  const html=getPath(state,path)||"";
+  return `<div class="control ce" contenteditable="true" role="textbox" aria-label="${esc(t(o.label||"f_iv_notes"))}"
+    data-ce="${path}" data-ph="${esc(t(o.ph||""))}"
+    ${o.minh?`style="min-height:${o.minh}px"`:""}>${html}</div>`;
+}
+/* interview session card (used in Step 3 and Step 5) */
+function interviewCard(listPath,view,iv,i){
+  const roleSel=`<select class="control" data-model="${listPath}.${i}.role">${IV_ROLES.map(r=>`<option value="${r}"${iv.role===r?" selected":""}>${esc(t(r))}</option>`).join("")}</select>`;
+  const src=(iv.person&&iv.person.trim())?iv.person.trim():t("iv_session")+" "+(i+1);
+  return `<div class="scn" data-iv="${iv.id}">
+    <div class="scn-top"><span class="rc-n">${esc(t("iv_session"))} ${i+1}</span>${delBtn(listPath,i)}</div>
+    <div class="grid g3" style="margin-bottom:12px">
+      ${field("f_iv_person",`<input class="control" data-model="${listPath}.${i}.person" value="${esc(iv.person)}">`)}
+      ${field("f_iv_role",roleSel)}
+      ${field("f_iv_date",`<input class="control" type="date" data-model="${listPath}.${i}.date" value="${esc(iv.date)}">`)}
+    </div>
+    ${recordBlock(listPath,i,iv)}
+    <div class="field" style="margin-top:12px"><label class="lab">${esc(t("f_iv_notes"))}</label>
+      ${ceField(listPath+"."+i+".notes",{view,src,ph:"f_iv_notes",minh:60,label:"f_iv_notes"})}</div>
+    <div class="field" style="margin-top:12px"><label class="lab">${esc(t("f_iv_transcript"))}</label>
+      ${ceField(listPath+"."+i+".transcript",{view,src,ph:"f_iv_transcript",minh:90,label:"f_iv_transcript"})}
+      <div class="stt-note" id="stt-${iv.id}"></div></div>
+  </div>`;
+}
+function recordBlock(listPath,i,iv){
+  const audio = iv.audio ? `<div class="rec-audio"><audio controls data-audio-iv="${iv.id}" preload="none" style="height:36px"></audio>
+      <button class="btn sm" data-action="rec-download" data-iv="${iv.id}" data-name="${esc(iv.audio.name||"recording.webm")}" type="button">${downIcon()} ${esc(t("rec_download"))}</button>
+      <button class="btn sm danger-ghost" data-action="rec-delete" data-list="${listPath}" data-index="${i}" data-iv="${iv.id}" type="button">${esc(t("rec_delete"))}</button></div>` : "";
+  return `<div class="recbar" data-recbar="${iv.id}">
+    <button class="btn sm" data-action="rec-start" data-list="${listPath}" data-index="${i}" data-iv="${iv.id}" type="button"><span class="rec-dot"></span> ${esc(t("rec_start"))}</button>
+    <span class="rec-timer mono" id="rec-timer-${iv.id}"></span>
+  </div>${audio}`;
+}
+
+/* ------------------------------------------------------------------ *
+ *  Views
+ * ------------------------------------------------------------------ */
+function renderDashboard(){
+  const c=counts(), ready=isReady(), sv=screeningVerdict(), svMeta=verdictMeta(sv.v);
+  const scrMark = sv.v==="go"?"✓":(sv.v==="nogo"?"✕":(sv.v==="conditional"?"!":"…"));
+  const okBox=(done,label)=>`<div class="gr${done?" done":""}"><span class="p">${done?"✓":"…"}</span>${label}</div>`;
+  const gateReq=`<div class="gr${sv.v==="go"?" done":""}"><span class="p">${scrMark}</span>${t("step_word")} 0</div>`
+    +`<div class="gr${stepPct(1)===100?" done":""}"><span class="p">${stepPct(1)}%</span>${t("step_word")} 1</div>`
+    +okBox(step2HasData(),t("step_word")+" 2")
+    +okBox(step3HasData(),t("step_word")+" 3")
+    +okBox(step5HasData(),t("step_word")+" 5");
+  const dashVerdict=`<div class="verdict ${svMeta.cls} dash-verdict" data-action="nav" data-view="step0">
+    <div class="vb"><div class="vlamp"><div class="c"></div></div>
+      <div><div class="eyebrow">${esc(t("s0"))} · ${esc(t("scr_verdict"))}</div><h3>${esc(svMeta.label)}</h3></div></div></div>`;
+  const progressRows=STEPS.map(n=>{const p=stepPct(n);const rq=(n>=1&&n<=3)||n===0||n===5;
+    return `<div class="prow${rq?" req":""}" data-action="nav" data-view="step${n}">
+      <span class="pn">${n}</span>
+      <div class="ptxt"><div class="pt">${esc(t("s"+n))}${rq?` <span style="color:var(--brand);font-size:10px;font-weight:800;font-family:var(--font-mono)">${t("req_badge")}</span>`:""}</div>
+        <div class="bar"><i class="${p===100?"full":""}" style="width:${p}%"></i></div></div>
+      <span class="pp">${p}%</span></div>`;}).join("");
+  const solWarn = state.step1.isSolutionRequest ? `<div class="callout danger" style="margin-bottom:18px">${warnIcon()}<div>${esc(t("s1_warn_solution"))}</div></div>`:"";
+  return `<div class="view-head"><h1>${esc(t("dash_title"))}</h1><p class="lead">${esc(t("dash_lead"))}</p></div>
+  ${dashVerdict}${solWarn}
+  <div class="card tna-cta">
+    <div class="tna-body"><div class="eyebrow">${esc(t("tna_cta_eyebrow"))}</div>
+      <h3>${esc(t("tna_cta_title"))}</h3><p>${esc(t("tna_cta_desc"))}</p></div>
+    <button class="btn primary lg" data-action="export-tna" type="button">${sparkIcon()} ${esc(t("tna_export_btn"))}</button>
+  </div>
+  <div class="dash-grid">
+    <div>
+      <div class="stat-wall" style="margin-bottom:18px">
+        <div class="stat t-env"><span class="sk" style="background:var(--terracotta)"></span><div class="sv">${c.dataItems}</div><div class="sl">${esc(t("c_dataitems"))}</div></div>
+        <div class="stat t-know"><span class="sk" style="background:var(--teal)"></span><div class="sv">${c.interviews}</div><div class="sl">${esc(t("c_interviews"))}</div></div>
+        <div class="stat t-skill"><span class="sk" style="background:var(--moss)"></span><div class="sv">${c.scenarios}</div><div class="sl">${esc(t("c_scenarios"))}</div></div>
+        <div class="stat t-conf"><span class="sk" style="background:var(--gold)"></span><div class="sv">${c.files}</div><div class="sl">${esc(t("c_files"))}</div></div>
+      </div>
+      <div class="section">
+        ${sectionHead("",("progress_title"),"progress_hint")}
+        <div class="progress-list">${progressRows}</div>
+        <div class="mini-legend"><span><i style="background:var(--ok)"></i>${esc(t("legend_full"))}</span><span><i style="background:var(--brand)"></i>${esc(t("legend_part"))}</span></div>
+      </div>
+      <div class="section">
+        ${sectionHead("",("project_info"))}
+        <div class="grid g2">
+          ${tField("meta.projectName","f_projectName",{ph:"ph_projectName"})}
+          ${tField("meta.client","f_client",{ph:"ph_client"})}
+          ${tField("meta.collector","f_collector",{ph:"ph_collector"})}
+          ${tField("meta.startDate","f_startDate",{type:"date"})}
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card gate ${ready?"go":"lock"}">
+        <div class="lamp-xl"><div class="core"></div></div>
+        <div class="eyebrow">${esc(t("gate_title"))}</div>
+        <h3 style="margin-top:6px">${esc(ready?t("gate_go_h"):t("gate_lock_h"))}</h3>
+        <p class="gsub">${esc(ready?t("gate_go_desc"):t("gate_lock_desc"))}</p>
+        <div class="gate-req">${gateReq}</div>
+      </div>
+      <div class="section" style="margin-top:18px">
+        ${sectionHead("",("backup_title"))}
+        <p style="font-size:12.5px;color:var(--ink-3);margin-bottom:12px">${esc(t("export_hint"))}</p>
+        <div class="btn-row">
+          <button class="btn" data-action="export-data">${downIcon()} ${esc(t("export_data_only"))}</button>
+          <button class="btn" data-action="export-files">${downIcon()} ${esc(t("export_with_files"))}</button>
+          <button class="btn" data-action="import-json">${upIcon()} ${esc(t("btn_import"))}</button>
+        </div>
+        <p style="font-size:11px;color:var(--ink-3);margin-top:8px">${esc(t("export_files_warn"))}</p>
+      </div>
+    </div>
+  </div>`;
+}
+function sparkIcon(){return '<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>';}
+function warnIcon(){return '<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/></svg>';}
+function downIcon(){return '<svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>';}
+function upIcon(){return '<svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20V9M7 13l5-5 5 5M5 4h14"/></svg>';}
+
+function renderStep1(){
+  const warn = state.step1.isSolutionRequest? `<div class="callout danger" style="margin-top:12px">${warnIcon()}<div>${esc(t("s1_warn_solution"))}</div></div>`:"";
+  return stepHeader(1,"s1_lead")+`
+  <div class="section">${sectionHead("1.1","s1_sponsor")}
+    <div class="grid g2">${tField("step1.sponsorName","f_sponsorName",{req:1})}${tField("step1.sponsorTitle","f_sponsorTitle",{req:1})}</div></div>
+  <div class="section">${sectionHead("1.2","s1_success")}
+    ${tField("step1.successAnswer","f_successAnswer",{area:1,rows:3,ph:"ph_successAnswer",req:1})}</div>
+  <div class="section">${sectionHead("1.3","s1_goal","s1_goal_hint")}
+    <div class="goal-formula">
+      ${tField("step1.metric","f_metric",{ph:"ph_metric",req:1})}
+      ${tField("step1.baseline","f_baseline",{ph:"ph_baseline",req:1})}
+      ${tField("step1.target","f_target",{ph:"ph_target",req:1})}
+      ${tField("step1.deadline","f_deadline",{type:"date",req:1})}
+    </div></div>
+  <div class="section">${sectionHead("1.4","s1_confirm")}
+    ${checkField("step1.confirmed","f_confirmed",{req:1})}
+    <div class="grid g2" style="margin-top:12px">${tField("step1.confirmDate","f_confirmDate",{type:"date"})}${tField("step1.confirmForm","f_confirmForm",{ph:"ph_confirmForm"})}</div></div>
+  <div class="section">${sectionHead("1.5","s1_kickoff")}
+    <div class="grid g2">${tField("step1.kickoffAttendees","f_kickoffAttendees",{area:1,ph:"ph_kickoffAttendees"})}${tField("step1.kickoffDecisions","f_kickoffDecisions",{area:1,ph:"ph_kickoffDecisions"})}</div></div>
+  <div class="section">${sectionHead("1.6","f_isSolutionRequest")}
+    ${checkField("step1.isSolutionRequest","f_isSolutionRequest")}${warn}</div>`;
+}
+function fileRow(row,i){
+  const f=row.file;
+  const meta = f ? `<div class="file-chip"><span class="fn">${esc(f.name)}</span><span class="fs mono">${fmtSize(f.size)}</span>
+      <button class="btn sm" data-action="file-download" data-list="step2.dataRequests" data-index="${i}" type="button">${downIcon()}</button>
+      <button class="iconbtn" data-action="file-delete" data-list="step2.dataRequests" data-index="${i}" type="button" aria-label="${esc(t("btn_remove"))}">${TRASH}</button></div>`
+    : `<label class="btn sm file-up"><input type="file" data-action="file-upload" data-index="${i}" style="display:none">${upIcon()} ${esc(t("btn_upload"))}</label>`;
+  return `<div class="dr-card">
+    <div class="grid g4" style="gap:10px">
+      ${field("f_dr_item",`<input class="control" data-model="step2.dataRequests.${i}.item" value="${esc(row.item)}">`)}
+      ${field("f_dr_provider",`<input class="control" data-model="step2.dataRequests.${i}.provider" value="${esc(row.provider)}">`)}
+      ${field("f_dr_deadline",`<input class="control" type="date" data-model="step2.dataRequests.${i}.deadline" value="${esc(row.deadline)}">`)}
+      ${field("f_dr_status",`<select class="control" data-model="step2.dataRequests.${i}.status">${DR_STATUS.map(sx=>`<option value="${sx}"${row.status===sx?" selected":""}>${esc(t(sx))}</option>`).join("")}</select>`)}
+    </div>
+    <div class="dr-foot"><span class="lab" style="align-self:center">${esc(t("f_attach"))}</span>${meta}${delBtn("step2.dataRequests",i)}</div>
+  </div>`;
+}
+function renderStep2(){
+  const drs=state.step2.dataRequests;
+  const drList = drs.length? drs.map((r,i)=>fileRow(r,i)).join("") : `<div class="empty">${esc(t("none_yet"))}</div>`;
+  const ops=state.step2.opsData;
+  const opsList = ops.length? ops.map((r,i)=>`<div class="rowcard">
+      <div class="rc-head"><span class="rc-n">#${i+1}</span>${delBtn("step2.opsData",i)}</div>
+      <div class="field" style="margin-bottom:10px"><label class="lab">${esc(t("f_ops_content"))}</label>
+        ${ceField("step2.opsData."+i+".content",{ph:"ph_ops_content",minh:52})}</div>
+      <div class="grid g2">
+        ${field("f_ops_source",`<input class="control" data-model="step2.opsData.${i}.source" value="${esc(r.source)}">`)}
+        ${field("f_ops_level",`<input class="control" data-model="step2.opsData.${i}.level" value="${esc(r.level)}" placeholder="${esc(t("ph_ops_level"))}">`)}
+      </div></div>`).join("") : `<div class="empty">${esc(t("none_yet"))}</div>`;
+  return stepHeader(2,"s2_lead")+`
+  <div class="section">${sectionHead("2.1","s2_drl","s2_drl_hint")}
+    <div class="rowlist">${drList}</div>
+    <div style="margin-top:12px">${addBtn("step2.dataRequests")}</div></div>
+  <div class="section">${sectionHead("2.2","s2_ops","s2_ops_hint")}
+    <div class="rowlist">${opsList}</div>
+    <div style="margin-top:12px">${addBtn("step2.opsData")}</div></div>`;
+}
+function renderStep3(){
+  const ivs=state.step3.interviews;
+  const cards = ivs.length? ivs.map((iv,i)=>interviewCard("step3.interviews",("step3"),iv,i)).join("") : `<div class="empty">${esc(t("none_yet"))}</div>`;
+  return stepHeader(3,"s3_lead")+`
+  <div class="section">${sectionHead("3.1","s3_interviews")}
+    <div class="rowlist">${cards}</div>
+    <div style="margin-top:12px">${addBtn("step3.interviews")}</div></div>`;
+}
+function renderStep4(){
+  const devs=DEVICES.map(d=>{const on=state.step4.devices.includes(d);
+    return `<label class="chip${on?" on":""}"><input type="checkbox" data-action="device" data-device="${d}"${on?" checked":""}><span class="bx"></span>${esc(t(d))}</label>`;}).join("");
+  return stepHeader(4,"s4_lead")+`
+  <div class="section">${sectionHead("4.1","s4")}
+    <div class="grid g2">
+      ${tField("step4.role","f_role",{req:1})}
+      ${tField("step4.size","f_size",{type:"number",inputmode:"numeric",req:1})}
+      ${tField("step4.tenure","f_tenure",{type:"number",inputmode:"decimal",req:1})}
+      ${tField("step4.turnover","f_turnover",{type:"number",inputmode:"numeric",req:1})}
+      ${tField("step4.freeTime","f_freeTime",{type:"number",inputmode:"numeric",req:1})}
+      ${tField("step4.shift","f_shift",{ph:"ph_shift",req:1})}
+    </div>
+    <div class="field col-all" style="margin-top:14px"><label class="lab">${esc(t("f_devices"))} <span class="req">*</span></label><div class="chips${state.step4.devices.length?"":" req-miss-chips"}">${devs}</div></div>
+    <div class="grid g2" style="margin-top:14px">
+      ${tField("step4.priorTraining","f_priorTraining",{area:1,ph:"ph_priorTraining",req:1})}
+      ${tField("step4.baseKnowledge","f_baseKnowledge",{area:1,ph:"ph_baseKnowledge",req:1})}
+    </div></div>`;
+}
+function renderStep5(){
+  const scn=state.step5.scenarios.map((s,i)=>{
+    return `<div class="scn${s.isDistractor?" dist":""}">
+      <div class="scn-top">
+        <span class="rc-n">${t("scn_word")} ${i+1}</span>
+        <div style="display:flex;gap:10px;align-items:center">${s.isDistractor?`<span class="scn-flag">⭐ ${esc(t("f_scn_distractor"))}</span>`:""}${delBtn("step5.scenarios",i)}</div>
+      </div>
+      <div class="grid g2">
+        <div class="field"><label class="lab">${esc(t("f_scn_sme"))}</label>
+          <input class="control" list="smeList" data-model="step5.scenarios.${i}.sme" value="${esc(s.sme)}"></div>
+        ${tf5(i,"context","ph_scn_context")}
+        ${tf5(i,"decision","ph_scn_decision")}
+        ${tf5(i,"mistake","ph_scn_mistake")}
+        ${tf5(i,"consequence","ph_scn_consequence")}
+        ${tf5(i,"quote","ph_scn_quote")}
+      </div>
+      <label class="check" style="margin-top:12px"><input type="checkbox" data-model="step5.scenarios.${i}.isDistractor"${s.isDistractor?" checked":""}><span class="ct"><b>${esc(t("f_scn_distractor"))}</b></span></label>
+    </div>`;}).join("");
+  const smeDL=`<datalist id="smeList">${state.step5.interviews.filter(m=>m.person.trim()).map(m=>`<option value="${esc(m.person)}">`).join("")}</datalist>`;
+  const ivs=state.step5.interviews;
+  const cards = ivs.length? ivs.map((iv,i)=>interviewCard("step5.interviews",("step5"),iv,i)).join("") : `<div class="empty">${esc(t("none_yet"))}</div>`;
+  return stepHeader(5,"s5_lead")+`
+  <div class="section">${sectionHead("5.1","s5_smes")}
+    <div class="rowlist">${cards}</div>
+    <div style="margin-top:12px">${addBtn("step5.interviews")}</div></div>
+  <div class="section">${sectionHead("5.2","s5_scenarios","s5_scn_hint")}
+    ${smeDL}
+    ${state.step5.scenarios.length?scn:`<div class="empty">${esc(t("none_yet"))}</div>`}
+    <div style="margin-top:12px">${addBtn("step5.scenarios")}</div></div>`;
+}
+function tf5(i,key,ph){
+  const s=state.step5.scenarios[i];
+  return `<div class="field"><label class="lab">${esc(t("f_scn_"+key))}</label><textarea class="control" data-model="step5.scenarios.${i}.${key}" rows="2" placeholder="${esc(t(ph))}">${esc(s[key])}</textarea></div>`;
+}
+function renderDocs(){
+  const cards=DOCS.map((d,i)=>`<div class="doc-card">
+    <div class="dnum">${i}</div>
+    <div class="dc-body"><div class="dc-t">${esc(t(d))}</div><div class="dc-s">${esc(t(d+"_s"))}</div>
+      <div class="dc-act"><button class="btn sm" data-action="view-doc" data-doc="${d}">${eyeIcon()} ${esc(t("btn_view"))}</button>
+      <button class="btn sm" data-action="print-doc-direct" data-doc="${d}">${esc(t("btn_print"))}</button></div>
+    </div></div>`).join("");
+  return `<div class="view-head"><h1>${esc(t("docs_title"))}</h1><p class="lead">${esc(t("docs_lead"))}</p></div>
+    <div class="doc-list">${cards}</div>`;
+}
+function eyeIcon(){return '<svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';}
+/* names of the required fields still empty in a step (for the reminder line) */
+function missingFields(step){
+  const s=state, m=[]; const add=(v,k)=>{ if(!String(v||"").trim()) m.push(t(k)); };
+  if(step===0){ ["q1","q2","q3","q4","q5","q6","q7"].forEach((q,i)=>{ if(!s.screening.answers[q]) m.push(t("scr_q_short")+" "+(i+1)); }); }
+  else if(step===1){ add(s.step1.sponsorName,"f_sponsorName"); add(s.step1.sponsorTitle,"f_sponsorTitle"); add(s.step1.successAnswer,"dh_success_metric");
+    add(s.step1.metric,"f_metric"); add(s.step1.baseline,"f_baseline"); add(s.step1.target,"f_target"); add(s.step1.deadline,"f_deadline");
+    if(!s.step1.confirmed) m.push(t("s1_confirm")); }
+  else if(step===2){ if(!s.step2.dataRequests.some(r=>r.item.trim())) m.push(t("s2_drl")); if(!s.step2.opsData.some(r=>r.content.trim())) m.push(t("s2_ops")); }
+  else if(step===3){ if(!s.step3.interviews.some(r=>r.person.trim())) m.push(t("s3_interviews")); }
+  else if(step===4){ add(s.step4.role,"f_role"); add(s.step4.size,"f_size"); add(s.step4.tenure,"f_tenure"); add(s.step4.turnover,"f_turnover");
+    add(s.step4.shift,"f_shift"); add(s.step4.freeTime,"f_freeTime"); add(s.step4.priorTraining,"f_priorTraining"); add(s.step4.baseKnowledge,"f_baseKnowledge");
+    if(!s.step4.devices.length) m.push(t("f_devices")); }
+  else if(step===5){ if(!s.step5.interviews.some(r=>r.person.trim())) m.push(t("s5_smes")); if(!s.step5.scenarios.some(r=>r.context.trim())) m.push(t("s5_scenarios")); }
+  return m;
+}
+function stepNav(step){
+  const prev = step>0 ? `<button class="btn" data-action="nav" data-view="step${step-1}" type="button">← ${esc(t("nav_back"))}</button>` : `<span></span>`;
+  const next = step<5 ? `<button class="btn primary" data-action="nav" data-view="step${step+1}" type="button">${esc(t("nav_next"))} →</button>` : `<span></span>`;
+  const miss=missingFields(step);
+  const hint = miss.length
+    ? `<div class="stepnav-hint">${esc(tf("nav_incomplete",{n:miss.length}))} <span class="miss-names">${miss.map(esc).join(" · ")}</span></div>`
+    : `<div class="stepnav-hint"></div>`;
+  return `<div class="stepnav">${prev}${hint}${next}</div>`;
+}
+const VIEWS={dashboard:renderDashboard,step0:renderStep0,step1:renderStep1,step2:renderStep2,step3:renderStep3,step4:renderStep4,step5:renderStep5,docs:renderDocs};
+
+/* ------------------------------------------------------------------ *
+ *  Document generators (10) — assembled from state, in current language
+ * ------------------------------------------------------------------ */
+function fmtToday(){ try{ return new Date().toLocaleDateString(LANG==="vi"?"vi-VN":"en-GB"); }catch(e){ return new Date().toDateString(); } }
+function docv(v){ v=(v==null?"":String(v)).trim(); return v? esc(v) : `<span class="doc-empty">${t("doc_empty_field")}</span>`; }
+function docLine(v){ v=(v==null?"":String(v)).trim(); return v? esc(v).replace(/\n/g,"<br>") : `<span class="doc-empty">${t("doc_empty_field")}</span>`; }
+function docHeader(titleKey){
+  return `<div class="doc-head"><div class="doc-brand">Discovery Hub · ${esc(t(titleKey))}</div>
+    <h1>${esc(t(titleKey))}</h1>
+    <div class="doc-meta">
+      <div class="dm"><span class="k">${esc(t("doc_project"))}</span><span class="v">${docv(state.meta.projectName)}</span></div>
+      <div class="dm"><span class="k">${esc(t("doc_client"))}</span><span class="v">${docv(state.meta.client)}</span></div>
+      <div class="dm"><span class="k">${esc(t("doc_prepared"))}</span><span class="v">${docv(state.meta.collector)}</span></div>
+      <div class="dm"><span class="k">${esc(t("doc_generated"))}</span><span class="v">${esc(fmtToday())}</span></div>
+    </div></div>`;
+}
+function kv(rows){ return `<div class="doc-kv">`+rows.map(r=>`<div class="k">${esc(r[0])}</div><div class="v">${r[2]?r[1]:docLine(r[1])}</div>`).join("")+`</div>`; }
+function signBlock(sponsor){
+  const id=`<div class="sign"><div class="line"></div><div class="sl">${esc(t("doc_sign_id"))} · ${esc(t("doc_date"))}: ${esc(t("doc_empty_field"))}</div></div>`;
+  const sp=sponsor?`<div class="sign"><div class="line"></div><div class="sl">${esc(t("doc_sign_sponsor"))} · ${esc(t("doc_date"))}: ${esc(t("doc_empty_field"))}</div></div>`:"";
+  return `<div class="sign-block">${sp}${id}</div>`;
+}
+function statusLabel(v){ return v?t(v):""; }
+
+function signBlockScr(){
+  return `<div class="sign-block">
+    <div class="sign"><div class="line"></div><div class="sl">${esc(t("doc_sign_assessor"))} · ${esc(t("doc_date"))}: ${esc(t("doc_empty_field"))}</div></div>
+    <div class="sign"><div class="line"></div><div class="sl">${esc(t("doc_sign_sponsor"))} · ${esc(t("doc_date"))}: ${esc(t("doc_empty_field"))}</div></div></div>`;
+}
+function buildDoc(id){
+  const s=state, m=s.meta;
+  switch(id){
+  case "d0":{
+    const a=s.screening.answers, n=s.screening.notes, sv=screeningVerdict(), meta=verdictMeta(sv.v);
+    const rows=["q1","q2","q3","q4","q5","q6","q7"].map((q,i)=>
+      `<tr><td style="width:8mm;text-align:center;font-weight:700">${i+1}</td><td>${esc(t(q))}</td><td style="width:22mm;font-weight:600">${a[q]?esc(t("ans_"+a[q])):`<span class="doc-empty">—</span>`}</td><td>${docv(n[q])}</td></tr>`).join("");
+    let extra="";
+    if(sv.v==="conditional"){
+      extra=`<div class="doc-section"><h2>${esc(t("dh_scr_conditions"))}</h2><table class="doc-table"><thead><tr><th>${esc(t("dh_scr_question"))}</th><th>${esc(t("scr_conditions"))}</th><th style="width:24mm;text-align:center">${esc(t("scr_handled"))}</th></tr></thead><tbody>`
+        +sv.unmet.map(q=>`<tr><td>${esc(t(q))}</td><td>${esc(t("cond_"+q))}</td><td style="text-align:center;font-weight:700">${s.screening.handled[q]?"✓":"—"}</td></tr>`).join("")+`</tbody></table></div>`;
+    }else if(sv.v==="nogo"){
+      extra=`<div class="doc-section"><h2>${esc(t("dh_scr_alt"))}</h2>`
+        +["1","2","3"].map(k=>`<p><b>${esc(t("alt"+k+"_t"))}</b> ${esc(t("alt"+k+"_d"))}</p>`).join("")+`</div>`;
+    }
+    return docHeader("d0")
+      +`<div class="doc-section"><table class="doc-table"><thead><tr><th style="width:8mm">#</th><th>${esc(t("dh_scr_question"))}</th><th>${esc(t("dh_scr_answer"))}</th><th>${esc(t("dh_scr_note"))}</th></tr></thead><tbody>${rows}</tbody></table></div>`
+      +`<div class="doc-section"><h2>${esc(t("scr_verdict"))}</h2><p style="font-size:13pt;font-weight:800;margin-bottom:1mm">${esc(meta.label)}</p><p>${esc(meta.desc)}</p></div>`
+      +extra
+      +signBlockScr();
+  }
+  case "d1":{
+    const rows=[
+      [t("dh_sponsor"), (docStr(s.step1.sponsorName))+(s.step1.sponsorTitle?" — "+esc(s.step1.sponsorTitle):""), true],
+      [t("dh_success_metric"), s.step1.successAnswer]
+    ];
+    const goal=`<table class="doc-table"><thead><tr><th>${esc(t("dh_metric"))}</th><th>${esc(t("dh_baseline"))}</th><th>${esc(t("dh_target"))}</th><th>${esc(t("dh_deadline"))}</th></tr></thead>
+      <tbody><tr><td>${docv(s.step1.metric)}</td><td>${docv(s.step1.baseline)}</td><td>${docv(s.step1.target)}</td><td>${docv(s.step1.deadline)}</td></tr></tbody></table>`;
+    const confirm = s.step1.confirmed
+      ? kv([[t("dh_confirmed_on"),s.step1.confirmDate],[t("dh_confirm_form"),s.step1.confirmForm]])
+      : `<p class="doc-note">${esc(t("dh_not_confirmed"))}</p>`;
+    const warn = s.step1.isSolutionRequest? `<p style="color:#a33;font-weight:700;margin-top:3mm">${esc(t("dh_solution_warning"))}</p>`:"";
+    return docHeader("d1")
+      +`<div class="doc-section"><h2>${esc(t("dh_goal_statement"))}</h2>${kv(rows)}</div>`
+      +`<div class="doc-section"><h2>${esc(t("dh_goal_formula"))}</h2>${goal}${warn}</div>`
+      +`<div class="doc-section"><h2>${esc(t("dh_confirm_status"))}</h2>${confirm}</div>`
+      +signBlock(true);
+  }
+  case "d2":{
+    return docHeader("d2")
+      +`<div class="doc-section"><h2>${esc(t("dh_attendees"))}</h2><p>${docLine(s.step1.kickoffAttendees)}</p></div>`
+      +`<div class="doc-section"><h2>${esc(t("dh_decisions"))}</h2><p>${docLine(s.step1.kickoffDecisions)}</p></div>`
+      +`<div class="doc-section">${kv([[t("dh_sponsor"),(docStr(s.step1.sponsorName))+(s.step1.sponsorTitle?" — "+esc(s.step1.sponsorTitle):""),true],[t("dh_confirmed_on"),s.step1.confirmDate]])}</div>`
+      +signBlock(true);
+  }
+  case "d3":{
+    const rows=s.step2.dataRequests;
+    const body=rows.length? rows.map(r=>`<tr><td>${docv(r.item)}</td><td>${docv(r.provider)}</td><td>${docv(r.deadline)}</td><td>${esc(statusLabel(r.status))}</td></tr>`).join("")
+      : `<tr><td colspan="4" class="doc-empty">${esc(t("none_yet"))}</td></tr>`;
+    return docHeader("d3")+`<table class="doc-table"><thead><tr><th>${esc(t("dh_item"))}</th><th>${esc(t("dh_provider"))}</th><th>${esc(t("f_dr_deadline"))}</th><th>${esc(t("dh_status"))}</th></tr></thead><tbody>${body}</tbody></table>`;
+  }
+  case "d4":{
+    const rows=s.step2.opsData.slice();
+    const body=rows.length? rows.map(r=>`<tr><td>${docv(stripHTML(r.content))}</td><td>${docv(r.source)}</td><td>${docv(r.level)}</td></tr>`).join("")
+      : `<tr><td colspan="3" class="doc-empty">${esc(t("none_yet"))}</td></tr>`;
+    return docHeader("d4")+`<table class="doc-table"><thead><tr><th style="width:55%">${esc(t("dh_content"))}</th><th>${esc(t("dh_source"))}</th><th>${esc(t("dh_level"))}</th></tr></thead><tbody>${body}</tbody></table>`;
+  }
+  case "d7":{
+    const devs=s.step4.devices.map(d=>t(d)).join(", ");
+    return docHeader("d7")+kv([
+      [t("dh_learner_role"),s.step4.role],
+      [t("dh_learner_size"),s.step4.size?s.step4.size+" "+t("dh_people"):""],
+      [t("dh_tenure"),s.step4.tenure?s.step4.tenure+" "+t("dh_years"):""],
+      [t("dh_turnover"),s.step4.turnover?s.step4.turnover+" %":""],
+      [t("dh_shift"),s.step4.shift],
+      [t("dh_devices"),devs],
+      [t("dh_freetime"),s.step4.freeTime?s.step4.freeTime+" "+t("dh_min"):""],
+      [t("dh_prior"),s.step4.priorTraining],
+      [t("dh_baseknow"),s.step4.baseKnowledge]
+    ]);
+  }
+  case "d8":{
+    let html=docHeader("d8");
+    const groups={};
+    s.step5.scenarios.forEach(sc=>{ const key=(sc.sme&&sc.sme.trim())||"__none__"; (groups[key]=groups[key]||[]).push(sc); });
+    const keys=Object.keys(groups);
+    if(!keys.length) return html+`<p class="doc-empty">${esc(t("none_yet"))}</p>`;
+    keys.forEach(k=>{
+      html+=`<div class="doc-section"><h2>${k==="__none__"?esc(t("dh_no_sme")):esc(k)}</h2>`;
+      groups[k].forEach((sc,idx)=>{
+        html+=`<div class="doc-section" style="margin-bottom:4mm"><h3>${esc(t("scn_word"))} ${idx+1}${sc.isDistractor?`<span class="badge-dist">⭐ ${esc(t("f_scn_distractor"))}</span>`:""}</h3>`;
+        const style=sc.isDistractor?' style="font-weight:600"':'';
+        html+=`<div${style}>`+kv([
+          [t("dh_context"),sc.context],[t("dh_decision"),sc.decision],
+          [t("dh_mistake"),sc.mistake],[t("dh_consequence"),sc.consequence]
+        ])+`</div>`;
+        if(sc.quote&&sc.quote.trim()) html+=`<div class="doc-quote">“${esc(sc.quote)}”</div>`;
+        html+=`</div>`;
+      });
+      html+=`</div>`;
+    });
+    return html;
+  }
+  }
+  return "";
+}
+function docStr(v){ v=(v==null?"":String(v)).trim(); return v?esc(v):`<span class="doc-empty">${t("doc_empty_field")}</span>`; }
+
+/* ------------------------------------------------------------------ *
+ *  TNA Package (.md) — one file with AI instructions + all raw TNA data
+ * ------------------------------------------------------------------ */
+function htmlToText(html){
+  let s=String(html||"");
+  s=s.replace(/<\s*br\s*\/?>/gi,"\n").replace(/<\/\s*(div|p|li|h[1-6])\s*>/gi,"\n").replace(/<\s*li[^>]*>/gi,"- ");
+  const d=document.createElement("div"); d.innerHTML=s;
+  return (d.textContent||"").replace(/\n{3,}/g,"\n\n").trim();
+}
+function nz(v){ v=(v==null?"":String(v)).trim(); return v || t("tna_empty"); }
+function aiInstructions(){
+  if(LANG==="vi"){
+return `# HƯỚNG DẪN CHO AI (đọc trước khi xử lý)
+Bạn là Instructional Designer theo phương pháp Action Mapping (Cathy Moore). Từ dữ liệu TNA thô bên dưới, hãy tạo MỘT file HTML Action Map flowchart có cấu trúc 4 phần:
+- 01 BUSINESS GOAL: goal chính đo lường được (chỉ số, baseline → target, deadline) + các chỉ số theo dõi.
+- 02 PHÂN TÍCH "TRAINING CÓ GIẢI QUYẾT ĐƯỢC KHÔNG?": tự phân tích nguyên nhân gốc từ dữ liệu vận hành + transcript phỏng vấn; mỗi vấn đề 1 hàng: Vấn đề → Nguyên nhân gốc (gắn tag MÔI TRƯỜNG/KIẾN THỨC/KỸ NĂNG/TỰ TIN) → Verdict (✓ Training / ◐ Một phần / ✕ Ngoài training, kèm điều kiện tiên quyết nếu có).
+- 03 ACTION MAP: chỉ với các vấn đề training giải quyết được — Goal node bên trái, các nhánh Behavior (hành vi quan sát được trên ca) → Practice Activity (ưu tiên branching scenario, distractors lấy từ sai lầm thật trong dữ liệu, feedback theo hậu quả tự nhiên consequence-first) → Minimum Info Required. Tận dụng Scenario Bank làm nguyên liệu practice.
+- 04 NGOÀI TRAINING: các nguyên nhân môi trường bàn giao stakeholder (kèm owner đề xuất) + khung đo lường New World Kirkpatrick (trọng tâm Level 3-4).
+Thiết kế thị giác: theo đúng file template HTML đính kèm hoặc file style guide đính kèm (nếu có); nếu không có template: nền ivory #F6F3EC, navy #16324F, gold #B9862E, xanh rêu #3E6B4F, terracotta #A4462D, heading Georgia serif, không gradient. Trước khi vẽ, nếu dữ liệu thiếu nghiêm trọng (không có goal đo được, không có dữ liệu hành vi), hãy chỉ ra thiếu gì thay vì bịa.`;
+  }
+return `# INSTRUCTIONS FOR THE AI (read before processing)
+You are an Instructional Designer using Action Mapping (Cathy Moore). From the raw TNA data below, create ONE HTML Action Map flowchart with 4 sections:
+- 01 BUSINESS GOAL: the measurable primary goal (metric, baseline → target, deadline) + tracking indicators.
+- 02 "CAN TRAINING SOLVE IT?" ANALYSIS: derive root causes yourself from the operational data + interview transcripts; one row per problem: Problem → Root cause (tag ENVIRONMENT/KNOWLEDGE/SKILL/CONFIDENCE) → Verdict (✓ Training / ◐ Partial / ✕ Outside training, with prerequisites if any).
+- 03 ACTION MAP: only for training-solvable problems — Goal node on the left, Behavior branches (observable on-shift behaviors) → Practice Activity (prefer branching scenarios, distractors drawn from real mistakes in the data, consequence-first feedback) → Minimum Info Required. Use the Scenario Bank as practice raw material.
+- 04 OUTSIDE TRAINING: environment root causes to hand off to stakeholders (with a suggested owner) + a New World Kirkpatrick measurement frame (focus on Levels 3–4).
+Visual design: follow the attached HTML template or style-guide file if provided; if none: ivory background #F6F3EC, navy #16324F, gold #B9862E, moss #3E6B4F, terracotta #A4462D, Georgia serif headings, no gradients. Before drawing, if the data is severely lacking (no measurable goal, no behavior data), state what's missing instead of inventing it.`;
+}
+function buildTNAPackage(){
+  const s=state, L=[];
+  const H=(x)=>L.push(x);
+  H(aiInstructions()); H("");
+  // 0. Screening
+  const sv=screeningVerdict(), vm=verdictMeta(sv.v);
+  H("# 0. "+(LANG==="vi"?"SCREENING GO/NO-GO":"GO/NO-GO SCREENING"));
+  ["q1","q2","q3","q4","q5","q6","q7"].forEach((q,i)=>{
+    H(`**Q${i+1}. ${t(q)}**`);
+    H(`- ${t("dh_scr_answer")}: ${s.screening.answers[q]?t("ans_"+s.screening.answers[q]):t("tna_empty")}`);
+    if((s.screening.notes[q]||"").trim()) H(`- ${t("dh_scr_note")}: ${s.screening.notes[q].trim()}`);
+  });
+  H(""); H(`**${t("scr_verdict")}: ${vm.label}** — ${vm.desc}`);
+  if(sv.v==="conditional") sv.unmet.forEach(q=>H(`- ${t("cond_"+q)} ${s.screening.handled[q]?"["+t("scr_handled")+" ✓]":""}`));
+  H("");
+  // 1. Business goal
+  H("# 1. "+(LANG==="vi"?"BUSINESS GOAL":"BUSINESS GOAL"));
+  H(`- ${t("dh_sponsor")}: ${nz(s.step1.sponsorName)}${s.step1.sponsorTitle?" — "+s.step1.sponsorTitle:""}`);
+  H(`- ${t("dh_success_metric")}: ${nz(s.step1.successAnswer)}`);
+  H(`- ${t("dh_goal_formula")}: ${nz(s.step1.metric)} | ${t("dh_baseline")}: ${nz(s.step1.baseline)} → ${t("dh_target")}: ${nz(s.step1.target)} | ${t("dh_deadline")}: ${nz(s.step1.deadline)}`);
+  H(`- ${t("dh_confirm_status")}: ${s.step1.confirmed? (t("yes")+(s.step1.confirmDate?" ("+s.step1.confirmDate+(s.step1.confirmForm?", "+s.step1.confirmForm:"")+")":"")) : t("dh_not_confirmed")}`);
+  if(s.step1.isSolutionRequest) H(`- ⚠ ${t("dh_solution_warning")}`);
+  H(`- ${t("dh_kickoff")} — ${t("dh_attendees")}: ${nz(s.step1.kickoffAttendees)}`);
+  H(`- ${t("dh_kickoff")} — ${t("dh_decisions")}: ${nz(s.step1.kickoffDecisions)}`);
+  H("");
+  // 2. Operational data
+  H("# 2. "+(LANG==="vi"?"DỮ LIỆU VẬN HÀNH":"OPERATIONAL DATA"));
+  if(!s.step2.opsData.length) H("("+t("tna_empty")+")");
+  s.step2.opsData.forEach((r,i)=>{ H(`## 2.${i+1}`);
+    H(`- ${t("dh_content")}: ${nz(htmlToText(r.content))}`);
+    H(`- ${t("dh_source")}: ${nz(r.source)}`);
+    H(`- ${t("dh_level")}: ${nz(r.level)}`); });
+  H(""); H(`**${t("f_attach")}:**`);
+  const files=s.step2.dataRequests.filter(r=>r.file);
+  if(!files.length) H("- ("+t("tna_empty")+")");
+  s.step2.dataRequests.forEach(r=>{ if(r.file) H(`- ${r.file.name} (${fmtSize(r.file.size)})${r.item?" — "+r.item:""}`); });
+  H("");
+  // 3. Front-line interviews
+  H("# 3. "+(LANG==="vi"?"PHỎNG VẤN TRỰC TIẾP":"FRONT-LINE INTERVIEWS"));
+  if(!s.step3.interviews.length) H("("+t("tna_empty")+")");
+  s.step3.interviews.forEach((iv,i)=>{ H(`## 3.${i+1} ${nz(iv.person)} — ${t(iv.role)}${iv.date?" ("+iv.date+")":""}`);
+    H(`**${t("f_iv_notes")}:**`); H(nz(htmlToText(iv.notes)));
+    H(`**${t("f_iv_transcript")}:**`); H(nz(htmlToText(iv.transcript))); H(""); });
+  H("");
+  // 4. Learner profile
+  H("# 4. "+(LANG==="vi"?"LEARNER PROFILE":"LEARNER PROFILE"));
+  H(`- ${t("dh_learner_role")}: ${nz(s.step4.role)}`);
+  H(`- ${t("dh_learner_size")}: ${nz(s.step4.size)}`);
+  H(`- ${t("dh_tenure")}: ${nz(s.step4.tenure)}`);
+  H(`- ${t("dh_turnover")}: ${nz(s.step4.turnover)}`);
+  H(`- ${t("dh_shift")}: ${nz(s.step4.shift)}`);
+  H(`- ${t("dh_devices")}: ${s.step4.devices.length? s.step4.devices.map(d=>t(d)).join(", ") : t("tna_empty")}`);
+  H(`- ${t("dh_freetime")}: ${nz(s.step4.freeTime)}`);
+  H(`- ${t("dh_prior")}: ${nz(s.step4.priorTraining)}`);
+  H(`- ${t("dh_baseknow")}: ${nz(s.step4.baseKnowledge)}`);
+  H("");
+  // 5. SME interviews + scenario bank
+  H("# 5. "+(LANG==="vi"?"PHỎNG VẤN SME & SCENARIO BANK":"SME INTERVIEWS & SCENARIO BANK"));
+  if(!s.step5.interviews.length) H("("+t("tna_empty")+")");
+  s.step5.interviews.forEach((iv,i)=>{ H(`## 5.${i+1} ${nz(iv.person)} — ${t(iv.role)}${iv.date?" ("+iv.date+")":""}`);
+    H(`**${t("f_iv_notes")}:**`); H(nz(htmlToText(iv.notes)));
+    H(`**${t("f_iv_transcript")}:**`); H(nz(htmlToText(iv.transcript))); H(""); });
+  H("### "+t("s5_scenarios"));
+  if(!s.step5.scenarios.length) H("("+t("tna_empty")+")");
+  s.step5.scenarios.forEach((sc,i)=>{ H(`**${t("scn_word")} ${i+1}${sc.sme?" — "+sc.sme:""}${sc.isDistractor?" [⭐ "+t("f_scn_distractor")+"]":""}**`);
+    H(`- ${t("dh_context")}: ${nz(sc.context)}`);
+    H(`- ${t("dh_decision")}: ${nz(sc.decision)}`);
+    H(`- ${t("dh_mistake")}: ${nz(sc.mistake)}`);
+    H(`- ${t("dh_consequence")}: ${nz(sc.consequence)}`);
+    H(`- ${t("dh_quote")}: ${nz(sc.quote)}`); H(""); });
+  return L.join("\n");
+}
+function exportTNA(){
+  const md=buildTNAPackage();
+  const blob=new Blob(["﻿"+md],{type:"text/markdown;charset=utf-8"});
+  const name=((state.meta.projectName||"project").replace(/[^\w\-]+/g,"_").slice(0,40))||"project";
+  triggerDownload(blob, `TNA_Package_${name}_${new Date().toISOString().slice(0,10).replace(/-/g,"")}.md`);
+  toast(t("tna_exported"));
+}
+
+/* ------------------------------------------------------------------ *
+ *  Navigation + chrome
+ * ------------------------------------------------------------------ */
+function svg(icon){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">${ICONS[icon]}</svg>`; }
+function navMeter(step){ if(!step) return ""; const p=stepPct(step); return `<span class="navmeter"><i class="${p===100?"full":""}" style="width:${p}%"></i></span>`; }
+function navItem(n){
+  const on=ui.view===n.id;
+  const label=n.step? t("s"+n.step) : t(n.key);
+  const lead=n.step? `<span class="num">${n.step}</span>` : `<span class="ico">${svg(n.icon)}</span>`;
+  return `<button class="navitem${on?" on":""}" data-action="nav" data-view="${n.id}">${lead}<span class="lbl">${esc(label)}</span>${navMeter(n.step)}</button>`;
+}
+function refreshNav(){
+  let html=`<div class="nav-group">${esc(t("group_flow"))}</div>`;
+  NAV.filter(n=>n.grp==="flow").forEach(n=>html+=navItem(n));
+  html+=`<div class="nav-group">${esc(t("group_tools"))}</div>`;
+  NAV.filter(n=>n.grp==="tools").forEach(n=>html+=navItem(n));
+  document.getElementById("sideNav").innerHTML=html;
+  // bottom bar
+  const cur=ui.view, isStep=/^step\d/.test(cur);
+  const tabs=[
+    {a:"nav",v:"dashboard",icon:"grid",key:"bt_home",on:cur==="dashboard"},
+    {a:"open-sheet",icon:"target",key:"bt_steps",on:isStep},
+    {a:"nav",v:"ai",icon:"spark",key:"bt_ai",on:cur==="ai"},
+    {a:"nav",v:"docs",icon:"docs",key:"bt_docs",on:cur==="docs"}
+  ];
+  document.getElementById("bottomBar").innerHTML=tabs.map(tb=>`<button class="btab${tb.on?" on":""}" data-action="${tb.a}"${tb.v?` data-view="${tb.v}"`:""}><span class="bi">${svg(tb.icon)}</span>${esc(t(tb.key))}</button>`).join("");
+}
+function refreshTop(){
+  const tp=document.getElementById("topProject");
+  tp.innerHTML=(state.meta.projectName||state.meta.client)
+    ? `<div class="pn">${esc(state.meta.projectName||"—")}</div><div class="pc">${esc(state.meta.client||"")}</div>` : "";
+  const ready=isReady(), pill=document.getElementById("readPill");
+  pill.className="readpill "+(ready?"go":"lock");
+  document.getElementById("readPillText").textContent=ready?t("readiness_go"):t("readiness_lock");
+}
+function refreshMeters(){ refreshNav(); refreshTop(); }
+function refreshStepNav(){ const m=/^step(\d)$/.exec(ui.view); if(!m) return; const el=document.querySelector(".stepnav"); if(el) el.outerHTML=stepNav(+m[1]); }
+
+function renderSheet(){
+  const items=NAV.map(n=>{
+    const on=ui.view===n.id, label=n.step?t("s"+n.step):t(n.key);
+    const lead=n.step?`<span class="num">${n.step}</span>`:`<span class="ico">${svg(n.icon)}</span>`;
+    const pct=n.step?`<span class="mono" style="color:var(--ink-3);font-size:12px;font-weight:700">${stepPct(n.step)}%</span>`:"";
+    return `<button class="navitem${on?" on":""}" data-action="nav" data-view="${n.id}" style="width:100%;margin-bottom:2px">${lead}<span class="lbl">${esc(label)}</span>${pct}</button>`;
+  }).join("");
+  document.getElementById("sheetBody").innerHTML=items;
+}
+function openSheet(){ renderSheet(); document.getElementById("sheet").classList.add("open"); document.getElementById("sheetBackdrop").classList.add("open"); }
+function closeSheet(){ document.getElementById("sheet").classList.remove("open"); document.getElementById("sheetBackdrop").classList.remove("open"); }
+
+function renderContent(){
+  let html=VIEWS[ui.view]();
+  const m=/^step(\d)$/.exec(ui.view);
+  if(m) html+=stepNav(+m[1]);
+  document.getElementById("view").innerHTML=html;
+  hydrateMedia();
+}
+function rerender(){ renderContent(); refreshNav(); refreshTop(); }
+function showView(id){ if(!VIEWS[id]) id="dashboard"; ui.view=id; closeSheet(); renderContent(); window.scrollTo(0,0); refreshNav(); refreshTop(); }
+
+function applyStaticI18n(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent=t(el.dataset.i18n); });
+  document.getElementById("langVi").classList.toggle("on",LANG==="vi");
+  document.getElementById("langEn").classList.toggle("on",LANG==="en");
+  const db=document.getElementById("dataBtn"); if(db){ db.title=t("dm_open"); db.setAttribute("aria-label",t("dm_open")); }
+}
+function setLang(l){
+  if(l===LANG) return;
+  LANG=l; state.meta.lang=l; persist();
+  applyStaticI18n(); rerender();
+  const o=document.getElementById("docOverlay");
+  if(o.classList.contains("open")&&o.dataset.doc){ document.getElementById("docPaper").innerHTML=buildDoc(o.dataset.doc); document.getElementById("docTitle").textContent=t(o.dataset.doc); }
+}
+
+/* ------------------------------------------------------------------ *
+ *  Files / recording helpers
+ * ------------------------------------------------------------------ */
+function stripHTML(html){ const d=document.createElement("div"); d.innerHTML=String(html||""); return (d.textContent||"").trim(); }
+function fmtSize(b){ b=+b||0; if(b<1024) return b+" B"; if(b<1048576) return (b/1024).toFixed(0)+" KB"; return (b/1048576).toFixed(1)+" MB"; }
+const MAX_FILE=5*1024*1024;
+
+/* ---- IndexedDB (files + audio blobs; never localStorage) ---- */
+const IDB={db:null,
+  open(){ return new Promise((res,rej)=>{
+    if(this.db) return res(this.db);
+    if(!("indexedDB" in window)) return rej(new Error("no-idb"));
+    const rq=indexedDB.open("discoveryHubDB",1);
+    rq.onupgradeneeded=e=>{ const db=e.target.result; if(!db.objectStoreNames.contains("files"))db.createObjectStore("files"); if(!db.objectStoreNames.contains("audio"))db.createObjectStore("audio"); };
+    rq.onsuccess=e=>{ this.db=e.target.result; res(this.db); };
+    rq.onerror=()=>rej(rq.error||new Error("idb"));
+  });},
+  async put(store,key,val){ const db=await this.open(); return new Promise((res,rej)=>{ const tx=db.transaction(store,"readwrite"); tx.objectStore(store).put(val,key); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); },
+  async get(store,key){ const db=await this.open(); return new Promise((res,rej)=>{ const tx=db.transaction(store,"readonly"); const r=tx.objectStore(store).get(key); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); },
+  async del(store,key){ const db=await this.open(); return new Promise((res,rej)=>{ const tx=db.transaction(store,"readwrite"); tx.objectStore(store).delete(key); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); },
+  async clear(store){ try{ const db=await this.open(); return new Promise((res)=>{ const tx=db.transaction(store,"readwrite"); tx.objectStore(store).clear(); tx.oncomplete=()=>res(); tx.onerror=()=>res(); }); }catch(e){} }
+};
+async function clearAllMedia(){ await IDB.clear("files"); await IDB.clear("audio"); }
+function blobToB64(blob){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]||""); r.onerror=()=>rej(r.error); r.readAsDataURL(blob); }); }
+function b64ToBlob(b64,type){ const bin=atob(b64||""); const arr=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i); return new Blob([arr],{type:type||"application/octet-stream"}); }
+
+/* ---- file attachment (Data Request List) ---- */
+async function fileUpload(i,file){
+  if(!file) return;
+  if(file.size>MAX_FILE){ toast(t("file_toobig"),true); return; }
+  const id=uid();
+  try{ await IDB.put("files", id, {blob:file, name:file.name, type:file.type, size:file.size}); }
+  catch(e){ toast(t("file_idb_fail"),true); return; }
+  const row=state.step2.dataRequests[i]; if(!row) return;
+  if(row.file&&row.file.id){ IDB.del("files",row.file.id).catch(()=>{}); }
+  row.file={id, name:file.name, type:file.type, size:file.size};
+  persist(); rerender();
+}
+async function fileDownload(meta){
+  if(!meta||!meta.id) return;
+  try{ const rec=await IDB.get("files",meta.id); if(!rec||!rec.blob){ toast(t("file_none"),true); return; }
+    triggerDownload(rec.blob, meta.name||"file"); }catch(e){ toast(t("file_idb_fail"),true); }
+}
+function triggerDownload(blob,name){
+  const url=URL.createObjectURL(blob), a=document.createElement("a");
+  a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),800);
+}
+
+/* ---- audio recording (MediaRecorder) + live transcript (Web Speech) ---- */
+const REC={active:null, timer:null, startTs:0, pausedMs:0, pauseStart:0, recog:null};
+function pad2(n){ return (n<10?"0":"")+n; }
+function fmtDur(s){ s=Math.max(0,Math.floor(s)); return pad2(Math.floor(s/60))+":"+pad2(s%60); }
+function recElapsed(){ let ms=Date.now()-REC.startTs-REC.pausedMs; if(REC.pauseStart) ms-=Date.now()-REC.pauseStart; return ms/1000; }
+function updateRecTimer(ivId){ const el=document.getElementById("rec-timer-"+ivId); if(el) el.textContent=fmtDur(recElapsed()); }
+function renderRecControls(ivId,mode){
+  const bar=document.querySelector('[data-recbar="'+ivId+'"]'); if(!bar) return;
+  const a=REC.active;
+  if(mode==="recording"){
+    const paused=!!REC.pauseStart;
+    bar.innerHTML=`<button class="btn sm rec-live${paused?" paused":""}" data-action="rec-pause" data-iv="${ivId}" type="button"><span class="rec-dot on"></span> ${esc(paused?t("rec_resume"):t("rec_pause"))}</button>
+      <button class="btn sm primary" data-action="rec-stop" data-iv="${ivId}" type="button">${esc(t("rec_stop"))}</button>
+      <span class="rec-timer mono" id="rec-timer-${ivId}"></span><span class="rec-badge">${esc(t("rec_recording"))}</span>`;
+    updateRecTimer(ivId);
+  }
+}
+async function recStart(listPath,i,ivId){
+  if(REC.active){ return; }
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)||typeof window.MediaRecorder==="undefined"){ toast(t("rec_no_support"),true); setSttNote(ivId,t("stt_unavailable")); return; }
+  let stream;
+  try{ stream=await navigator.mediaDevices.getUserMedia({audio:true}); }
+  catch(e){ toast(t("rec_perm_denied"),true); return; }
+  let mr; try{ mr=new MediaRecorder(stream); }catch(e){ stream.getTracks().forEach(x=>x.stop()); toast(t("rec_no_support"),true); return; }
+  const chunks=[];
+  mr.ondataavailable=e=>{ if(e.data&&e.data.size) chunks.push(e.data); };
+  mr.onstop=async()=>{
+    const type=mr.mimeType||"audio/webm";
+    const blob=new Blob(chunks,{type});
+    const dur=Math.round(recElapsed());
+    const name="interview-"+ivId+".webm";
+    try{ await IDB.put("audio", ivId, {blob, name, type, size:blob.size, duration:dur});
+      const iv=getPath(state,listPath)&&getPath(state,listPath)[i];
+      if(iv){ iv.audio={id:ivId, name, type, size:blob.size, duration:dur}; persist(); }
+      toast(t("rec_saved"));
+    }catch(e){ toast(t("file_idb_fail"),true); }
+    stream.getTracks().forEach(x=>x.stop());
+    stopSTT();
+    clearInterval(REC.timer); REC.active=null; REC.pauseStart=0; REC.pausedMs=0;
+    rerender();
+  };
+  REC.active={mr,stream,ivId,listPath,i}; REC.startTs=Date.now(); REC.pausedMs=0; REC.pauseStart=0;
+  mr.start();
+  startSTT(ivId,listPath,i);
+  renderRecControls(ivId,"recording");
+  REC.timer=setInterval(()=>updateRecTimer(ivId),500);
+}
+function recPauseToggle(){
+  const a=REC.active; if(!a) return;
+  if(REC.pauseStart){ // resume
+    REC.pausedMs+=Date.now()-REC.pauseStart; REC.pauseStart=0;
+    try{ a.mr.resume(); }catch(e){}
+    startSTT(a.ivId,a.listPath,a.i);
+  }else{ // pause
+    REC.pauseStart=Date.now();
+    try{ a.mr.pause(); }catch(e){}
+    stopSTT();
+  }
+  renderRecControls(a.ivId,"recording");
+}
+function recStop(){ const a=REC.active; if(!a) return; try{ a.mr.stop(); }catch(e){} }
+/* Web Speech transcript — Chrome/Edge + online only; degrade gracefully */
+function sttSupported(){ return typeof (window.SpeechRecognition||window.webkitSpeechRecognition)!=="undefined"; }
+function setSttNote(ivId,msg){ const el=document.getElementById("stt-"+ivId); if(el) el.innerHTML=msg?`<span class="stt-msg">${esc(msg)}</span>`:""; }
+function appendTranscript(listPath,i,text){
+  const path=listPath+"."+i+".transcript";
+  const ce=document.querySelector('[data-ce="'+path+'"]');
+  const cur=getPath(state,path)||"";
+  const joined=(cur?cur+" ":"")+esc(text);
+  setPath(state,path,joined);
+  if(ce){ ce.innerHTML=joined; }
+  scheduleSave();
+}
+function startSTT(ivId,listPath,i){
+  if(!sttSupported() || (typeof navigator.onLine!=="undefined" && !navigator.onLine)){ setSttNote(ivId,t("stt_unavailable")); return; }
+  try{
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    const r=new SR();
+    r.lang = LANG==="vi" ? "vi-VN" : "en-US";
+    r.continuous=true; r.interimResults=false;
+    r.onresult=e=>{ for(let k=e.resultIndex;k<e.results.length;k++){ if(e.results[k].isFinal){ const txt=e.results[k][0].transcript.trim(); if(txt) appendTranscript(listPath,i,txt); } } };
+    r.onerror=ev=>{ if(ev.error==="not-allowed"||ev.error==="service-not-allowed") setSttNote(ivId,t("stt_unavailable")); };
+    r.onend=()=>{ if(REC.active&&REC.active.ivId===ivId&&!REC.pauseStart){ try{ r.start(); }catch(e){} } };
+    r.start();
+    REC.recog=r; setSttNote(ivId,t("stt_listening"));
+  }catch(e){ setSttNote(ivId,t("stt_unavailable")); }
+}
+function stopSTT(){ if(REC.recog){ try{ REC.recog.onend=null; REC.recog.stop(); }catch(e){} REC.recog=null; } }
+async function recDelete(listPath,i,ivId){
+  try{ await IDB.del("audio",ivId); }catch(e){}
+  const iv=getPath(state,listPath)&&getPath(state,listPath)[i]; if(iv){ iv.audio=null; persist(); }
+  rerender();
+}
+async function recDownload(ivId,name){
+  try{ const rec=await IDB.get("audio",ivId); if(!rec||!rec.blob){ toast(t("file_none"),true); return; } triggerDownload(rec.blob,name||"recording.webm"); }
+  catch(e){ toast(t("file_idb_fail"),true); }
+}
+/* load audio blobs into <audio> players after each render */
+function hydrateMedia(){
+  document.querySelectorAll("audio[data-audio-iv]").forEach(async el=>{
+    if(el.dataset.loaded) return; el.dataset.loaded="1";
+    try{ const rec=await IDB.get("audio", el.dataset.audioIv); if(rec&&rec.blob){ el.src=URL.createObjectURL(rec.blob); } }catch(e){}
+  });
+}
+
+/* ------------------------------------------------------------------ *
+ *  Clipboard / export / import / docs / toast
+ * ------------------------------------------------------------------ */
+function copyText(txt){
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).catch(()=>fallbackCopy(txt)); }
+  else fallbackCopy(txt);
+}
+function fallbackCopy(txt){ const ta=document.createElement("textarea"); ta.value=txt; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.focus(); ta.select(); try{document.execCommand("copy");}catch(e){} ta.remove(); }
+async function exportJSON(withFiles){
+  const data=JSON.parse(JSON.stringify(state));
+  if(withFiles){
+    const att={files:{},audio:{}};
+    for(const r of state.step2.dataRequests){ if(r.file&&r.file.id){ try{ const rec=await IDB.get("files",r.file.id); if(rec&&rec.blob) att.files[r.file.id]={name:r.file.name,type:r.file.type,b64:await blobToB64(rec.blob)}; }catch(e){} } }
+    for(const iv of [...state.step3.interviews,...state.step5.interviews]){ if(iv.audio&&iv.audio.id){ try{ const rec=await IDB.get("audio",iv.audio.id); if(rec&&rec.blob) att.audio[iv.audio.id]={name:iv.audio.name,type:iv.audio.type,b64:await blobToB64(rec.blob)}; }catch(e){} } }
+    data._attachments=att;
+  }
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const name=((state.meta.projectName||"discovery-hub").replace(/[^\w\-]+/g,"_").slice(0,40))||"discovery-hub";
+  triggerDownload(blob, `${name}_${new Date().toISOString().slice(0,10)}${withFiles?"_full":""}.json`);
+}
+async function restoreAttachments(att){
+  try{
+    if(att.files) for(const id in att.files){ const f=att.files[id]; const blob=b64ToBlob(f.b64,f.type); await IDB.put("files",id,{blob,name:f.name,type:f.type,size:blob.size}); }
+    if(att.audio) for(const id in att.audio){ const a=att.audio[id]; const blob=b64ToBlob(a.b64,a.type); await IDB.put("audio",id,{blob,name:a.name,type:a.type,size:blob.size,duration:0}); }
+  }catch(e){}
+}
+function openDoc(id){
+  document.getElementById("docPaper").innerHTML=buildDoc(id);
+  document.getElementById("docTitle").textContent=t(id);
+  const o=document.getElementById("docOverlay"); o.dataset.doc=id; o.classList.add("open"); o.scrollTop=0;
+}
+function closeDoc(){ document.getElementById("docOverlay").classList.remove("open"); }
+let toastTimer=null;
+function toast(msg,bad){
+  let el=document.getElementById("toast");
+  if(!el){ el=document.createElement("div"); el.id="toast";
+    el.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:200;padding:12px 18px;border-radius:10px;font-size:13.5px;font-weight:600;box-shadow:var(--sh-2);max-width:90vw;text-align:center";
+    document.body.appendChild(el); }
+  el.style.background=bad?"var(--danger)":"var(--brand)"; el.style.color="#fff"; el.textContent=msg; el.style.opacity="1";
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>{ el.style.transition="opacity .4s"; el.style.opacity="0"; },2600);
+}
+function calloutHTML(type,icon,msg){ return `<div class="callout ${type}" style="margin-top:12px">${icon}<div>${esc(msg)}</div></div>`; }
+function okIcon(){ return '<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 6"/></svg>'; }
+
+/* ------------------------------------------------------------------ *
+ *  Data management (new project / partial delete)
+ * ------------------------------------------------------------------ */
+const DM = {view:"main", resetSettings:false, confirmText:"", parts:[]};
+const PART_KEYS = ["s0","s1","s2","s3","s4","s5","files","audio"];
+function partLabel(k){ return k==="files"?t("dm_part_files") : k==="audio"?t("dm_part_audio") : t(k); }
+function openDataModal(){ DM.view="main"; DM.resetSettings=false; DM.confirmText=""; DM.parts=[]; renderDataModal();
+  document.getElementById("dataModal").classList.add("open"); }
+function closeDataModal(){ document.getElementById("dataModal").classList.remove("open"); }
+function renderDataModal(){
+  const box=document.getElementById("dataModalBox");
+  const head=(title)=>`<div class="m-head"><h2>${esc(title)}</h2><button class="btn sm" data-action="close-data" type="button">${esc(t("btn_close"))}</button></div>`;
+  if(DM.view==="main"){
+    const parts=PART_KEYS.map(k=>`<label class="part-chk"><input type="checkbox" data-dm-part="${k}"${DM.parts.indexOf(k)>=0?" checked":""}><span>${esc(partLabel(k))}</span></label>`).join("");
+    box.innerHTML=head(t("dm_title"))
+      +`<div class="m-card">
+          <h3>${esc(t("dm_new_h"))}</h3><p>${esc(t("dm_new_desc"))}</p>
+          <button class="btn danger" data-action="dm-new" type="button">${esc(t("dm_new_btn"))}</button>
+        </div>
+        <div class="m-card">
+          <h3>${esc(t("dm_partial_h"))}</h3><p>${esc(t("dm_partial_desc"))}</p>
+          <div class="part-list">${parts}</div>
+          <button class="btn" data-action="dm-partial" type="button">${esc(t("dm_delete_selected"))}</button>
+          <div id="dmMsg"></div>
+        </div>`;
+  } else if(DM.view==="new1"){
+    box.innerHTML=head(t("dm_new_h"))
+      +`<div class="m-warn">${warnIcon()} ${esc(t("dm_warn"))}</div>
+        <button class="btn" data-action="dm-backup" type="button">${downIcon()} ${esc(t("dm_backup_btn"))}</button>
+        <label class="m-check"><input type="checkbox" data-dm="resetSettings"${DM.resetSettings?" checked":""}><span>${esc(t("dm_reset_settings"))}</span></label>
+        <div class="btn-row" style="margin-top:8px">
+          <button class="btn" data-action="dm-back" type="button">← ${esc(t("dm_back"))}</button>
+          <button class="btn danger" data-action="dm-continue" type="button">${esc(t("dm_continue"))} →</button>
+        </div>`;
+  } else if(DM.view==="new2"){
+    const w=t("dm_confirm_word");
+    const okd = DM.confirmText.trim().toUpperCase()===w.toUpperCase();
+    box.innerHTML=head(t("dm_new_h"))
+      +`<div class="m-warn">${warnIcon()} ${esc(t("dm_warn"))}</div>
+        <p style="font-size:13px;color:var(--ink-2)">${esc(tf("dm_type_confirm",{w}))}</p>
+        <input class="confirm-in" id="dmConfirmInput" data-dm="confirmText" value="${esc(DM.confirmText)}" placeholder="${esc(w)}" autocomplete="off" autocapitalize="characters">
+        <div class="btn-row">
+          <button class="btn" data-action="dm-back" type="button">← ${esc(t("dm_back"))}</button>
+          <button class="btn danger" id="dmConfirmBtn" data-action="dm-confirm-new" type="button"${okd?"":" disabled"}>${esc(t("dm_confirm_new"))}</button>
+        </div>`;
+  } else if(DM.view==="pconfirm"){
+    box.innerHTML=head(t("dm_partial_h"))
+      +`<p style="font-size:13px;color:var(--ink-2);margin-bottom:8px">${esc(t("dm_pconfirm_h"))}</p>
+        <ul style="margin:0 0 14px 18px;font-size:13.5px;font-weight:600">${DM.parts.map(k=>`<li>${esc(partLabel(k))}</li>`).join("")}</ul>
+        <div class="btn-row">
+          <button class="btn" data-action="dm-back" type="button">← ${esc(t("dm_back"))}</button>
+          <button class="btn danger" data-action="dm-confirm-partial" type="button">${esc(t("dm_confirm_delete"))}</button>
+        </div>`;
+  }
+}
+async function doNewProject(){
+  const keepLang=LANG;
+  await clearAllMedia();
+  clearAppLocalStorage();
+  state=defaults();
+  if(DM.resetSettings){ LANG="vi"; } else { LANG=keepLang; }
+  state.meta.lang=LANG;
+  persist();
+  closeDataModal();
+  applyStaticI18n(); showView("dashboard"); setSaveFlag(false);
+  toast(t("dm_new_done"));
+}
+async function doPartialDelete(){
+  const sel=DM.parts, has=(k)=>sel.indexOf(k)>=0, d=defaults();
+  // remove media blobs from IndexedDB first
+  if(has("files")||has("s2")){ for(const r of state.step2.dataRequests){ if(r.file&&r.file.id) await IDB.del("files",r.file.id).catch(()=>{}); } }
+  if(has("audio")||has("s3")){ for(const r of state.step3.interviews){ if(r.audio&&r.audio.id) await IDB.del("audio",r.audio.id).catch(()=>{}); } }
+  if(has("audio")||has("s5")){ for(const r of state.step5.interviews){ if(r.audio&&r.audio.id) await IDB.del("audio",r.audio.id).catch(()=>{}); } }
+  // reset selected step slices
+  if(has("s0")) state.screening=d.screening;
+  if(has("s1")) state.step1=d.step1;
+  if(has("s2")) state.step2=d.step2;
+  if(has("s3")) state.step3=d.step3;
+  if(has("s4")) state.step4=d.step4;
+  if(has("s5")) state.step5=d.step5;
+  // media-only selections (when their step wasn't fully reset)
+  if(has("files")&&!has("s2")) state.step2.dataRequests.forEach(r=>r.file=null);
+  if(has("audio")){ if(!has("s3")) state.step3.interviews.forEach(r=>r.audio=null); if(!has("s5")) state.step5.interviews.forEach(r=>r.audio=null); }
+  persist(); closeDataModal(); showView("dashboard"); toast(t("dm_deleted"));
+}
+
+/* ------------------------------------------------------------------ *
+ *  Action dispatch
+ * ------------------------------------------------------------------ */
+function handleAction(act,el){
+  switch(act){
+    case "nav": showView(el.dataset.view); break;
+    case "lang": setLang(el.dataset.lang); break;
+    case "open-sheet": openSheet(); break;
+    case "close-sheet": closeSheet(); break;
+    case "screen-ans":{ state.screening.answers[el.dataset.q]=el.dataset.v; persist(); rerender(); break; }
+    case "add":{ const list=el.dataset.list; getPath(state,list).push(ROW_FACTORY[list]()); persist(); rerender(); break; }
+    case "del":{ const list=el.dataset.list, i=+el.dataset.index; getPath(state,list).splice(i,1); persist(); rerender(); break; }
+    case "device":{ const d=el.dataset.device, arr=state.step4.devices, k=arr.indexOf(d);
+      if(k>=0) arr.splice(k,1); else arr.push(d); persist(); rerender(); break; }
+    // files
+    case "file-upload": fileUpload(+el.dataset.index, el.files&&el.files[0]); break;
+    case "file-download": fileDownload(state.step2.dataRequests[+el.dataset.index] && state.step2.dataRequests[+el.dataset.index].file); break;
+    case "file-delete":{ const row=state.step2.dataRequests[+el.dataset.index]; if(row&&row.file){ if(row.file.id) IDB.del("files",row.file.id).catch(()=>{}); row.file=null; persist(); rerender(); } break; }
+    // recording
+    case "rec-start": recStart(el.dataset.list, +el.dataset.index, el.dataset.iv); break;
+    case "rec-pause": recPauseToggle(); break;
+    case "rec-stop": recStop(); break;
+    case "rec-download": recDownload(el.dataset.iv, el.dataset.name); break;
+    case "rec-delete": recDelete(el.dataset.list, +el.dataset.index, el.dataset.iv); break;
+    // data management
+    case "open-data": openDataModal(); break;
+    case "close-data": closeDataModal(); break;
+    case "dm-new": DM.view="new1"; renderDataModal(); break;
+    case "dm-back": DM.view = (DM.view==="new2")?"new1":"main"; renderDataModal(); break;
+    case "dm-backup": exportJSON(true); break;
+    case "dm-continue": DM.view="new2"; DM.confirmText=""; renderDataModal(); break;
+    case "dm-confirm-new": if(DM.confirmText.trim().toUpperCase()===t("dm_confirm_word").toUpperCase()) doNewProject(); break;
+    case "dm-partial":{ const sel=Array.from(document.querySelectorAll("[data-dm-part]:checked")).map(x=>x.dataset.dmPart);
+      const m=document.getElementById("dmMsg");
+      if(!sel.length){ if(m)m.innerHTML=calloutHTML("warn",warnIcon(),t("dm_none_selected")); return; }
+      DM.parts=sel; DM.view="pconfirm"; renderDataModal(); break; }
+    case "dm-confirm-partial": doPartialDelete(); break;
+    // TNA package + backup
+    case "export-tna": exportTNA(); break;
+    case "export-data": exportJSON(false); break;
+    case "export-files": exportJSON(true); break;
+    case "import-json": document.getElementById("importFile").click(); break;
+    case "view-doc": openDoc(el.dataset.doc); break;
+    case "print-doc-direct": openDoc(el.dataset.doc); setTimeout(()=>window.print(),150); break;
+    case "print-doc": window.print(); break;
+    case "close-doc": closeDoc(); break;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ *  Event wiring
+ * ------------------------------------------------------------------ */
+function setModel(path,v){ setPath(state,path,v); }
+document.addEventListener("click",e=>{
+  const el=e.target.closest("[data-action]"); if(!el) return;
+  if(el.tagName==="SELECT") return;
+  if(el.tagName==="INPUT"&&(el.type==="checkbox"||el.type==="radio")) return;
+  handleAction(el.dataset.action,el);
+});
+document.addEventListener("input",e=>{
+  const el=e.target;
+  if(el.dataset&&el.dataset.dm==="confirmText"){ DM.confirmText=el.value; const b=document.getElementById("dmConfirmBtn");
+    if(b){ if(el.value.trim().toUpperCase()===t("dm_confirm_word").toUpperCase()) b.removeAttribute("disabled"); else b.setAttribute("disabled",""); } return; }
+  if(el.dataset&&el.dataset.ce){ setPath(state, el.dataset.ce, el.innerHTML); scheduleSave(); return; }
+  if(el.matches&&el.matches("[data-model]")){ setModel(el.dataset.model, el.type==="checkbox"?el.checked:el.value); scheduleSave();
+    if(el.dataset.req) el.classList.toggle("req-miss", !String(el.value||"").trim());
+    refreshMeters(); refreshStepNav(); return; }
+  if(el.dataset&&el.dataset.cap){ ui[el.dataset.cap]=el.value; }
+});
+document.addEventListener("change",e=>{
+  const el=e.target;
+  if(el.dataset&&el.dataset.dm==="resetSettings"){ DM.resetSettings=el.checked; return; }
+  if(el.matches&&el.matches("[data-model]")){
+    const v=el.type==="checkbox"?el.checked:el.value;
+    setModel(el.dataset.model,v); scheduleSave();
+    if(el.dataset.req) el.classList.toggle("req-miss", !String(el.value||"").trim());
+    if(el.type==="checkbox") rerender(); else { refreshMeters(); refreshStepNav(); }
+    return;
+  }
+  if(el.dataset&&el.dataset.action) handleAction(el.dataset.action,el);
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){
+    if(document.getElementById("dataModal").classList.contains("open")) closeDataModal();
+    else if(document.getElementById("docOverlay").classList.contains("open")) closeDoc();
+    else closeSheet();
+  }
+});
+document.getElementById("dataModal").addEventListener("click",e=>{ if(e.target.id==="dataModal") closeDataModal(); });
+document.getElementById("importFile").addEventListener("change",e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=async()=>{ try{ const obj=JSON.parse(rd.result);
+      if(obj&&obj._attachments) await restoreAttachments(obj._attachments);
+      mergeState(obj); LANG=state.meta.lang||LANG; applyStaticI18n(); showView(ui.view); toast(t("imported_ok")); }
+      catch(err){ toast(t("import_bad"),true); } };
+  rd.readAsText(f); e.target.value="";
+});
+
+/* ------------------------------------------------------------------ *
+ *  Boot
+ * ------------------------------------------------------------------ */
+load();
+applyStaticI18n();
+showView("dashboard");
+setSaveFlag(false);
+</script>
+</body>
+</html>
