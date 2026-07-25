@@ -6,7 +6,7 @@
 
 
 **▶ Dùng ngay:** https://ngolinhtrang2011-dot.github.io/discovery-hub/   
-**▶ Hoặc tải file:** tải `discovery-hub.html` → mở bằng Chrome/Edge
+**▶ Hoặc tải file:** tải `index.html` → mở bằng Chrome/Edge
 
 ---
 
