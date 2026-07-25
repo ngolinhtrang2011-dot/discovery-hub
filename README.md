@@ -4,7 +4,7 @@
 
 **A Training Needs Analysis (TNA) data collection tool for Instructional Designers**, built on the Action Mapping method (Cathy Moore — *Map It*). A single HTML file that runs offline, requires no installation, and never sends your data anywhere.
 
-**▶ Use it now:**  https://ngolinhtrang2011-dot.github.io/discovery-hub/*  
+**▶ Use it now:**  https://ngolinhtrang2011-dot.github.io/discovery-hub/  
 **▶ Or download:** get `index.html` → open with Chrome/Edge
 
 ---
