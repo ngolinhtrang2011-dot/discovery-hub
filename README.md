@@ -86,7 +86,7 @@ See [CHANGELOG.md](CHANGELOG.md). Always download the latest version from this p
 
 Released under **CC BY 4.0** — you are free to use, share, and adapt this tool, as long as you credit the source.
 
-Designed by **Trang Ngo, CPTD** — Instructional Designer & L&D Consultant
+Designed by **Trang Ngo, CPTD** — Instructional Designer & L&D Consultant  
 Method: Action Mapping © Cathy Moore (*Map It: The hands-on guide to strategic training design*)
 
 *If this tool helps you, a ⭐ star on this repo or a recommendation to a fellow L&D professional means a lot.*
