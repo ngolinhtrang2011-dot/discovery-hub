@@ -76,7 +76,7 @@ flowchart LR
 
 ## Contributing & feedback
 
-Report bugs or request features: [open an Issue](../../issues) or fill in the feedback form *(https://forms.gle/hHo6virmGAQAnaccA)*. When reporting a bug, please include: browser + device + app version (see the app footer).
+Report bugs or request features: [open an Issue](../../issues) or fill in the [feedback form](https://forms.gle/hHo6virmGAQAnaccA). When reporting a bug, please include: browser + device + app version (see the app footer).
 
 ## Versioning
 
