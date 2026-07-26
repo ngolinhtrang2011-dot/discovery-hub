@@ -1,0 +1,352 @@
+{
+  "meta": {
+    "projectName": "TNA – Chất lượng dọn phòng (Housekeeping) Auréa Bay",
+    "client": "Auréa Bay Hotels & Resorts",
+    "collector": "Ngô Thị Linh Trang",
+    "startDate": "2026-07-10",
+    "lang": "vi"
+  },
+  "screening": {
+    "answers": {
+      "q1": "yes",
+      "q2": "yes",
+      "q3": "yes",
+      "q4": "yes",
+      "q5": "yes",
+      "q6": "yes",
+      "q7": "yes"
+    },
+    "notes": {
+      "q1": "Nhắm thay đổi hành vi kiểm tra phòng của buồng phòng.",
+      "q2": "",
+      "q3": "",
+      "q4": "Đã xác nhận bằng dữ liệu inspection Q2/2026: fail lần đầu ~13,4% lặp lại đều trong 3 tháng, cao hơn ở NV mới (<2 tháng) và ca cuối tuần → vấn đề hiệu suất thật sự, lặp lại, không phải sự cố một lần.",
+      "q5": "",
+      "q6": "",
+      "q7": ""
+    },
+    "handled": {
+      "q1": false,
+      "q2": false,
+      "q3": false,
+      "q4": false,
+      "q5": false,
+      "q6": false,
+      "q7": false
+    }
+  },
+  "step1": {
+    "sponsorName": "Nguyễn Thị Bích",
+    "sponsorTitle": "Executive Housekeeper",
+    "successAnswer": "Nếu thành công, tỷ lệ phòng bị trả lại (fail inspection) sẽ giảm và điểm 'Room Cleanliness' trên khảo sát tăng.",
+    "metric": "Tỷ lệ phòng fail inspection lần đầu (%)",
+    "baseline": "14%",
+    "target": "8%",
+    "deadline": "31/12/2026",
+    "confirmed": true,
+    "confirmDate": "2026-07-10",
+    "confirmForm": "Email xác nhận của Executive Housekeeper + biên bản họp kickoff có chữ ký",
+    "kickoffAttendees": "Nguyễn Thị Bích (Executive Housekeeper), Vũ Thị Mai (HK Supervisor), Phan Thị Kim Chi (Giám sát tầng), Phạm Hải (L&D), Ngô Thị Linh Trang (ID Consultant)",
+    "kickoffDecisions": "Chốt metric = tỷ lệ fail inspection lần đầu; baseline 14% → target 8%; phạm vi khối buồng phòng 3 resort; tách riêng phần đào tạo được vs phần định mức/môi trường để bàn giao.",
+    "isSolutionRequest": false
+  },
+  "step2": {
+    "dataRequests": [
+      {
+        "item": "Báo cáo inspection buồng phòng 3 tháng gần nhất (fail rate theo nhân viên/ca) → file: inspection-buongphong-Q2-2026.xlsx",
+        "provider": "Executive Housekeeper",
+        "deadline": "2026-07-18",
+        "status": "dr_received"
+      },
+      {
+        "item": "Phàn nàn khách liên quan vệ sinh phòng (Guest Voice) → file: phannan-vesinh-buongphong-Q2-2026.xlsx",
+        "provider": "Guest Relations",
+        "deadline": "2026-07-18",
+        "status": "dr_received"
+      }
+    ],
+    "opsData": [
+      {
+        "content": "Bỏ bước hút bụi & kiểm tra gầm giường, dưới sofa khi làm phòng gấp — đây là nhóm lỗi fail inspection nhiều nhất.",
+        "source": "Báo cáo inspection buồng phòng Q2/2026",
+        "level": "★4 · 26/100 lượt fail"
+      },
+      {
+        "content": "Không lau sạch tóc & vệt nước trong phòng tắm (bồn tắm, vòi sen, gương) — nhóm khách phàn nàn nhiều nhất.",
+        "source": "Log phàn nàn Guest Voice Q2/2026",
+        "level": "★4 · 14 phàn nàn/quý"
+      },
+      {
+        "content": "Làm qua loa hoặc bỏ bước vệ sinh ban công & rãnh cửa kính lùa (còn lá khô, bụi, tàn thuốc từ khách trước).",
+        "source": "Inspection + phàn nàn khách Q2/2026 (12 fail · 12 phàn nàn)",
+        "level": "★3 · thường xuyên"
+      },
+      {
+        "content": "Nhân viên mới (<2 tháng) không bấm bộ đàm báo Supervisor khi phòng quá tải mà tự cắt bước để kịp giờ — fail rate 20,7% so với chỉ 4,6% ở nhân viên senior.",
+        "source": "Inspection tách theo thâm niên Q2/2026",
+        "level": "★5 · nhóm <2 tháng thâm niên"
+      },
+      {
+        "content": "Ca cuối tuần (định mức 16 phòng/ca) fail cao hơn hẳn ngày thường (16,8% vs 11,8%) — dấu hiệu cắt góc do quá tải, KHÔNG giải được bằng đào tạo (cần bàn giao vấn đề định mức).",
+        "source": "Inspection theo loại ngày Q2/2026",
+        "level": "★5 · vấn đề môi trường / định mức"
+      },
+      {
+        "content": "Không thay ga giường / khăn có vết ố hoặc mùi ẩm khi turnover phòng gấp — dẫn tới phàn nàn về ga & khăn.",
+        "source": "Log phàn nàn khách Q2/2026",
+        "level": "★3 · 9 phàn nàn/quý"
+      }
+    ]
+  },
+  "step3": {
+    "interviews": [
+      {
+        "person": "Vũ Thị Mai",
+        "role": "role_manager",
+        "date": "2026-07-11",
+        "notes": "Housekeeping Supervisor. Nghi vấn do định mức phòng/ca quá cao vào cuối tuần.",
+        "transcript": "Cuối tuần mỗi bạn phải làm 16 phòng một ca, bình thường là 12. Lúc đó là các bạn bắt đầu bỏ bước — không phải vì không biết làm mà vì không đủ thời gian. Em nghĩ đây là chuyện định mức chứ chưa chắc là chuyện đào tạo.",
+        "audio": null
+      },
+      {
+        "person": "Phan Thị Kim Chi",
+        "role": "role_manager",
+        "date": "2026-07-11",
+        "notes": "Giám sát tầng khu Beach Villa, 6 năm nghề. Xác nhận vấn đề định mức cuối tuần + khoảng trống onboarding NV mới; đề xuất job-aid trên điện thoại và huấn luyện bằng tình huống thật.",
+        "transcript": "Cuối tuần mỗi bạn 16 phòng thì không thể làm kỹ như 12 phòng ngày thường, đó là toán học chứ không phải thái độ. Nhưng phần đào tạo được là: nhiều bạn mới không biết ưu tiên cái gì trước, và ngại bấm bộ đàm gọi tôi khi quá tải — cứ tự gồng rồi trả phòng thiếu sót. Checklist thì có nhưng lúc đông chả ai giở ra. Tôi nghĩ nên luyện bằng tình huống thật, và làm một thẻ tra nhanh trên điện thoại để các bạn kiểm 30 giây trước khi rời phòng.",
+        "audio": null
+      },
+      {
+        "person": "Lê Thị Duyên",
+        "role": "role_employee",
+        "date": "2026-07-11",
+        "notes": "Phú Quốc · thâm niên 1 năm. Checklist dài, dễ quên bước dưới áp lực.",
+        "transcript": "Em nhớ đại khái các bước, nhưng lúc đông là quên vài chỗ, hay sót gầm giường với đầu tủ. Checklist dài quá, em không giở ra giữa chừng được.",
+        "audio": null
+      },
+      {
+        "person": "Bùi Thị Thu",
+        "role": "role_employee",
+        "date": "2026-07-11",
+        "notes": "Bãi Dài · thâm niên 6 tuần. NV mới: onboarding 2 ngày quá nhanh, học bằng cách nhìn.",
+        "transcript": "Em học có 2 ngày rồi ra làm luôn, chủ yếu nhìn chị cũ làm rồi bắt chước. Nhiều chỗ em không chắc đúng hay không, nhưng ngại hỏi vì sợ làm chậm cả nhóm.",
+        "audio": null
+      },
+      {
+        "person": "Ngô Văn Kiên",
+        "role": "role_employee",
+        "date": "2026-07-12",
+        "notes": "Hồ Tràm · thâm niên 4 tuần. NV mới: chưa phân biệt được deep-clean vs quick-clean, sợ hỏi.",
+        "transcript": "Có phòng em không biết nên làm kỹ cỡ nào, phòng nào chỉ cần dọn nhanh. Em sợ hỏi nhiều bị nói, nên toàn đoán. Đoán sai thì bị trả phòng lại.",
+        "audio": null
+      },
+      {
+        "person": "Trịnh Thị Lan",
+        "role": "role_employee",
+        "date": "2026-07-12",
+        "notes": "Phú Quốc · thâm niên 3 tuần. NV mới: cuối tuần 16 phòng không kịp, bỏ bước gầm giường.",
+        "transcript": "Cuối tuần em chạy không kịp, 16 phòng một ca là quá sức với em bây giờ. Để kịp giờ khách nhận phòng, em đành bỏ bước hút gầm giường với lau ban công.",
+        "audio": null
+      },
+      {
+        "person": "Đặng Văn Tú",
+        "role": "role_employee",
+        "date": "2026-07-12",
+        "notes": "Bãi Dài · thâm niên 3 tháng. Ngại bấm bộ đàm xin hỗ trợ, sợ bị đánh giá.",
+        "transcript": "Phòng bẩn quá em cũng không dám gọi bộ đàm xin người phụ, sợ giám sát nghĩ mình yếu. Thế là tự làm, mà tự làm thì không kịp, rồi lại sót.",
+        "audio": null
+      },
+      {
+        "person": "Hoàng Thị Yến",
+        "role": "role_employee",
+        "date": "2026-07-13",
+        "notes": "Bãi Dài · thâm niên 5 tháng. Phòng tắm khó làm sạch đều (tóc & vệt nước).",
+        "transcript": "Cái khó nhất với em là phòng tắm — tóc với vệt nước khô trên vòi sen, gương. Nhìn thì tưởng sạch mà giám sát soi kỹ là còn. Em chưa có mẹo làm cho đều.",
+        "audio": null
+      },
+      {
+        "person": "Vũ Thị Nga",
+        "role": "role_employee",
+        "date": "2026-07-13",
+        "notes": "Hồ Tràm · thâm niên 8 tháng. Không chắc khi nào phải thay ga/khăn có vết mờ.",
+        "transcript": "Ga với khăn nhiều khi có vết mờ mờ, em không biết nên thay hẳn hay để lại. Thay hết thì sợ lãng phí, để lại thì khách phàn nàn. Không ai nói rõ mức nào là phải thay.",
+        "audio": null
+      },
+      {
+        "person": "Nguyễn Thị Mơ",
+        "role": "role_employee",
+        "date": "2026-07-13",
+        "notes": "Phú Quốc · thâm niên 1,5 năm. Muốn thẻ tra cứu nhanh trên điện thoại.",
+        "transcript": "Giá mà có cái thẻ nhỏ tra nhanh trên điện thoại, kiểu 5 điểm dễ sót cần kiểm trước khi ra, thì tiện lắm. Chứ giở nguyên cuốn SOP thì không thực tế.",
+        "audio": null
+      },
+      {
+        "person": "Phạm Văn Long",
+        "role": "role_employee",
+        "date": "2026-07-13",
+        "notes": "Hồ Tràm · thâm niên 2,5 năm. Senior: khách quay lại phòng, NV mới hay lúng túng.",
+        "transcript": "Mấy bạn mới gặp khách quay lại phòng giữa lúc đang dọn là đơ luôn, không biết nói gì. Cái này quen thì xử được, nhưng phải có ai chỉ và cho tập, chứ tự nhiên không biết.",
+        "audio": null
+      },
+      {
+        "person": "Trần Thị Hạnh",
+        "role": "role_employee",
+        "date": "2026-07-13",
+        "notes": "Bãi Dài · thâm niên >3 năm. High performer: đọc phòng bằng mắt khách; tin là dạy được qua tình huống.",
+        "transcript": "Bí quyết của em là trước khi rời phòng, đứng lại nhìn bằng con mắt của khách. Cái đó dạy được, nhưng phải cho các bạn tập với tình huống thật chứ xem video suông không thấm.",
+        "audio": null
+      },
+      {
+        "person": "Đỗ Thị Hoa",
+        "role": "role_employee",
+        "date": "2026-07-14",
+        "notes": "Phú Quốc · thâm niên 2 tháng. NV mới: một phần SOP bằng tiếng Anh khó đọc.",
+        "transcript": "Có mấy phần trong tài liệu là tiếng Anh, em đọc không hiểu hết nên toàn đoán. Nếu có bản tiếng Việt dễ hiểu với hình minh hoạ thì em học nhanh hơn.",
+        "audio": null
+      },
+      {
+        "person": "Mai Văn Sơn",
+        "role": "role_employee",
+        "date": "2026-07-14",
+        "notes": "Bãi Dài · thâm niên 7 tháng. Thích được demo tận tay hơn xem video.",
+        "transcript": "Em học kiểu nhìn tận tay dễ vào hơn là ngồi xem video. Video em xem xong quên liền, còn được chị chỉ trực tiếp một lần là em nhớ.",
+        "audio": null
+      },
+      {
+        "person": "Lý Thị Bình",
+        "role": "role_employee",
+        "date": "2026-07-14",
+        "notes": "Hồ Tràm · thâm niên 1 năm. Feedback giám sát khác nhau giữa các ca.",
+        "transcript": "Ca này giám sát bảo làm thế này đạt, ca kia lại bắt làm khác. Em không biết chuẩn nào mới đúng, nên hên xui theo người kiểm.",
+        "audio": null
+      },
+      {
+        "person": "Cao Thị Nhung",
+        "role": "role_employee",
+        "date": "2026-07-14",
+        "notes": "Phú Quốc · thâm niên 4 tháng. Cảm giác bị đổ lỗi khi fail dù nguyên nhân là thiếu giờ.",
+        "transcript": "Nhiều lúc fail là vì không đủ giờ chứ không phải em không biết làm, nhưng vẫn bị ghi tên vào báo cáo. Cảm giác bị đổ lỗi làm em nản.",
+        "audio": null
+      },
+      {
+        "person": "Hồ Văn Đạt",
+        "role": "role_employee",
+        "date": "2026-07-14",
+        "notes": "Bãi Dài · thâm niên 9 tháng. Ban công hay bị quên vì làm cuối, hết giờ.",
+        "transcript": "Ban công em toàn để làm sau cùng, mà đến đó thì thường hết giờ nên làm qua loa hoặc bỏ. Biết là sai nhưng thứ tự làm của em nó vậy.",
+        "audio": null
+      },
+      {
+        "person": "Nguyễn Thị Thảo",
+        "role": "role_employee",
+        "date": "2026-07-15",
+        "notes": "Hồ Tràm · thâm niên 2 năm. Quy trình Lost & Found chưa rõ với NV mới.",
+        "transcript": "Đồ khách để quên thì em biết quy trình, nhưng mấy bạn mới thì mù mờ — có bạn để nguyên trên bàn, có bạn cất chờ cuối ca. Cái này phải chỉ rõ từ đầu.",
+        "audio": null
+      },
+      {
+        "person": "Trương Thị Kiều",
+        "role": "role_employee",
+        "date": "2026-07-15",
+        "notes": "Phú Quốc · thâm niên 5 tuần. NV mới: giờ cao điểm checkout dồn, khách chờ nhận phòng.",
+        "transcript": "Giờ checkout với check-in dồn vào nhau, khách mới đứng chờ mà phòng em chưa xong. Em cuống nên làm ẩu. Chưa ai dạy em xử lý lúc gấp thế nào cho đúng.",
+        "audio": null
+      },
+      {
+        "person": "Phùng Văn Hải",
+        "role": "role_employee",
+        "date": "2026-07-15",
+        "notes": "Bãi Dài · thâm niên 1,5 năm. Không có khen thưởng cho phòng tốt, chỉ phạt khi fail.",
+        "transcript": "Làm tốt cả tháng chả ai nói gì, sảy một phòng fail là bị ghi ngay. Kiểu đó lâu dần ai cũng chỉ lo đừng bị bắt lỗi chứ không có động lực làm xuất sắc.",
+        "audio": null
+      },
+      {
+        "person": "Đinh Thị Lệ",
+        "role": "role_employee",
+        "date": "2026-07-15",
+        "notes": "Hồ Tràm · thâm niên 3 năm. Senior: nhóm tự giúp nhau khi quá tải, nên chính thức hoá.",
+        "transcript": "Tụi em hay tự động phụ nhau khi ai đó ôm phòng nặng, nhưng là làm ngầm thôi. Nếu khách sạn cho phép chính thức gọi hỗ trợ khi quá tải thì đỡ hơn nhiều.",
+        "audio": null
+      },
+      {
+        "person": "Võ Thị Tâm",
+        "role": "role_employee",
+        "date": "2026-07-16",
+        "notes": "Phú Quốc · thâm niên 6 tháng. Amenity setup thay đổi liên tục, hay sắp sai.",
+        "transcript": "Cách bày amenity với dép thay đổi mấy lần rồi, em hay nhầm theo kiểu cũ. Không có mẫu chuẩn dán ở đâu để nhìn nên toàn nhớ theo trí nhớ.",
+        "audio": null
+      },
+      {
+        "person": "Bạch Văn Minh",
+        "role": "role_employee",
+        "date": "2026-07-16",
+        "notes": "Bãi Dài · thâm niên 7 tuần. NV mới: thời gian shadow quá ngắn, ra làm một mình sớm.",
+        "transcript": "Em mới theo chị cũ có 3 buổi là bị tách ra làm riêng rồi. Em thấy chưa vững, nhiều tình huống gặp lần đầu là em không biết xử.",
+        "audio": null
+      },
+      {
+        "person": "Tạ Thị Xuân",
+        "role": "role_employee",
+        "date": "2026-07-16",
+        "notes": "Hồ Tràm · thâm niên 10 tháng. Bụi đầu tủ/khung tranh hay sót vì không thành thói quen.",
+        "transcript": "Mấy chỗ cao như đầu tủ, khung tranh em hay quên vì không nằm trong tay quen. Chỉ khi giám sát nhắc em mới để ý, chứ tự nhiên là bỏ sót.",
+        "audio": null
+      }
+    ]
+  },
+  "step4": {
+    "role": "Nhân viên Buồng phòng (Room Attendant)",
+    "size": "34 người (3 resort)",
+    "tenure": "1,4 năm (nhiều NV mới <2 tháng)",
+    "turnover": "42%/năm",
+    "shift": "3 ca luân phiên; định mức 12 phòng/ca ngày thường, 16 phòng/ca cuối tuần; cao điểm turnover 11–15h",
+    "devices": [
+      "dev_shared",
+      "dev_phone"
+    ],
+    "freeTime": "5–10 phút cuối ca, không ổn định",
+    "priorTraining": "Onboarding 2 ngày + video SOP; shadow 3 buổi rồi làm độc lập; chưa có luyện tình huống thật.",
+    "baseKnowledge": "Đa số tốt nghiệp phổ thông/trung cấp; quen dùng smartphone; một phần SOP bằng tiếng Anh gây khó đọc."
+  },
+  "step5": {
+    "interviews": [
+      {
+        "person": "Nguyễn Thị Bích",
+        "role": "role_manager",
+        "date": "2026-07-12",
+        "notes": "Trưởng bộ phận Housekeeping (Executive Housekeeper), 12 năm nghề. Root cause hỗn hợp: skill gap ở nhân viên <2 tháng (đào tạo được) + quá tải định mức cuối tuần 16 phòng/ca (vấn đề môi trường, cần bàn giao). Khai thác được 3 scenario + nhiều quote vàng cho consequence-first feedback.",
+        "transcript": "PV: Chị Bích, với chị một buồng phòng làm 'đạt' và một buồng 'xuất sắc' khác nhau ở đâu?\nBÍCH: Đạt là sạch theo checklist. Xuất sắc là khách bước vào không tìm thấy một lỗi nào — kể cả chỗ họ không nghĩ tới: gầm giường, khe ban công, mặt dưới nắp bồn cầu. Bạn giỏi là bạn tưởng tượng được ánh mắt của khách trước khi rời phòng.\n\nPV: Tỷ lệ fail inspection lần đầu đang 14%. Theo chị gốc rễ nằm ở đâu — kỹ năng hay cái gì khác?\nBÍCH: Hai thứ trộn vào nhau. Nhân viên mới trong 2 tháng đầu đúng là còn sót bước, cái này đào tạo được. Nhưng cuối tuần tôi giao 16 phòng một ca thay vì 12, thì cả người giỏi cũng bắt đầu cắt góc. Lúc đó không phải họ không biết làm, mà là không đủ thời gian để làm đúng. Anh có ép đào tạo kiểu gì cũng không đẻ thêm phút ra được.\n\nPV: Chị kể cho tôi một tình huống thật gần đây mà một bạn phải ra quyết định khó?\nBÍCH: Tuần trước. Phòng checkout sau một nhóm tiệc, bẩn kinh khủng — chai lọ, mùi, khăn vứt khắp nơi. Mà khách mới thì 20 phút nữa nhận phòng, cuối tuần cao điểm. Bạn mới cắm đầu làm cho kịp giờ, bỏ luôn bước kiểm gầm giường với ban công. Khách vào, phát hiện tóc trong bồn tắm và rác dưới gầm — review 2 sao, phòng bị trả lại.\n\nPV: Đáng ra bạn ấy nên làm gì?\nBÍCH: Bấm bộ đàm báo Supervisor ngay lúc mở cửa thấy phòng như vậy. Câu tôi luôn dạy là: 'Phòng quá tải thì gọi người, đừng gồng. Trả phòng bẩn tốn gấp mười lần xin thêm mười phút.' Supervisor sẽ hoặc điều người phụ, hoặc xin lễ tân dời giờ nhận phòng. Cái sai không phải làm chậm — cái sai là im lặng tự gánh.\n\nPV: Còn tình huống nào về đồ khách để quên không?\nBÍCH: Thường xuyên. Dọn phòng checkout mà thấy ví, đồng hồ, có khi cả trang sức. Bạn mới hay lúng túng — có bạn để nguyên trên bàn nghĩ 'khách quay lại lấy', có bạn cất vào túi định cuối ca nộp. Cả hai đều sai. Đúng quy trình là chụp ảnh, ghi phiếu Lost & Found, nộp Supervisor trong vòng 15 phút, tuyệt đối không rời phòng khi món đồ còn trên tay mình. Một lần thất lạc là mất niềm tin cả khách sạn, mà bạn nhân viên cũng dính nghi ngờ oan.\n\nPV: Có khi nào đang dọn thì khách bất ngờ quay lại phòng?\nBÍCH: Có, và người mới hay đơ. Có bạn cứ cúi đầu dọn tiếp như không có ai, có bạn hốt hoảng bỏ xe đẩy chạy ra. Đúng ra là dừng tay, quay lại, mỉm cười: 'Dạ em đang hoàn thiện phòng cho mình, anh/chị cần em ra ngoài mấy phút không ạ?' — trả quyền quyết định cho khách. Khách cần cảm giác phòng này là của họ, mình chỉ là người phục vụ, không phải người xâm phạm.\n\nPV: Nếu chỉ được dạy nhân viên mới một điều, chị dạy gì?\nBÍCH: Đọc phòng bằng con mắt của khách, và biết lúc nào phải gọi người. Kỹ thuật lau chùi học một tuần là xong. Cái khó là phán đoán dưới áp lực — cái đó phải luyện bằng tình huống thật.",
+        "audio": null
+      }
+    ],
+    "scenarios": [
+      {
+        "sme": "Nguyễn Thị Bích",
+        "context": "Phòng checkout sau một nhóm tiệc, bẩn nặng (chai lọ, rác, mùi). Khách mới sẽ nhận phòng sau 20 phút, đang là ca cao điểm cuối tuần (định mức 16 phòng/ca).",
+        "decision": "Cố làm thật nhanh cho kịp giờ (chấp nhận bỏ bớt bước), hay bấm bộ đàm báo Supervisor ngay để xin người hỗ trợ / lùi giờ nhận phòng?",
+        "mistake": "Người mới cắm đầu làm cho kịp, bỏ bước kiểm tra gầm giường và ban công, im lặng tự gánh.",
+        "consequence": "Khách nhận phòng phát hiện tóc trong bồn tắm và rác dưới gầm giường → review 2 sao, phòng bị trả lại (fail inspection).",
+        "quote": "Phòng quá tải thì gọi người, đừng gồng. Trả phòng bẩn tốn gấp mười lần xin thêm mười phút.",
+        "isDistractor": false
+      },
+      {
+        "sme": "Nguyễn Thị Bích",
+        "context": "Đang dọn phòng checkout thì phát hiện đồ khách để quên có giá trị (ví, đồng hồ, trang sức).",
+        "decision": "Xử lý ngay theo quy trình Lost & Found, hay để lại xử lý sau (để trên bàn / cất chờ cuối ca nộp)?",
+        "mistake": "Để nguyên món đồ trên bàn nghĩ 'khách quay lại lấy', hoặc cất vào túi cá nhân định cuối ca mới nộp.",
+        "consequence": "Đồ thất lạc hoặc chậm hoàn trả → khách khiếu nại, mất niềm tin vào khách sạn, và nhân viên bị nghi ngờ oan.",
+        "quote": "Tuyệt đối không rời phòng khi món đồ còn trên tay mình — chụp ảnh, ghi phiếu, nộp Supervisor trong 15 phút.",
+        "isDistractor": false
+      },
+      {
+        "sme": "Nguyễn Thị Bích",
+        "context": "Nhân viên đang dọn dở thì khách bất ngờ quay lại phòng.",
+        "decision": "Ứng xử thế nào: dừng tay và trao quyền quyết định cho khách, hay tiếp tục/rời đi mà không giải thích?",
+        "mistake": "Cúi đầu dọn tiếp như không có ai, hoặc hốt hoảng bỏ xe đẩy chạy ra ngoài không nói gì.",
+        "consequence": "Khách cảm thấy bị xâm phạm riêng tư, khó chịu → đánh giá trải nghiệm thấp.",
+        "quote": "Dạ em đang hoàn thiện phòng cho mình, anh/chị cần em ra ngoài mấy phút không ạ?",
+        "isDistractor": false
+      }
+    ]
+  }
+}
