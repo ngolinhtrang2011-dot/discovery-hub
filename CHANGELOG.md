@@ -2,6 +2,46 @@
 
 Format based on [Keep a Changelog](https://keepachangelog.com/). The current version is shown in the app footer.
 
+## [1.2.0] — 2026-08-05
+
+### Added
+- **Welcome is now its own page** (separate from the Dashboard), with a sidebar entry; the app opens here when no project has been started yet.
+- **Interview media options (Steps 3 & 5):** besides live recording, you can now **upload an MP3** or **upload photos of handwritten notes** — useful when an interviewee declines to be recorded. Attachments are saved in JSON backups and referenced in the TNA Package.
+
+### Changed
+- Vietnamese UI: "Training Needs Analysis" → "Phân tích nhu cầu đào tạo"; reworded the welcome heading/description.
+- Empty/silent recordings (<1 KB) are rejected with a clear message instead of appearing "saved".
+- Clearer warnings when opened via `file://` (microphone & auto-transcript need `http://localhost` or https) and when auto-transcript fails due to network.
+
+### Fixed
+- **Security:** interview notes/transcripts and operational-data fields are now sanitized on input, import, and render — prevents stored-XSS via imported JSON files.
+- Recording controls (Pause/Stop) no longer disappear if the page re-renders mid-recording.
+- Released audio/image object URLs between renders (fixed a memory leak).
+- Re-importing a file no longer creates duplicate/colliding record IDs.
+- Step 2 progress now updates live while editing operational-data content.
+- Removed dead code/CSS; internal cleanup.
+
+---
+
+## [1.1.0] — 2026-07-30
+
+### Added
+- First-run **welcome / empty state** with a one-click sample project (Auréa Bay) and a "sample data" banner so you can explore before starting.
+- Contextual empty-state hints on each step (method guidance shown where data is missing).
+
+### Changed
+- Unified color system (single source of design tokens) and consistent step numbering (Screening + Steps 1–5).
+
+### Fixed
+- **Save reliability:** when browser storage is full, the app now shows a **"Save failed"** state with a rescue banner (Export JSON / free up space) instead of silently claiming "Saved"; early warning as the storage limit approaches.
+- Microphone-denied state now shows an inline explanation with a **Retry** button.
+- Import shows a result summary and distinguishes "not a valid JSON file" from "not a Discovery Hub file".
+
+### Removed
+- Removed unused/legacy features and dead code (AI-extract view, insight-capture / RCA workspace, redundant steps and documents).
+
+---
+
 ## [1.0.0] — 2026-07-25
 
 🎉 **First public release.**
