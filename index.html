@@ -8,13 +8,19 @@
 /* ===== Reset & tokens ===== */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --paper:#F5F3EE; --surface:#FFFFFF; --surface-2:#FBFAF7;
+  /* ===== PALETTE — nguồn sự thật DUY NHẤT: brand Action Map (không hard-code hex ngoài đây) ===== */
+  --paper:#F6F3EC; --surface:#FFFFFF; --surface-2:#FBFAF7;
   --ink:#20242B; --ink-2:#5C6470; --ink-3:#8A9098;
   --line:#E4E1D8; --line-2:#EEEBE3;
-  --brand:#1C4E4A; --brand-2:#16413D; --brand-tint:#E7EEEC;
-  --terracotta:#B85C38; --teal:#2A7F84; --moss:#5E7A4F; --gold:#B4832B;
+  --brand:#16324F; --brand-2:#0E2438; --brand-tint:#E7ECF2; --brand-line:#C6D3E0;
+  --terracotta:#A4462D; --teal:#2F6D75; --moss:#3E6B4F; --gold:#B9862E;
+  --gold-ink:#7A5B18;   /* gold cho CHỮ trên nền sáng — đủ tương phản AA (#B9862E không đạt) */
   --danger:#B23B3B; --danger-tint:#F6E7E4; --ok:#2E7D4F; --ok-tint:#E4F0E8;
-  --warn:#B4832B; --warn-tint:#F6EEDD;
+  --warn:#B9862E; --warn-tint:#F6EEDD;
+  /* verdict Go/No-Go — go=moss · cond=gold · nogo=terracotta (bg/line/ink/lamp = tint tương ứng) */
+  --go:#3E6B4F; --go-bg:#EAF1EC; --go-line:#C3DCCB; --go-ink:#2F5740; --go-lamp:#D6E6DB;
+  --cond:#B9862E; --cond-bg:#F7EFDB; --cond-line:#E6D3A3; --cond-ink:#7A5714; --cond-lamp:#EFE1BD;
+  --nogo:#A4462D; --nogo-bg:#F7E5DF; --nogo-line:#E6C4B6; --nogo-ink:#8A3A22; --nogo-lamp:#F0D2C6;
   --font-sans:-apple-system,"Segoe UI",system-ui,Roboto,"Helvetica Neue",Arial,sans-serif;
   --font-mono:"Cascadia Code","Consolas",ui-monospace,"SFMono-Regular",Menlo,monospace;
   --r:10px; --r-sm:7px; --topbar-h:60px; --bottombar-h:62px;
@@ -26,7 +32,7 @@ body{overflow-x:hidden}
 a{color:var(--brand);text-decoration:none}
 button{font-family:inherit;font-size:inherit;cursor:pointer;border:0;background:none;color:inherit}
 input,select,textarea{font-family:inherit;font-size:15px;color:var(--ink);background:var(--surface)}
-::selection{background:#d7e3e0}
+::selection{background:#cfdbe8}
 :focus-visible{outline:2.5px solid var(--brand);outline-offset:2px;border-radius:4px}
 .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
 .eyebrow{font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);font-family:var(--font-mono)}
@@ -44,8 +50,32 @@ input,select,textarea{font-family:inherit;font-size:15px;color:var(--ink);backgr
 .topbar-project .pc{font-size:11.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .topbar-spacer{flex:1}
 .saveflag{font-size:11.5px;color:var(--ink-3);font-family:var(--font-mono);display:flex;align-items:center;gap:6px;white-space:nowrap}
-.saveflag .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
-.saveflag.saving .dot{background:var(--gold)}
+.saveflag .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);transition:background .3s}
+.saveflag.saving .dot{background:var(--gold);animation:savepulse 1s ease-in-out infinite}
+.saveflag.error{color:var(--danger);font-weight:700}
+.saveflag.error .dot{background:var(--danger);animation:none}
+@keyframes savepulse{0%,100%{opacity:1}50%{opacity:.35}}
+/* save-error banner (fixed at top of content) */
+.saveerr-bar{display:none}
+.saveerr-bar.on{display:block;margin-bottom:16px}
+.saveerr-box{background:var(--danger-tint);border:1px solid #e6c6c0;border-left:4px solid var(--danger);border-radius:var(--r-sm);padding:14px 16px}
+.saveerr-box h3{font-size:15px;font-weight:760;color:#8f2f2f;display:flex;align-items:center;gap:9px}
+.saveerr-box p{font-size:13px;color:#8f2f2f;margin:6px 0 12px;line-height:1.5}
+.saveerr-box .btn-row{gap:9px}
+/* welcome / onboarding */
+.welcome{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh-1);padding:30px 28px;text-align:center;max-width:640px;margin:0 auto}
+.welcome .eyebrow{justify-content:center}
+.welcome h2{font-size:24px;font-weight:770;letter-spacing:-.02em;margin:10px 0 8px}
+.welcome p.wd{font-size:14.5px;color:var(--ink-2);line-height:1.55;max-width:52ch;margin:0 auto 22px}
+.welcome .wbtns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.welcome .wprivacy{margin-top:18px;font-size:12px;color:var(--ink-3);display:inline-flex;gap:7px;align-items:center;justify-content:center}
+.welcome .wprivacy svg{width:15px;height:15px;flex:0 0 auto}
+.sample-banner{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--cond-bg);border:1px solid var(--cond-line);border-radius:var(--r-sm);padding:12px 15px;margin-bottom:16px;font-size:13px;color:var(--cond-ink)}
+.sample-banner .sb-txt{flex:1;min-width:180px;font-weight:600}
+/* mic-blocked state */
+.rec-blocked{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border:1px solid var(--danger-tint);background:var(--danger-tint);border-radius:var(--r-sm)}
+.rec-blocked .rb-msg{font-size:12.5px;color:#8f2f2f;line-height:1.45}
+.recbar .btn[disabled]{opacity:.5;cursor:not-allowed}
 .langtoggle{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
 .langtoggle button{padding:6px 12px;font-size:12.5px;font-weight:700;color:var(--ink-3);min-height:34px}
 .langtoggle button.on{background:var(--brand);color:#fff}
@@ -74,6 +104,8 @@ input,select,textarea{font-family:inherit;font-size:15px;color:var(--ink);backgr
 @media (max-width:480px){ .modal .part-list{grid-template-columns:1fr} }
 .readpill{display:flex;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;border:1px solid transparent}
 .readpill .lamp{width:11px;height:11px;border-radius:50%;box-shadow:0 0 0 3px rgba(0,0,0,.05)}
+.readpill.idle{background:var(--surface-2);color:var(--ink-2);border-color:var(--line)}
+.readpill.idle .lamp{background:var(--ink-3)}
 .readpill.lock{background:var(--danger-tint);color:#8f2f2f;border-color:#eccfca}
 .readpill.lock .lamp{background:var(--danger)}
 .readpill.go{background:var(--ok-tint);color:#1f6540;border-color:#cbe4d4}
@@ -137,7 +169,7 @@ label.lab,.lab{font-size:12.5px;font-weight:650;color:var(--ink-2)}
 .lab .sub{display:block;font-weight:400;color:var(--ink-3);font-size:11.5px;margin-top:2px}
 .control{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);transition:border-color .15s,box-shadow .15s}
 .control:hover{border-color:#d2cec3}
-.control:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(28,78,74,.13)}
+.control:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(22,50,79,.16)}
 .app-footer{text-align:center;font-size:11.5px;line-height:1.6;color:var(--ink-3);padding:16px 18px;border-top:1px solid var(--line);background:var(--surface-2)}
 .app-footer a{color:var(--ink-2);text-decoration:underline;text-underline-offset:2px}
 .app-footer a:hover{color:var(--brand)}
@@ -148,7 +180,6 @@ label.lab,.lab{font-size:12.5px;font-weight:650;color:var(--ink-2)}
 textarea.control{resize:vertical;min-height:76px;line-height:1.5}
 select.control{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235C6470' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
 .goal-formula{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end}
-.goal-formula .op{display:none}
 
 /* checkbox / toggle */
 .check{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);min-height:44px;cursor:pointer}
@@ -167,9 +198,9 @@ select.control{-webkit-appearance:none;appearance:none;background-image:url("dat
 /* ===== Callouts ===== */
 .callout{display:flex;gap:12px;padding:13px 15px;border-radius:var(--r-sm);font-size:13px;line-height:1.5;border:1px solid}
 .callout .ci{flex:0 0 auto;width:18px;height:18px;margin-top:1px}
-.callout.warn{background:var(--warn-tint);border-color:#e7d5ab;color:#7a5b18}
+.callout.warn{background:var(--warn-tint);border-color:#e7d5ab;color:var(--gold-ink)}
 .callout.danger{background:var(--danger-tint);border-color:#e6c6c0;color:#8f2f2f}
-.callout.info{background:var(--brand-tint);border-color:#c9dbd7;color:var(--brand-2)}
+.callout.info{background:var(--brand-tint);border-color:var(--brand-line);color:var(--brand-2)}
 .callout.ok{background:var(--ok-tint);border-color:#cbe4d4;color:#1f6540}
 .callout b{font-weight:700}
 
@@ -193,14 +224,6 @@ select.control{-webkit-appearance:none;appearance:none;background-image:url("dat
 .rowcard{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);padding:13px 13px 14px;position:relative}
 .rowcard .rc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .rowcard .rc-n{font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:var(--ink-3);letter-spacing:.06em}
-.dtable-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-sm)}
-.dtable{width:100%;border-collapse:collapse;min-width:520px}
-.dtable th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);
-  background:var(--surface-2);padding:9px 11px;border-bottom:1px solid var(--line);font-family:var(--font-mono)}
-.dtable td{padding:7px 9px;border-bottom:1px solid var(--line-2);vertical-align:top}
-.dtable tr:last-child td{border-bottom:0}
-.dtable .control{min-height:40px;padding:8px 10px}
-.dtable td.act{width:44px;text-align:center}
 .iconbtn{width:36px;height:36px;border-radius:8px;display:inline-grid;place-items:center;color:var(--ink-3)}
 .iconbtn:hover{background:var(--danger-tint);color:var(--danger)}
 .iconbtn .bi{width:16px;height:16px}
@@ -213,8 +236,8 @@ select.control{-webkit-appearance:none;appearance:none;background-image:url("dat
 .stat .sv{font-family:var(--font-mono);font-size:34px;font-weight:750;line-height:1;letter-spacing:-.03em}
 .stat .sl{font-size:12px;color:var(--ink-2);margin-top:8px;font-weight:600}
 .stat .sk{position:absolute;right:12px;top:11px;width:9px;height:9px;border-radius:50%}
-.stat.t-env .sv{color:var(--terracotta)} .stat.t-know .sv{color:var(--teal)}
-.stat.t-skill .sv{color:var(--moss)} .stat.t-conf .sv{color:var(--gold)}
+.stat.t-data .sv{color:var(--terracotta)} .stat.t-iv .sv{color:var(--teal)}
+.stat.t-scn .sv{color:var(--moss)} .stat.t-file .sv{color:var(--gold)}
 .gate{padding:20px}
 .gate .lamp-xl{width:64px;height:64px;border-radius:50%;margin-bottom:14px;display:grid;place-items:center;transition:.4s}
 .gate.lock .lamp-xl{background:var(--danger-tint);box-shadow:0 0 0 6px rgba(178,59,59,.08)}
@@ -243,61 +266,11 @@ select.control{-webkit-appearance:none;appearance:none;background-image:url("dat
 .mini-legend span{display:inline-flex;align-items:center;gap:6px}
 .mini-legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
 
-/* ===== Insight capture ===== */
-.tag-dot{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
-.t-environment{--tc:var(--terracotta)} .t-knowledge{--tc:var(--teal)}
-.t-skill{--tc:var(--moss)} .t-confidence{--tc:var(--gold)}
-.capture{position:sticky;bottom:0;z-index:20;background:var(--surface);border:1px solid var(--line);
-  border-radius:var(--r);box-shadow:var(--sh-2);padding:14px;margin-top:6px}
-.capture .cap-in{width:100%;min-height:48px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r-sm);font-size:15.5px}
-.capture .cap-in:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(28,78,74,.13)}
-.tagbtns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:11px}
-.tagbtn{min-height:46px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11.5px;font-weight:700;color:var(--ink-2);padding:5px 4px;line-height:1.15;text-align:center}
-.tagbtn .sw{width:14px;height:14px;border-radius:4px;background:var(--tc)}
-.tagbtn.on{border-color:var(--tc);background:color-mix(in srgb,var(--tc) 12%,#fff);color:var(--ink)}
-.tagbtn.on .sw{box-shadow:0 0 0 3px color-mix(in srgb,var(--tc) 25%,#fff)}
-.cap-row2{display:flex;gap:10px;margin-top:11px;flex-wrap:wrap;align-items:center}
-.cap-row2 .src{flex:1;min-width:150px}
-.cap-toggles{display:flex;gap:8px}
-.captog{min-height:44px;padding:0 13px;border:1.5px solid var(--line);border-radius:999px;font-size:12.5px;font-weight:650;color:var(--ink-2);display:inline-flex;align-items:center;gap:7px}
-.captog.on{border-color:var(--gold);background:var(--warn-tint);color:#7a5b18}
-.captog.on.bank{border-color:var(--teal);background:#e3efef;color:#1d5a5e}
-.cap-hint{font-size:11.5px;color:var(--ink-3);margin-top:9px}
-.cap-hint.err{color:var(--danger);font-weight:600}
-
-.ins-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.ins-filters .control{min-height:40px}
-.ins-list{display:flex;flex-direction:column;gap:9px}
-.ins{display:flex;gap:11px;padding:12px 13px;border:1px solid var(--line);border-left:4px solid var(--tc);border-radius:var(--r-sm);background:var(--surface)}
-.ins .ic-body{flex:1;min-width:0}
-.ins .ic-txt{font-size:14px;line-height:1.45}
-.ins .ic-meta{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:7px;font-size:11.5px;color:var(--ink-3)}
-.ins .ic-tag{font-family:var(--font-mono);font-weight:700;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--tc);
-  background:color-mix(in srgb,var(--tc) 10%,#fff);border:1px solid color-mix(in srgb,var(--tc) 25%,#fff);padding:2px 7px;border-radius:5px}
-.ins .ic-src{display:inline-flex;align-items:center;gap:5px}
-.ins .badge{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:5px}
-.ins .badge.d{background:var(--warn-tint);color:#7a5b18}
-.ins .badge.b{background:#e3efef;color:#1d5a5e}
-.ins .ic-acts{display:flex;flex-direction:column;gap:5px;flex:0 0 auto}
-.tglbtn{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;border:1px solid var(--line);font-size:14px;color:var(--ink-3);background:var(--surface)}
-.tglbtn.on{border-color:var(--gold);background:var(--warn-tint)}
-.tglbtn.on.bank{border-color:var(--teal);background:#e3efef}
-.tglbtn.del:hover{border-color:var(--danger);background:var(--danger-tint);color:var(--danger)}
-
 /* scenario cards */
 .scn{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:15px;margin-bottom:12px;position:relative}
 .scn.dist{border-color:#e7d5ab;box-shadow:0 0 0 1px #e7d5ab inset}
 .scn .scn-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;align-items:center}
-.scn-flag{font-size:11px;font-weight:700;color:#7a5b18;background:var(--warn-tint);padding:3px 9px;border-radius:6px;display:inline-flex;gap:6px;align-items:center}
-
-/* ===== AI extract ===== */
-.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.codebox{font-family:var(--font-mono);font-size:12.5px;line-height:1.55;background:#1e2329;color:#d7dbe0;border-radius:var(--r-sm);padding:14px;
-  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;border:1px solid #2c333b}
-.ai-preview{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px}
-.ai-preview .pv{font-family:var(--font-mono)}
-.ai-preview .pv b{font-size:24px;font-weight:750}
+.scn-flag{font-size:11px;font-weight:700;color:var(--gold-ink);background:var(--warn-tint);padding:3px 9px;border-radius:6px;display:inline-flex;gap:6px;align-items:center}
 
 /* ===== Documents ===== */
 .doc-list{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
@@ -354,9 +327,9 @@ select.control{-webkit-appearance:none;appearance:none;background-image:url("dat
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
 .segbtn{min-height:46px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface);font-weight:650;font-size:13.5px;color:var(--ink-2);display:flex;align-items:center;justify-content:center;gap:8px}
 .segbtn .sd{width:9px;height:9px;border-radius:50%;background:currentColor;opacity:.4}
-.segbtn.yes.on{border-color:var(--moss);background:color-mix(in srgb,var(--moss) 13%,#fff);color:#3E6B4F}
-.segbtn.no.on{border-color:var(--terracotta);background:color-mix(in srgb,var(--terracotta) 13%,#fff);color:#A4462D}
-.segbtn.unclear.on{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 16%,#fff);color:#8a6414}
+.segbtn.yes.on{border-color:var(--moss);background:color-mix(in srgb,var(--moss) 13%,#fff);color:var(--moss)}
+.segbtn.no.on{border-color:var(--terracotta);background:color-mix(in srgb,var(--terracotta) 13%,#fff);color:var(--terracotta)}
+.segbtn.unclear.on{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 16%,#fff);color:var(--gold-ink)}
 .segbtn.on .sd{opacity:1}
 .verdict{border-radius:var(--r);padding:18px;border:1px solid;display:flex;flex-direction:column;gap:8px}
 .verdict .vb{display:flex;align-items:center;gap:13px}
@@ -364,16 +337,16 @@ select.control{-webkit-appearance:none;appearance:none;background-image:url("dat
 .verdict .vlamp .c{width:16px;height:16px;border-radius:50%}
 .verdict h3{font-size:17px;font-weight:760;letter-spacing:-.01em}
 .verdict .vd{font-size:13px;line-height:1.5}
-.v-go{background:#eaf1ec;border-color:#c3dccb;color:#2f5740}
-.v-go .vlamp{background:#d6e6db}.v-go .vlamp .c{background:#3E6B4F}
-.v-cond{background:#f7efdb;border-color:#e6d3a3;color:#7a5714}
-.v-cond .vlamp{background:#efe1bd}.v-cond .vlamp .c{background:#B9862E}
-.v-nogo{background:#f7e5df;border-color:#e6c4b6;color:#8a3a22}
-.v-nogo .vlamp{background:#f0d2c6}.v-nogo .vlamp .c{background:#A4462D}
+.v-go{background:var(--go-bg);border-color:var(--go-line);color:var(--go-ink)}
+.v-go .vlamp{background:var(--go-lamp)}.v-go .vlamp .c{background:var(--go)}
+.v-cond{background:var(--cond-bg);border-color:var(--cond-line);color:var(--cond-ink)}
+.v-cond .vlamp{background:var(--cond-lamp)}.v-cond .vlamp .c{background:var(--cond)}
+.v-nogo{background:var(--nogo-bg);border-color:var(--nogo-line);color:var(--nogo-ink)}
+.v-nogo .vlamp{background:var(--nogo-lamp)}.v-nogo .vlamp .c{background:var(--nogo)}
 .v-unset{background:var(--surface-2);border-color:var(--line);color:var(--ink-2)}
 .v-unset .vlamp{background:#e9e7e0}.v-unset .vlamp .c{background:var(--ink-3)}
 .cond-list{display:flex;flex-direction:column;gap:8px}
-.cond{display:flex;gap:11px;align-items:flex-start;padding:11px 13px;border:1px solid #e6d3a3;background:#fbf6ea;border-radius:var(--r-sm);font-size:12.5px;line-height:1.45;cursor:pointer}
+.cond{display:flex;gap:11px;align-items:flex-start;padding:11px 13px;border:1px solid var(--cond-line);background:var(--cond-bg);border-radius:var(--r-sm);font-size:12.5px;line-height:1.45;cursor:pointer}
 .cond input{width:20px;height:20px;margin-top:1px;accent-color:var(--gold);flex:0 0 auto}
 .cond.done{opacity:.55;border-color:var(--line);background:var(--surface-2)}
 .alt-list{display:grid;gap:10px}
@@ -383,7 +356,7 @@ select.control{-webkit-appearance:none;appearance:none;background-image:url("dat
 .dash-verdict{margin-bottom:18px;cursor:pointer;box-shadow:var(--sh-1)}
 .dash-verdict .vb{margin:0}
 .tna-cta{display:flex;align-items:center;gap:18px;justify-content:space-between;flex-wrap:wrap;
-  padding:20px 22px;margin-bottom:18px;background:linear-gradient(0deg,var(--brand-tint),var(--brand-tint)),var(--surface);border-color:#c9dbd7}
+  padding:20px 22px;margin-bottom:18px;background:linear-gradient(0deg,var(--brand-tint),var(--brand-tint)),var(--surface);border-color:var(--brand-line)}
 .tna-cta .tna-body h3{font-size:18px;font-weight:760;letter-spacing:-.01em;margin-top:3px}
 .tna-cta .tna-body p{font-size:13px;color:var(--ink-2);margin-top:5px;max-width:60ch}
 .btn.lg{min-height:52px;padding:0 22px;font-size:15px;flex:0 0 auto}
@@ -407,39 +380,55 @@ select.control{-webkit-appearance:none;appearance:none;background-image:url("dat
 .rec-audio audio{max-width:100%;flex:1;min-width:180px}
 .stt-note{margin-top:8px}
 .stt-msg{font-size:12px;color:var(--ink-3);display:inline-block;padding:6px 10px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm)}
+/* interview media block: audio (record OR upload) + handwritten-note photos */
+.ivmedia{display:flex;flex-direction:column;gap:10px}
+.ivmedia .mrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ivmedia .mlbl{font-size:11px;font-weight:750;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;font-family:var(--font-mono);margin-right:2px}
+.ivmedia .msep{width:1px;height:22px;background:var(--line);margin:0 2px}
+.rec-warn{font-size:12px;color:var(--gold-ink);background:var(--gold-tint,rgba(191,143,42,.12));border:1px solid var(--gold,#bf8f2a);border-radius:var(--r-sm);padding:7px 10px;line-height:1.5;display:flex;gap:7px;align-items:flex-start}
+.rec-warn svg{width:15px;height:15px;flex:0 0 auto;margin-top:1px}
+.note-grid{display:flex;gap:10px;flex-wrap:wrap}
+.note-thumb{position:relative;width:78px;height:78px;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden;background:var(--surface-2);cursor:pointer;flex:0 0 auto}
+.note-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.note-thumb .ndel{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:6px;border:none;background:rgba(20,20,20,.62);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.note-thumb .ndel svg{width:13px;height:13px}
+.note-thumb .nname{position:absolute;left:0;right:0;bottom:0;font-size:9px;color:#fff;background:rgba(20,20,20,.62);padding:2px 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ce{min-height:52px;cursor:text;overflow-wrap:anywhere}
 .ce:empty:before{content:attr(data-ph);color:var(--ink-3)}
-.ce:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(28,78,74,.13)}
-mark.pp{background:color-mix(in srgb,var(--terracotta) 22%,#fff);color:inherit;border-radius:3px;padding:0 1px;box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--terracotta) 45%,#fff)}
-.hl-btn{position:absolute;z-index:120;background:var(--ink);color:#fff;border-radius:999px;padding:8px 14px;font-size:12.5px;font-weight:700;box-shadow:var(--sh-2);white-space:nowrap;min-height:38px}
-.hl-btn:hover{background:#000}
+.ce:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(22,50,79,.16)}
 .stepnav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:24px 0 8px}
-.stepnav-hint{flex:1;text-align:center;font-size:12px;color:var(--gold);font-weight:600;line-height:1.5}
-.stepnav-hint .miss-names{display:inline;color:#a8721f;font-weight:600}
-.rca-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.dist{display:flex;flex-direction:column;gap:9px}
-.dist-row{display:flex;align-items:center;gap:12px}
-.dist-l{flex:0 0 150px;font-size:12.5px;font-weight:700;font-family:var(--font-mono)}
-.dist-bar{flex:1;height:12px;border-radius:6px;background:var(--line);overflow:hidden}
-.dist-bar i{display:block;height:100%;border-radius:6px;transition:width .4s}
-.dist-n{width:34px;text-align:right;font-weight:700;font-size:13px}
-.rca-list{display:flex;flex-direction:column;gap:12px}
-.rca-card{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:14px}
-.rca-card.unclassified{border-color:#e6d3a3;background:#fdfaf2}
-.rca-top{display:flex;gap:10px;align-items:flex-start}
-.rca-top .control{flex:1}
-.rca-meta{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin:9px 0}
-.rca-src{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--ink-3);border:1px solid var(--line);border-radius:6px;padding:3px 8px;background:var(--surface-2)}
-.rca-src:hover{border-color:var(--brand);color:var(--brand)}
-.rca-sug{font-size:11.5px;color:var(--ink-3)}
-.rca-tags{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.rca-tag{min-height:44px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface);display:flex;align-items:center;justify-content:center;gap:7px;font-size:12px;font-weight:700;color:var(--ink-2);padding:5px 6px;text-align:center;line-height:1.15}
-.rca-tag .sw{width:12px;height:12px;border-radius:4px;flex:0 0 auto}
-.rca-toggles{display:flex;gap:8px;margin-top:10px}
+.stepnav-hint{flex:1;text-align:center;font-size:12px;color:var(--gold-ink);font-weight:600;line-height:1.5}
+.stepnav-hint .miss-names{display:inline;color:var(--gold-ink);font-weight:600}
+/* interview question guide */
+.guide{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);margin-bottom:14px;overflow:hidden}
+.guide>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:13px 15px;font-weight:650;font-size:13.5px;color:var(--brand-2)}
+.guide>summary::-webkit-details-marker{display:none}
+.guide>summary .g-ico{width:18px;height:18px;flex:0 0 auto;color:var(--brand)}
+.guide>summary .g-hint{margin-left:auto;font-weight:400;color:var(--ink-3);font-size:12px}
+.guide>summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--ink-3);border-bottom:2px solid var(--ink-3);transform:rotate(45deg);transition:transform .2s;flex:0 0 auto;margin-left:12px}
+.guide[open]>summary::after{transform:rotate(-135deg)}
+.guide[open]>summary{border-bottom:1px solid var(--line)}
+.guide .guide-body{padding:14px 16px 16px}
+.guide-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.guide-tools label{font-size:12.5px;color:var(--ink-2);display:flex;align-items:center;gap:7px}
+.guide-tools select{min-height:36px;padding:6px 28px 6px 11px;font-size:12.5px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);max-width:220px}
+.guide-groups{display:grid;grid-template-columns:1fr 1fr;gap:16px 28px}
+.guide-groups.editing{grid-template-columns:1fr;gap:16px}
+.guide-grp h4{font-size:11px;font-weight:750;color:var(--brand);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;font-family:var(--font-mono)}
+.guide-grp ul{margin:0;padding-left:0;list-style:none}
+.guide-grp li{font-size:13px;line-height:1.5;color:var(--ink);margin-bottom:5px;display:flex;align-items:flex-start;gap:8px}
+.guide-grp li .gq-txt{flex:1;padding-left:15px;position:relative}
+.guide-grp li .gq-txt::before{content:"•";position:absolute;left:2px;color:var(--ink-3)}
+.gq-ins{flex:0 0 auto;width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--brand);display:grid;place-items:center;opacity:.45;transition:.15s}
+.guide-grp li:hover .gq-ins{opacity:1}
+.gq-ins:hover{background:var(--brand-tint);border-color:var(--brand)}
+.gq-ins svg{width:15px;height:15px}
+.gg-head{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.gg-head .control{font-weight:700;font-size:12.5px;min-height:38px}
+.gq-edit{margin-bottom:7px}
+.gq-edit .control{min-height:38px;font-size:13px}
+@media (max-width:640px){.guide-groups{grid-template-columns:1fr}}
 @media (max-width:480px){
-  .rca-stats{grid-template-columns:repeat(2,1fr)}
-  .rca-tags{grid-template-columns:repeat(2,1fr)}
-  .dist-l{flex-basis:110px}
   .stepnav{flex-wrap:wrap}
   .stepnav-hint{order:3;flex-basis:100%}
 }
@@ -448,14 +437,13 @@ mark.pp{background:color-mix(in srgb,var(--terracotta) 22%,#fff);color:inherit;b
 @media (max-width:1024px){
   .content{padding:22px 22px 40px}
   .dash-grid{grid-template-columns:1fr}
-  .ai-grid{grid-template-columns:1fr}
   .sidenav{position:sticky;top:var(--topbar-h);width:100%;flex-basis:100%;height:auto;overflow-x:auto;overflow-y:hidden;
     display:flex;gap:6px;padding:9px 14px;border-right:0;border-bottom:1px solid var(--line);background:var(--surface-2)}
   .shell{flex-direction:column}
   .nav-group{display:none}
   .navitem{width:auto;flex:0 0 auto;padding:8px 13px;white-space:nowrap;border:1px solid transparent}
   .navitem.on::before{display:none}
-  .navitem.on{border-color:#c9dbd7}
+  .navitem.on{border-color:var(--brand-line)}
   .navmeter{display:none}
   .navitem .lbl{max-width:130px}
   .stat-wall{grid-template-columns:repeat(2,1fr)}
@@ -479,14 +467,11 @@ mark.pp{background:color-mix(in srgb,var(--terracotta) 22%,#fff);color:inherit;b
   .view-head h1{font-size:22px}
   .stat-wall{grid-template-columns:repeat(2,1fr)}
   .section{padding:16px 14px 18px}
-  .tagbtns{grid-template-columns:repeat(2,1fr)}
   .bottombar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;height:calc(var(--bottombar-h) + env(safe-area-inset-bottom));
     padding-bottom:env(safe-area-inset-bottom);background:var(--surface);border-top:1px solid var(--line);align-items:stretch}
   .btab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--ink-3);font-size:10.5px;font-weight:650;min-height:44px}
   .btab .bi{width:21px;height:21px}
   .btab.on{color:var(--brand)}
-  .capture{bottom:calc(var(--bottombar-h) + env(safe-area-inset-bottom));margin-left:-15px;margin-right:-15px;border-radius:14px 14px 0 0;padding:12px 15px}
-  .ai-preview{gap:12px}
   .doc-scroll{padding:16px 0 40px}
   .doc-paper{padding:12mm 9mm;box-shadow:none}
   .sign-block{grid-template-columns:1fr}
@@ -536,7 +521,7 @@ mark.pp{background:color-mix(in srgb,var(--terracotta) 22%,#fff);color:inherit;b
 
   <div class="shell">
     <nav class="sidenav no-print" id="sideNav" aria-label="Sections"></nav>
-    <main class="content"><div class="wrap" id="view"></div></main>
+    <main class="content"><div class="wrap"><div id="saveErrorBar" class="saveerr-bar no-print"></div><div id="view"></div></div></main>
   </div>
 
   <footer class="app-footer no-print" id="appFooter"></footer>
@@ -559,6 +544,10 @@ mark.pp{background:color-mix(in srgb,var(--terracotta) 22%,#fff);color:inherit;b
   <div class="modal" id="dataModalBox"></div>
 </div>
 
+<div class="modal-overlay no-print" id="importModal" role="dialog" aria-modal="true">
+  <div class="modal" id="importModalBox" style="max-width:460px"></div>
+</div>
+
 <input type="file" id="importFile" accept="application/json,.json" style="display:none">
 
 <script>
@@ -571,39 +560,36 @@ mark.pp{background:color-mix(in srgb,var(--terracotta) 22%,#fff);color:inherit;b
 /* ------------------------------------------------------------------ *
  *  I18N dictionary — every UI string lives here (add a language = add a key)
  * ------------------------------------------------------------------ */
-const I18N = {
-vi:{
-  appTagline:"Công cụ thu thập dữ liệu Training Needs Analysis",
+const I18N = {vi:{
+  appTagline:"Công cụ thu thập dữ liệu Phân tích nhu cầu đào tạo",
   save_saved:"Đã lưu", save_saving:"Đang lưu…",
   readiness_go:"Đủ điều kiện vẽ Map", readiness_lock:"Chưa đủ điều kiện",
   // nav
   group_flow:"Quy trình", group_tools:"Công cụ",
-  nav_dashboard:"Dashboard", nav_ai:"AI Extract", nav_docs:"Tài liệu", nav_steps:"6 Bước", nav_rca:"Phân tích RCA",
-  bt_home:"Tổng quan", bt_steps:"Bước", bt_ai:"AI", bt_docs:"Tài liệu",
+  nav_welcome:"Chào mừng", nav_dashboard:"Dashboard", nav_docs:"Tài liệu",
+  bt_home:"Tổng quan", bt_steps:"Bước", bt_docs:"Tài liệu",
   // step names
   s1:"Mục tiêu kinh doanh", s2:"Dữ liệu vận hành", s3:"Phỏng vấn trực tiếp",
-  s4:"Chân dung người học", s5:"Phỏng vấn SME & High performer", s6:"Ràng buộc", s7:"Cam kết",
+  s4:"Chân dung người học", s5:"Phỏng vấn SME & High performer", constraints_title:"Ràng buộc", 
   s1_short:"Business Goal", s2_short:"Ops Data", s3_short:"Interviews",
-  s4_short:"Learner", s5_short:"SME & Scenarios", s6_short:"Constraints", s7_short:"Commitment",
+  s4_short:"Learner", s5_short:"SME & Scenarios", 
   // common
   btn_add:"Thêm", btn_remove:"Xóa", btn_view:"Xem", btn_print:"In / Lưu PDF", btn_close:"Đóng",
-  btn_copy:"Sao chép", btn_copied:"Đã sao chép!", none_yet:"Chưa có mục nào — bấm “Thêm”.",
-  of:"trong", required_short:"bắt buộc", step_word:"Bước",
+  none_yet:"Chưa có mục nào — bấm “Thêm”.",
+  of:"trong", step_word:"Bước",
   yes:"Có", no:"Không", ok:"OK", issue:"Có vấn đề", pick:"— Chọn —",
   // dashboard
   dash_title:"Discovery Dashboard",
-  dash_lead:"Nhập một lần, dữ liệu tự cập nhật vào mọi tài liệu đầu ra. Hoàn tất Bước 1–3 để thiết lập Action Map.",
+  dash_lead:"Nhập một lần, dữ liệu tự cập nhật vào mọi tài liệu đầu ra.",
   project_info:"Thông tin dự án",
   f_projectName:"Tên dự án", f_client:"Client / Khách hàng", f_collector:"Người thu thập", f_startDate:"Ngày bắt đầu",
   ph_projectName:"VD: Onboarding Nhân viên Kho", ph_client:"VD: Công ty ABC", ph_collector:"Tên bạn",
-  progress_title:"Tiến độ 6 bước", progress_hint:"% trường bắt buộc đã điền",
-  counters_title:"Thống kê nhanh",
-  c_insights:"Pain point", c_quotes:"Quote / Scenario", c_distractors:"Distractor tiềm năng", c_interviews:"Buổi phỏng vấn",
+  progress_title:"Sàng lọc + 5 bước discovery", progress_hint:"% trường bắt buộc đã điền",
+  c_interviews:"Buổi phỏng vấn",
   gate_title:"Điều kiện vẽ Map",
   gate_go_h:"Sẵn sàng vẽ Action Map", gate_lock_h:"Chưa đủ điều kiện",
   gate_go_desc:"Bước 0 = GO, Bước 1 hoàn tất 100% trường bắt buộc, và Bước 2, 3, 5 đã có dữ liệu. Bạn có thể bắt đầu vẽ Action Map với sponsor.",
   gate_lock_desc:"Đèn chỉ bật xanh khi Bước 0 cho verdict GO, Bước 1 (Mục tiêu kinh doanh) hoàn tất 100% trường bắt buộc, và Bước 2 (Dữ liệu vận hành), Bước 3 (Phỏng vấn trực tiếp), Bước 5 (Phỏng vấn SME) đã có dữ liệu.",
-  warn_step5:"Nhắc: Hoàn thành Bước 5 (Scenario Bank) trước khi viết bất kỳ scenario nào — thoại và tình huống thật phải đến từ SME.",
   legend_full:"Đủ 100%", legend_part:"Đang điền", req_badge:"BB",
   // step1
   s1_lead:"Xác định business goal đo lường được cùng sponsor. Không có con số → không có Map.",
@@ -625,36 +611,14 @@ vi:{
   f_isSolutionRequest:"Tự đánh giá: mục tiêu này thực chất chỉ là “yêu cầu giải pháp” (VD: “làm một khóa e-learning”), chưa phải con số kinh doanh",
   s1_warn_solution:"Cảnh báo: Đây là yêu cầu giải pháp, không phải business goal. Hãy quay lại hỏi sponsor: con số kinh doanh nào sẽ thay đổi? Nếu không có, dự án chưa nên bắt đầu.",
   // step2
-  s2_lead:"Thu thập bằng chứng về hành vi hiện tại. Cần dữ liệu thật, không phải phỏng đoán.",
   s2_drl:"Data Request List", s2_drl_hint:"Danh sách dữ liệu cần yêu cầu",
   f_dr_item:"Mục dữ liệu", f_dr_provider:"Người cung cấp", f_dr_deadline:"Deadline", f_dr_status:"Trạng thái nhận",
   dr_pending:"Chưa nhận", dr_partial:"Nhận một phần", dr_received:"Đã nhận",
-  s2_beh:"Phát hiện hành vi", s2_beh_hint:"Hành vi sai/thiếu quan sát được",
-  f_beh_desc:"Mô tả hành vi sai/thiếu", f_beh_freq:"Tần suất", f_beh_impact:"Ảnh hưởng (1–5)", f_beh_source:"Nguồn dữ liệu",
-  ph_beh_desc:"VD: Không kiểm tra nhãn trước khi dán", ph_beh_freq:"VD: 15 vụ/tuần",
   // step3
-  s3_lead:"Chẩn đoán vì sao hành vi xảy ra. Phần lớn vấn đề hiệu suất KHÔNG đến từ thiếu kiến thức.",
   s3_interviews:"Buổi phỏng vấn",
   f_iv_person:"Người phỏng vấn", f_iv_role:"Vai trò", f_iv_date:"Ngày",
   role_employee:"Nhân viên", role_supervisor:"Giám sát", role_teamlead:"Trưởng Nhóm", role_deptmanager:"Quản lý Bộ phận", role_board:"Ban Giám đốc", role_other:"Others",
-  s3_env:"5 yếu tố môi trường", s3_env_hint:"Đánh giá từng yếu tố",
-  env_tools:"Công cụ / Thiết bị", env_process:"Quy trình – SOP", env_people:"Nhân sự",
-  env_policy:"Chính sách – Phân quyền", env_reward:"Khen thưởng – Động lực",
-  f_env_status:"Đánh giá", f_env_note:"Ghi chú",
-  ph_env_note:"Yếu tố này có cản trở hành vi đúng không?",
   // insight capture
-  cap_title:"Insight Capture", cap_hint_speed:"Gõ 1 câu → chọn 1 tag → Enter. Nhanh nhất có thể.",
-  cap_ph:"Gõ nhanh một insight rồi Enter…",
-  tag_environment:"MÔI TRƯỜNG", tag_knowledge:"KIẾN THỨC", tag_skill:"KỸ NĂNG", tag_confidence:"TỰ TIN – ĐỘNG LỰC",
-  cap_source:"Nguồn", cap_source_ph:"Từ buổi PV / dữ liệu nào?",
-  cap_distractor:"Distractor", cap_bank:"Scenario Bank",
-  cap_add:"Ghi lại (Enter)", cap_need_tag:"Hãy chọn 1 tag trước khi lưu.",
-  cap_need_text:"Nhập nội dung insight.",
-  ins_list_title:"Insight đã ghi", ins_filter_tag:"Lọc theo tag", ins_filter_src:"Lọc theo nguồn",
-  filter_all_tags:"Tất cả tag", filter_all_src:"Tất cả nguồn",
-  ins_empty:"Chưa có insight nào. Dùng ô Capture bên trên.",
-  ins_none_match:"Không có insight khớp bộ lọc.",
-  src_unknown:"(chưa rõ nguồn)",
   // step4
   s4_lead:"Hiểu người học để thiết kế nội dung phù hợp với thực tế công việc của họ.",
   f_role:"Vai trò công việc", f_size:"Quy mô (số người)", f_tenure:"Thâm niên TB (năm)", f_turnover:"Turnover (%/năm)",
@@ -662,11 +626,9 @@ vi:{
   f_priorTraining:"Đào tạo đã có", f_baseKnowledge:"Kiến thức nền",
   ph_shift:"VD: 3 ca luân phiên, đứng máy liên tục", ph_priorTraining:"Các khóa/hướng dẫn đã trải qua",
   ph_baseKnowledge:"Học vấn, khả năng đọc hiểu, ngoại ngữ…",
-  dev_phone:"Điện thoại cá nhân", dev_shared:"Máy trạm dùng chung", dev_tablet:"Tablet", dev_desktop:"Máy tính bàn riêng", dev_kiosk:"Kiosk / Màn hình xưởng",
+  dev_phone:"Điện thoại cá nhân", dev_shared:"Máy tính dùng chung", dev_tablet:"Tablet", dev_desktop:"Máy tính bàn riêng", dev_kiosk:"Kiosk / Màn hình xưởng",
   // step5
-  s5_lead:"Khai thác SME & high performer để lấy tình huống thật — nguyên liệu cho practice activity.",
-  s5_smes:"SME / High performer", f_sme_name:"Tên", f_sme_role:"Vai trò / Chuyên môn",
-  ph_sme_role:"VD: Tổ trưởng QC 8 năm kinh nghiệm",
+  s5_smes:"SME / High performer", 
   s5_scenarios:"Ngân hàng tình huống", s5_scn_hint:"Mỗi tình huống = 1 card",
   f_scn_sme:"Nguồn (SME)", f_scn_context:"Bối cảnh", f_scn_decision:"Quyết định khó",
   f_scn_mistake:"Sai lầm phổ biến", f_scn_consequence:"Hậu quả thật", f_scn_quote:"Thoại nguyên văn",
@@ -676,37 +638,14 @@ vi:{
   ph_scn_quote:"Câu nói nguyên văn của SME…",
   scn_word:"Tình huống",
   // step6
-  s6_lead:"Xác định ràng buộc thực tế trước khi thiết kế — để không đề xuất điều bất khả thi.",
-  f_maxTime:"Thời gian học tối đa / người / kỳ", f_timeApproved:"Đã được duyệt chính thức",
-  f_infra:"Hạ tầng phân phối (LMS…)", f_budget:"Ngân sách", f_authoring:"Công cụ authoring", f_maintainer:"Người maintain nội dung",
+  f_maxTime:"Thời gian học tối đa / người / kỳ", 
+  f_infra:"Hạ tầng phân phối (LMS…)", f_budget:"Ngân sách", f_authoring:"Công cụ authoring", 
   ph_maxTime:"VD: 45 phút", ph_infra:"VD: LMS Moodle, mạng nội bộ", ph_budget:"VD: 50 triệu",
-  ph_authoring:"VD: Articulate Storyline / Rise", ph_maintainer:"Ai cập nhật khi quy trình đổi?",
+  ph_authoring:"VD: Articulate Storyline / Rise", 
   // step7
-  s7_lead:"Chốt cam kết: những vấn đề môi trường phải được bàn giao, và nguyên tắc cắt nội dung.",
-  s7_env_issues:"Bàn giao vấn đề môi trường", s7_env_hint:"Vấn đề không giải quyết bằng đào tạo",
-  f_ei_issue:"Vấn đề", f_ei_owner:"Owner", f_ei_timeline:"Timeline", f_ei_status:"Trạng thái cam kết",
-  cs_committed:"Đã cam kết", cs_progress:"Đang xử lý", cs_done:"Hoàn tất", cs_atrisk:"Rủi ro",
-  f_cutPrinciples:"Đã thống nhất nguyên tắc cắt nội dung (chỉ giữ nội dung phục vụ hành vi & mục tiêu)",
-  s7_measure:"Kế hoạch đo lường (L3–L4)",
-  f_mp_metric:"Chỉ số", f_mp_source:"Nguồn dữ liệu", f_mp_freq:"Tần suất", f_mp_collector:"Người thu thập",
-  s7_approver:"Duyệt & Review", f_mapApprover:"Người duyệt Map", f_reviewSchedule:"Lịch review",
-  ph_reviewSchedule:"VD: Review nháp Map ngày 20/07",
   // AI extract
-  ai_title:"AI Extract", ai_lead:"Dán transcript phỏng vấn thô (hoặc complaint log) → tạo prompt hoàn chỉnh cho Claude → dán JSON kết quả vào Hub.",
-  ai_step1:"1 · Dán transcript", ai_transcript_ph:"Dán nội dung phỏng vấn / khiếu nại thô ở đây…",
-  ai_session:"Tên buổi / nguồn", ai_session_ph:"VD: PV Tổ trưởng kho 08/07",
-  ai_genbtn:"Tạo prompt trích xuất & sao chép",
-  ai_step2:"2 · Prompt cho Claude", ai_prompt_note:"Prompt (đã kèm schema + ví dụ + transcript) đã được sao chép. Dán vào Claude.",
-  ai_prompt_empty:"Bấm nút “Tạo prompt” để sinh prompt.",
-  ai_need_transcript:"Hãy dán transcript trước.",
-  ai_step3:"3 · Dán JSON kết quả", ai_result_ph:"Dán JSON Claude trả về ở đây…",
-  ai_import:"Nhập vào Hub", ai_import_note:"Sẽ thêm dữ liệu, đánh dấu nguồn = “AI extract + tên buổi”.",
-  ai_bad_json:"JSON không hợp lệ. Kiểm tra lại nội dung dán.",
-  ai_no_data:"Không tìm thấy pain point / scenario trong JSON.",
-  ai_preview_ins:"pain point", ai_preview_scn:"scenario", ai_imported:"Đã nhập {i} pain point và {s} scenario vào khu RCA.",
-  ai_review:"Sẽ thêm:",
   // documents
-  docs_title:"Trình sinh tài liệu", docs_lead:"10 tài liệu tự lắp từ dữ liệu đã nhập. Xem và In/Save-PDF trên khổ A4. Đổi ngôn ngữ để đổi ngôn ngữ tài liệu.",
+  docs_title:"Trình sinh tài liệu", docs_lead:"7 tài liệu tự lắp từ dữ liệu đã nhập. Xem và In/Save-PDF trên khổ A4. Đổi ngôn ngữ để đổi ngôn ngữ tài liệu.",
   doc_prepared:"Người thực hiện", doc_generated:"Ngày lập", doc_project:"Dự án", doc_client:"Client",
   doc_sign_sponsor:"Chữ ký Sponsor", doc_sign_id:"Chữ ký Instructional Designer", doc_date:"Ngày",
   doc_empty_field:"………………………",
@@ -714,12 +653,8 @@ vi:{
   d2:"Biên bản Kickoff", d2_s:"Người dự, quyết định — Bước 1",
   d3:"Data Request List", d3_s:"Danh sách yêu cầu dữ liệu — Bước 2",
   d4:"Current-State Data Summary", d4_s:"Hành vi hiện tại, sắp theo mức ảnh hưởng — Bước 2",
-  d5:"Root Cause Analysis Report", d5_s:"Insight gom theo 4 nhóm + 5 yếu tố môi trường — Bước 3",
-  d6:"Danh sách bàn giao ngoài đào tạo", d6_s:"Insight MÔI TRƯỜNG + cam kết — Bước 3 & 7",
   d7:"Learner Profile", d7_s:"Chân dung người học — Bước 4",
   d8:"Scenario Bank", d8_s:"Tình huống theo SME, distractor in đậm — Bước 5",
-  d9:"Constraints Sheet", d9_s:"Ràng buộc dự án — Bước 6",
-  d10:"Commitment Agreement + Measurement Plan", d10_s:"Cam kết + đo lường, có chữ ký — Bước 7",
   // doc bodies
   dh_goal_statement:"Tuyên bố mục tiêu", dh_sponsor:"Sponsor", dh_success_metric:"Câu trả lời thành công",
   dh_goal_formula:"Công thức mục tiêu", dh_metric:"Chỉ số", dh_baseline:"Baseline", dh_target:"Target", dh_deadline:"Deadline",
@@ -727,34 +662,27 @@ vi:{
   dh_not_confirmed:"Chưa xác nhận bằng văn bản",
   dh_kickoff:"Ghi chú Kickoff", dh_attendees:"Người tham dự", dh_decisions:"Quyết định",
   dh_solution_warning:"CẢNH BÁO: Mục tiêu hiện được đánh dấu là “yêu cầu giải pháp”, chưa phải con số kinh doanh.",
-  dh_behaviors:"Phát hiện hành vi hiện tại", dh_behavior:"Hành vi", dh_frequency:"Tần suất", dh_impact:"Ảnh hưởng", dh_source:"Nguồn",
+  dh_source:"Nguồn",
   dh_provider:"Người cung cấp", dh_status:"Trạng thái", dh_item:"Mục dữ liệu",
-  dh_rca_intro:"Phân tích nguyên nhân gốc theo 4 nhóm insight và 5 yếu tố môi trường.",
-  dh_group:"Nhóm", dh_count:"Số insight", dh_insight:"Insight", dh_env_factor:"Yếu tố môi trường", dh_assessment:"Đánh giá", dh_note:"Ghi chú",
-  dh_env_total:"Tổng số insight môi trường (cần giải quyết ngoài đào tạo)",
-  dh_handoff_intro:"Các vấn đề dưới đây không giải quyết được bằng đào tạo và cần được bàn giao cho chủ sở hữu quy trình.",
-  dh_env_insights:"Insight thuộc nhóm Môi trường", dh_commitment_table:"Bảng cam kết bàn giao",
-  dh_issue:"Vấn đề", dh_owner:"Owner", dh_timeline:"Timeline",
   dh_learner_role:"Vai trò", dh_learner_size:"Quy mô", dh_tenure:"Thâm niên TB", dh_turnover:"Turnover",
   dh_shift:"Điều kiện ca kíp", dh_devices:"Thiết bị học", dh_freetime:"Thời gian rảnh/ca", dh_prior:"Đào tạo đã có", dh_baseknow:"Kiến thức nền",
   dh_context:"Bối cảnh", dh_decision:"Quyết định khó", dh_mistake:"Sai lầm phổ biến", dh_consequence:"Hậu quả", dh_quote:"Thoại",
-  dh_no_sme:"Chưa gán SME", dh_measure_plan:"Kế hoạch đo lường L3–L4",
-  dh_max_time:"Thời gian học tối đa", dh_approved:"Đã duyệt chính thức", dh_infra:"Hạ tầng phân phối",
-  dh_budget:"Ngân sách", dh_authoring:"Công cụ authoring", dh_maintainer:"Người maintain",
-  dh_cut_agreed:"Nguyên tắc cắt nội dung đã thống nhất", dh_map_approver:"Người duyệt Map", dh_review:"Lịch review",
+  dh_no_sme:"Chưa gán SME", 
+  dh_max_time:"Thời gian học tối đa", dh_infra:"Hạ tầng phân phối",
+  dh_budget:"Ngân sách", dh_authoring:"Công cụ authoring", 
   dh_min:"phút", dh_people:"người", dh_years:"năm",
   // misc
-  confirm_del:"Xóa mục này?",
   imported_ok:"Đã nhập & merge dữ liệu thành công.",
   import_bad:"File không hợp lệ.",
   export_hint:"Tải file .json để backup / chuyển máy / merge nhiều người.",
   backup_title:"Sao lưu & Đồng bộ",
-  btn_export:"Xuất JSON", btn_import:"Nhập / Merge JSON",
+  btn_import:"Nhập / Merge JSON",
   // Step 0 — screening
-  s0:"Sàng lọc dự án", s0_short:"Screening",
+  s0:"Sàng lọc dự án", s0_short:"Sàng lọc",
   s0_lead:"Trước khi thu thập bất cứ điều gì: dự án này có thực sự phù hợp với Action Mapping không? Trả lời 7 câu, verdict tính tự động.",
   scr_questions:"7 câu hỏi sàng lọc", scr_note:"Ghi chú (tùy chọn)",
   ans_yes:"Có", ans_no:"Không", ans_unclear:"Chưa rõ",
+  ans_yes7:"Đúng", ans_no7:"Sai", ans_unclear7:"Chưa rõ",
   q1:"Dự án nhằm thay đổi điều mọi người LÀM trong công việc (không phải chỉ “biết” hay “nhận thức”)?",
   q2:"Có business goal đo lường được — hoặc sponsor sẵn sàng cùng chốt một goal như vậy?",
   q3:"Có xác định được nhóm người thực hiện cụ thể và hành vi của họ quan sát được trên công việc?",
@@ -786,21 +714,44 @@ vi:{
   // --- v2 refactor ---
   nav_back:"Quay lại", nav_next:"Tiếp theo", nav_incomplete:"Còn thiếu {n} trường bắt buộc:", scr_q_short:"Câu",
   s2_lead:"Thu thập dữ liệu vận hành thật và ghi nhận con số/quan sát.",
-  s3_lead:"Phỏng vấn nhân viên & quản lý. Ghi chú, transcript, ghi âm.",
+  s3_lead:"Chẩn đoán vì sao hành vi xảy ra — phần lớn vấn đề hiệu suất KHÔNG đến từ thiếu kiến thức. Phỏng vấn nhân viên & quản lý: ghi chú, transcript, ghi âm.",
   s5_lead:"Phỏng vấn SME & high performer để lấy tình huống thật.",
   s2_ops:"Ghi nhận dữ liệu vận hành", s2_ops_hint:"Nội dung + nguồn + tần suất/mức độ",
   f_ops_content:"Nội dung", f_ops_source:"Nguồn", f_ops_level:"Tần suất / Mức độ",
   ph_ops_content:"VD: 15 khiếu nại giao sai địa chỉ trong tháng 6", ph_ops_level:"VD: 15 vụ/tháng · nặng",
-  f_attach:"File đính kèm", btn_upload:"Tải file lên", btn_download:"Tải xuống",
+  f_attach:"File đính kèm", btn_upload:"Tải file lên", 
   file_toobig:"File vượt quá 5MB — không đính kèm được.", file_none:"Chưa có file",
   file_idb_fail:"Không lưu được file (trình duyệt chặn IndexedDB).",
-  iv_session:"Buổi phỏng vấn", f_iv_notes:"Ghi chú", f_iv_transcript:"Transcript", iv_add:"Thêm buổi phỏng vấn",
+  iv_session:"Buổi phỏng vấn", f_iv_notes:"Ghi chú", f_iv_transcript:"Transcript", 
+  iv_guide_title:"Gợi ý bộ câu hỏi phỏng vấn", iv_guide_hint:"Bấm để mở · chèn vào ghi chú / tự sửa được",
+  iv_insert:"Chèn vào ghi chú", iv_inserted:"Đã chèn câu hỏi vào ghi chú.", iv_target:"Chèn vào buổi",
+  iv_no_session:"— (sẽ tạo buổi mới) —", iv_edit:"Sửa", iv_done:"Xong",
+  iv_add_q:"Thêm câu hỏi", iv_add_grp:"Thêm nhóm", iv_reset:"Khôi phục mặc định",
+  iv_grp_ph:"Tên nhóm câu hỏi", iv_q_ph:"Nội dung câu hỏi",
+  iv_q_label:"Hỏi", iv_a_label:"Đáp",
+  readiness_idle:"Đang thu thập",
+  s2_file_hint:"Khi đưa gói TNA cho AI, hãy đính kèm luôn các file này vào cuộc trò chuyện. Claude/ChatGPT đọc được nội dung xlsx/pdf/csv nên bạn không cần gõ lại số liệu.",
+  tna_file_note:"Đính kèm các file sau vào cùng cuộc trò chuyện với AI để AI tự đọc nội dung.",
+  nav_constraints:"Ràng buộc", constraints_lead:"Ràng buộc phân phối (tuỳ chọn) — giúp bản Action Map nháp thực tế hơn.", constraints_optional:"Không bắt buộc — bỏ trống nếu chưa có.",
+  dm_sample:"Nạp ví dụ mẫu", dm_sample_note:"Nạp một dự án mẫu (Auréa Bay) để xem thử. Sẽ ghi đè dữ liệu hiện tại.", dm_sample_loaded:"Đã nạp dữ liệu mẫu.",
   rec_start:"Ghi âm", rec_pause:"Tạm dừng", rec_resume:"Tiếp tục", rec_stop:"Dừng",
   rec_recording:"Đang ghi", rec_download:"Tải audio", rec_delete:"Xóa bản ghi", rec_saved:"Bản ghi đã lưu",
   rec_perm_denied:"Bạn đã từ chối quyền micro — không ghi âm được. Vẫn có thể nhập transcript bằng tay.",
   rec_no_support:"Trình duyệt không hỗ trợ ghi âm (MediaRecorder).",
+  rec_audio_label:"Âm thanh",
+  rec_upload_audio:"Tải mp3 lên",
+  rec_audio_only:"Chỉ nhận file âm thanh (mp3, m4a, wav…).",
+  audio_uploaded:"Đã tải file âm thanh lên.",
+  rec_empty:"Không thu được âm thanh — kiểm tra micro rồi thử lại (mở qua http://localhost, không dùng file://).",
+  rec_file_warn:"Bạn đang mở bằng file:// — micro và transcript tự động có thể không chạy. Hãy chạy qua http://localhost để dùng đầy đủ. Nếu người được phỏng vấn từ chối ghi âm, dùng nút Tải mp3 hoặc Tải ảnh note tay bên dưới.",
+  note_label:"Ảnh note tay",
+  note_upload:"Tải ảnh note tay",
+  note_img_only:"Chỉ nhận file ảnh (jpg, png…).",
+  note_uploaded:"Đã tải ảnh note lên.",
+  tna_noteimg_note:"Ảnh chụp note tay của buổi phỏng vấn — đính kèm các ảnh này vào cùng cuộc trò chuyện với AI để AI ĐỌC nội dung.",
   stt_listening:"🔴 Đang nghe & chuyển thành chữ…",
   stt_unavailable:"Transcript tự động không khả dụng (cần Chrome/Edge + internet) — ghi âm vẫn được lưu, bạn có thể nhập transcript bằng tay sau.",
+  stt_network:"Transcript tự động cần internet & origin http/https — bản ghi âm vẫn được lưu, bạn có thể gõ transcript bằng tay.",
   export_with_files:"Xuất kèm file (base64)", export_data_only:"Xuất chỉ dữ liệu", export_files_warn:"Kèm file sẽ làm JSON lớn hơn nhiều.",
   dh_level:"Tần suất / Mức độ", dh_content:"Nội dung",
   d4_s:"Dữ liệu vận hành, theo nguồn — Bước 2",
@@ -822,36 +773,71 @@ vi:{
   dm_partial_h:"Xóa từng phần", dm_partial_desc:"Chọn phần muốn xóa; các phần còn lại giữ nguyên.",
   dm_part_files:"File đính kèm", dm_part_audio:"Ghi âm",
   dm_delete_selected:"Xóa các phần đã chọn", dm_none_selected:"Chưa chọn phần nào.",
-  dm_pconfirm_h:"Xác nhận xóa các phần sau:", dm_confirm_delete:"Xác nhận xóa", dm_deleted:"Đã xóa các phần đã chọn."
+  dm_pconfirm_h:"Xác nhận xóa các phần sau:", dm_confirm_delete:"Xác nhận xóa", dm_deleted:"Đã xóa các phần đã chọn.",
+  // --- Đợt B: save state · edge · onboarding ---
+  save_failed:"Lưu thất bại",
+  saveerr_title:"Dữ liệu CHƯA được lưu",
+  saveerr_desc:"Bộ nhớ trình duyệt đã đầy nên Discovery Hub không lưu được thay đổi. Hãy cứu dữ liệu ngay trước khi đóng tab.",
+  saveerr_export:"Export JSON để cứu dữ liệu",
+  saveerr_manage:"Xóa audio/file để giải phóng chỗ",
+  storage_warn:"Bộ nhớ trình duyệt sắp đầy — nên Export JSON để backup ngay.",
+  rec_blocked:"Trình duyệt đã chặn micro. Mở cài đặt trang (biểu tượng ổ khóa cạnh URL) để cấp lại quyền, rồi Thử lại.",
+  rec_retry:"Thử lại",
+  import_result_title:"Kết quả nhập dữ liệu",
+  import_added:"Đã nhập & gộp",
+  import_skipped:"Bỏ qua / không đọc được",
+  import_none_added:"Không có mục danh sách nào được thêm (file rỗng hoặc chỉ có trường vô hiệu).",
+  import_not_dh:"Đây không phải file JSON của Discovery Hub — thiếu cấu trúc mong đợi (meta/step…). Đã bỏ qua.",
+  import_bad_json2:"Không đọc được file — không phải JSON hợp lệ.",
+  welcome_lead:"Điểm khởi đầu cho mỗi dự án Phân tích nhu cầu đào tạo.",
+  welcome_eyebrow:"Bắt đầu",
+  welcome_title:"Discovery Hub là gì?",
+  welcome_desc:"Đây là công cụ thu thập dữ liệu Phân tích nhu cầu đào tạo có cấu trúc để trả lời cho câu hỏi “Đào tạo có thực sự là giải pháp tối ưu?”, rồi xuất một file .md để làm input dựng Action Map.",
+  welcome_new:"Bắt đầu dự án mới",
+  welcome_sample:"Xem dự án mẫu",
+  welcome_privacy:"Dữ liệu chỉ lưu trên máy bạn — nhớ Export JSON sau mỗi buổi làm việc.",
+  welcome_sample_confirm:"Nạp dự án mẫu Auréa Bay để xem thử?",
+  sample_banner:"Bạn đang xem dự án mẫu (Auréa Bay) — dữ liệu minh họa, không phải dự án thật của bạn.",
+  sample_clear:"Xóa dữ liệu mẫu & bắt đầu dự án của tôi",
+  empty_dr:"Chưa có mục dữ liệu nào cần yêu cầu. VD: “Log inspection Q2”, “Danh sách khiếu nại khách hàng” — kèm ai cung cấp & hạn nhận.",
+  empty_ops:"Chưa ghi nhận dữ liệu vận hành. Bắt đầu từ một con số thật: “15 khiếu nại giao sai địa chỉ trong tháng 6”.",
+  empty_iv3:"Chưa có buổi phỏng vấn nào. Ngồi với người làm trực tiếp và hỏi: “Bước nào dễ sai nhất? Khi bận bạn hay bỏ bước nào?”",
+  empty_iv5:"Chưa có SME nào. Tìm người làm giỏi nhất tổ — họ giữ những “mẹo” không có trong tài liệu chính thức.",
+  empty_scn:"Chưa có tình huống nào. Hỏi SME: “Kể một lần nhân viên xử lý sai gần đây — họ đã quyết định gì, hậu quả ra sao?”",
+  tna_h_screening:"SÀNG LỌC GO/NO-GO",
+  tna_h_goal:"BUSINESS GOAL",
+  tna_h_ops:"DỮ LIỆU VẬN HÀNH",
+  tna_h_interviews:"PHỎNG VẤN TRỰC TIẾP",
+  tna_h_learner:"LEARNER PROFILE",
+  tna_h_sme:"PHỎNG VẤN SME & SCENARIO BANK",
+  tna_h_constraints:"RÀNG BUỘC PHÂN PHỐI (tuỳ chọn)"
 },
 en:{
   appTagline:"Training Needs Analysis data-collection tool",
   save_saved:"Saved", save_saving:"Saving…",
   readiness_go:"Ready to draw the Map", readiness_lock:"Not ready yet",
   group_flow:"Workflow", group_tools:"Tools",
-  nav_dashboard:"Dashboard", nav_ai:"AI Extract", nav_docs:"Documents", nav_steps:"6 Steps", nav_rca:"RCA Analysis",
-  bt_home:"Home", bt_steps:"Steps", bt_ai:"AI", bt_docs:"Docs",
+  nav_welcome:"Welcome", nav_dashboard:"Dashboard", nav_docs:"Documents",
+  bt_home:"Home", bt_steps:"Steps", bt_docs:"Docs",
   s1:"Business Goal", s2:"Operational Data", s3:"Front-line Interviews", s4:"Learner Profile",
-  s5:"SME & High-performer Interviews", s6:"Constraints", s7:"Commitment",
+  s5:"SME & High-performer Interviews", constraints_title:"Constraints", 
   s1_short:"Business Goal", s2_short:"Ops Data", s3_short:"Interviews",
-  s4_short:"Learner", s5_short:"SME & Scenarios", s6_short:"Constraints", s7_short:"Commitment",
+  s4_short:"Learner", s5_short:"SME & Scenarios", 
   btn_add:"Add", btn_remove:"Remove", btn_view:"View", btn_print:"Print / Save PDF", btn_close:"Close",
-  btn_copy:"Copy", btn_copied:"Copied!", none_yet:"Nothing yet — click “Add”.",
-  of:"of", required_short:"required", step_word:"Step",
+  none_yet:"Nothing yet — click “Add”.",
+  of:"of", step_word:"Step",
   yes:"Yes", no:"No", ok:"OK", issue:"Problem", pick:"— Select —",
   dash_title:"Discovery Dashboard",
   dash_lead:"Enter once, data flows into every output document. Complete Steps 1–3 to set up the Action Map.",
   project_info:"Project info",
   f_projectName:"Project name", f_client:"Client", f_collector:"Collected by", f_startDate:"Start date",
   ph_projectName:"e.g. Warehouse Staff Onboarding", ph_client:"e.g. ABC Corp", ph_collector:"Your name",
-  progress_title:"6-step progress", progress_hint:"% of required fields filled",
-  counters_title:"Quick counts",
-  c_insights:"Pain points", c_quotes:"Quotes / Scenarios", c_distractors:"Distractor candidates", c_interviews:"Interviews",
+  progress_title:"Screening + 5 discovery steps", progress_hint:"% of required fields filled",
+  c_interviews:"Interviews",
   gate_title:"Map readiness",
   gate_go_h:"Ready to draw the Action Map", gate_lock_h:"Not ready yet",
   gate_go_desc:"Step 0 = GO, Step 1 is 100% complete, and Steps 2, 3 and 5 have data. You can start drawing the Action Map with the sponsor.",
   gate_lock_desc:"The lamp turns green only when Step 0 returns GO, Step 1 (Business Goal) reaches 100% of required fields, and Step 2 (Operational Data), Step 3 (Front-line Interviews) and Step 5 (SME Interviews) have data.",
-  warn_step5:"Reminder: Finish Step 5 (Scenario Bank) before writing any scenario — real dialogue and situations must come from SMEs.",
   legend_full:"100% done", legend_part:"In progress", req_badge:"REQ",
   s1_lead:"Define a measurable business goal with the sponsor. No number → no Map.",
   s1_sponsor:"Sponsor",
@@ -871,34 +857,12 @@ en:{
   ph_kickoffAttendees:"List attendees & roles", ph_kickoffDecisions:"Decisions locked in the kickoff",
   f_isSolutionRequest:"Self-check: this goal is really just a “solution request” (e.g. “build an e-learning course”), not a business number",
   s1_warn_solution:"Warning: This is a solution request, not a business goal. Go back to the sponsor: which business number will change? Without one, the project shouldn't start.",
-  s2_lead:"Gather evidence of current behavior. Use real data, not guesses.",
   s2_drl:"Data Request List", s2_drl_hint:"Data to request",
   f_dr_item:"Data item", f_dr_provider:"Provider", f_dr_deadline:"Deadline", f_dr_status:"Received status",
   dr_pending:"Not received", dr_partial:"Partial", dr_received:"Received",
-  s2_beh:"Behavior findings", s2_beh_hint:"Observed wrong/missing behavior",
-  f_beh_desc:"Wrong/missing behavior", f_beh_freq:"Frequency", f_beh_impact:"Impact (1–5)", f_beh_source:"Data source",
-  ph_beh_desc:"e.g. Skips label check before applying", ph_beh_freq:"e.g. 15 cases/week",
-  s3_lead:"Diagnose why the behavior happens. Most performance problems are NOT a knowledge gap.",
   s3_interviews:"Interviews",
   f_iv_person:"Interviewee", f_iv_role:"Role", f_iv_date:"Date",
   role_employee:"Employee", role_supervisor:"Supervisor", role_teamlead:"Team Leader", role_deptmanager:"Department Manager", role_board:"Executive Board", role_other:"Others",
-  s3_env:"5 environment factors", s3_env_hint:"Assess each factor",
-  env_tools:"Tools / Equipment", env_process:"Process – SOP", env_people:"Staffing",
-  env_policy:"Policy – Authority", env_reward:"Incentives – Motivation",
-  f_env_status:"Assessment", f_env_note:"Note",
-  ph_env_note:"Does this factor block the right behavior?",
-  cap_title:"Insight Capture", cap_hint_speed:"Type a sentence → pick a tag → Enter. As fast as possible.",
-  cap_ph:"Quickly type an insight then Enter…",
-  tag_environment:"ENVIRONMENT", tag_knowledge:"KNOWLEDGE", tag_skill:"SKILL", tag_confidence:"CONFIDENCE – MOTIVATION",
-  cap_source:"Source", cap_source_ph:"From which interview / data?",
-  cap_distractor:"Distractor", cap_bank:"Scenario Bank",
-  cap_add:"Capture (Enter)", cap_need_tag:"Pick a tag before saving.",
-  cap_need_text:"Enter the insight text.",
-  ins_list_title:"Captured insights", ins_filter_tag:"Filter by tag", ins_filter_src:"Filter by source",
-  filter_all_tags:"All tags", filter_all_src:"All sources",
-  ins_empty:"No insights yet. Use the capture box above.",
-  ins_none_match:"No insights match the filter.",
-  src_unknown:"(source unknown)",
   s4_lead:"Understand the learner to design content that fits their real work.",
   f_role:"Job role", f_size:"Size (headcount)", f_tenure:"Avg tenure (years)", f_turnover:"Turnover (%/yr)",
   f_shift:"Shift conditions", f_devices:"Learning devices", f_freeTime:"Real free time/shift (min)",
@@ -906,9 +870,7 @@ en:{
   ph_shift:"e.g. 3 rotating shifts, standing at the line", ph_priorTraining:"Courses/guides already taken",
   ph_baseKnowledge:"Education, literacy, language…",
   dev_phone:"Personal phone", dev_shared:"Shared workstation", dev_tablet:"Tablet", dev_desktop:"Own desktop", dev_kiosk:"Kiosk / Floor screen",
-  s5_lead:"Mine SMEs & high performers for real situations — the raw material for practice activities.",
-  s5_smes:"SME / High performer", f_sme_name:"Name", f_sme_role:"Role / Expertise",
-  ph_sme_role:"e.g. QC lead, 8 years experience",
+  s5_smes:"SME / High performer", 
   s5_scenarios:"Scenario Bank", s5_scn_hint:"Each situation = one card",
   f_scn_sme:"Source (SME)", f_scn_context:"Context", f_scn_decision:"Hard decision",
   f_scn_mistake:"Common mistake", f_scn_consequence:"Real consequence", f_scn_quote:"Verbatim quote",
@@ -917,34 +879,11 @@ en:{
   ph_scn_mistake:"How do newcomers get it wrong?", ph_scn_consequence:"What actually happens next?",
   ph_scn_quote:"The SME's exact words…",
   scn_word:"Scenario",
-  s6_lead:"Pin down real constraints before design — so you never propose the impossible.",
-  f_maxTime:"Max learning time / person / period", f_timeApproved:"Officially approved",
-  f_infra:"Delivery infrastructure (LMS…)", f_budget:"Budget", f_authoring:"Authoring tool", f_maintainer:"Content maintainer",
+  f_maxTime:"Max learning time / person / period", 
+  f_infra:"Delivery infrastructure (LMS…)", f_budget:"Budget", f_authoring:"Authoring tool", 
   ph_maxTime:"e.g. 45 minutes", ph_infra:"e.g. Moodle LMS, intranet", ph_budget:"e.g. $2,000",
-  ph_authoring:"e.g. Articulate Storyline / Rise", ph_maintainer:"Who updates it when the process changes?",
-  s7_lead:"Lock commitments: which environment problems get handed off, and the content-cutting principle.",
-  s7_env_issues:"Environment problem handoff", s7_env_hint:"Not solvable by training",
-  f_ei_issue:"Problem", f_ei_owner:"Owner", f_ei_timeline:"Timeline", f_ei_status:"Commitment status",
-  cs_committed:"Committed", cs_progress:"In progress", cs_done:"Done", cs_atrisk:"At risk",
-  f_cutPrinciples:"Agreed the content-cutting principle (keep only content that serves behavior & goal)",
-  s7_measure:"Measurement plan (L3–L4)",
-  f_mp_metric:"Metric", f_mp_source:"Data source", f_mp_freq:"Frequency", f_mp_collector:"Collected by",
-  s7_approver:"Approval & Review", f_mapApprover:"Map approver", f_reviewSchedule:"Review schedule",
-  ph_reviewSchedule:"e.g. Review Map draft on Jul 20",
-  ai_title:"AI Extract", ai_lead:"Paste a raw interview transcript (or complaint log) → generate a complete prompt for Claude → paste the JSON result back into the Hub.",
-  ai_step1:"1 · Paste transcript", ai_transcript_ph:"Paste the raw interview / complaint text here…",
-  ai_session:"Session / source name", ai_session_ph:"e.g. Warehouse lead interview Jul 8",
-  ai_genbtn:"Generate extraction prompt & copy",
-  ai_step2:"2 · Prompt for Claude", ai_prompt_note:"The prompt (with schema + example + transcript) was copied. Paste it into Claude.",
-  ai_prompt_empty:"Click “Generate prompt” to build the prompt.",
-  ai_need_transcript:"Paste a transcript first.",
-  ai_step3:"3 · Paste result JSON", ai_result_ph:"Paste the JSON Claude returns here…",
-  ai_import:"Import into Hub", ai_import_note:"Adds data, tagged source = “AI extract + session name”.",
-  ai_bad_json:"Invalid JSON. Check what you pasted.",
-  ai_no_data:"No pain points / scenarios found in the JSON.",
-  ai_preview_ins:"pain point", ai_preview_scn:"scenario", ai_imported:"Imported {i} pain point(s) and {s} scenario(s) into RCA.",
-  ai_review:"Will add:",
-  docs_title:"Document generator", docs_lead:"10 documents auto-assembled from your data. View and Print/Save-PDF on A4. Switch language to switch the document language.",
+  ph_authoring:"e.g. Articulate Storyline / Rise", 
+  docs_title:"Document generator", docs_lead:"7 documents auto-assembled from your data. View and Print/Save-PDF on A4. Switch language to switch the document language.",
   doc_prepared:"Prepared by", doc_generated:"Generated", doc_project:"Project", doc_client:"Client",
   doc_sign_sponsor:"Sponsor signature", doc_sign_id:"Instructional Designer signature", doc_date:"Date",
   doc_empty_field:"………………………",
@@ -952,45 +891,34 @@ en:{
   d2:"Kickoff Minutes", d2_s:"Attendees, decisions — Step 1",
   d3:"Data Request List", d3_s:"Data request list — Step 2",
   d4:"Current-State Data Summary", d4_s:"Current behavior, sorted by impact — Step 2",
-  d5:"Root Cause Analysis Report", d5_s:"Insights grouped by 4 tags + 5 env factors — Step 3",
-  d6:"Non-Training Handoff List", d6_s:"Environment insights + commitments — Step 3 & 7",
   d7:"Learner Profile", d7_s:"Learner profile — Step 4",
   d8:"Scenario Bank", d8_s:"Scenarios by SME, distractors in bold — Step 5",
-  d9:"Constraints Sheet", d9_s:"Project constraints — Step 6",
-  d10:"Commitment Agreement + Measurement Plan", d10_s:"Commitment + measurement, with signatures — Step 7",
   dh_goal_statement:"Goal statement", dh_sponsor:"Sponsor", dh_success_metric:"Success answer",
   dh_goal_formula:"Goal formula", dh_metric:"Metric", dh_baseline:"Baseline", dh_target:"Target", dh_deadline:"Deadline",
   dh_confirm_status:"Confirmation status", dh_confirmed_on:"Confirmed on", dh_confirm_form:"Form",
   dh_not_confirmed:"Not confirmed in writing",
   dh_kickoff:"Kickoff notes", dh_attendees:"Attendees", dh_decisions:"Decisions",
   dh_solution_warning:"WARNING: The goal is currently flagged as a “solution request”, not a business number.",
-  dh_behaviors:"Current behavior findings", dh_behavior:"Behavior", dh_frequency:"Frequency", dh_impact:"Impact", dh_source:"Source",
+  dh_source:"Source",
   dh_provider:"Provider", dh_status:"Status", dh_item:"Data item",
-  dh_rca_intro:"Root cause analysis across 4 insight groups and 5 environment factors.",
-  dh_group:"Group", dh_count:"Insights", dh_insight:"Insight", dh_env_factor:"Environment factor", dh_assessment:"Assessment", dh_note:"Note",
-  dh_env_total:"Total environment insights (to resolve outside training)",
-  dh_handoff_intro:"The problems below cannot be solved by training and must be handed off to the process owner.",
-  dh_env_insights:"Environment-group insights", dh_commitment_table:"Handoff commitment table",
-  dh_issue:"Problem", dh_owner:"Owner", dh_timeline:"Timeline",
   dh_learner_role:"Role", dh_learner_size:"Size", dh_tenure:"Avg tenure", dh_turnover:"Turnover",
   dh_shift:"Shift conditions", dh_devices:"Learning devices", dh_freetime:"Free time/shift", dh_prior:"Prior training", dh_baseknow:"Baseline knowledge",
   dh_context:"Context", dh_decision:"Hard decision", dh_mistake:"Common mistake", dh_consequence:"Consequence", dh_quote:"Quote",
-  dh_no_sme:"No SME assigned", dh_measure_plan:"L3–L4 measurement plan",
-  dh_max_time:"Max learning time", dh_approved:"Officially approved", dh_infra:"Delivery infrastructure",
-  dh_budget:"Budget", dh_authoring:"Authoring tool", dh_maintainer:"Maintainer",
-  dh_cut_agreed:"Content-cutting principle agreed", dh_map_approver:"Map approver", dh_review:"Review schedule",
+  dh_no_sme:"No SME assigned", 
+  dh_max_time:"Max learning time", dh_infra:"Delivery infrastructure",
+  dh_budget:"Budget", dh_authoring:"Authoring tool", 
   dh_min:"min", dh_people:"people", dh_years:"yrs",
-  confirm_del:"Delete this item?",
   imported_ok:"Data imported & merged successfully.",
   import_bad:"Invalid file.",
   export_hint:"Download a .json to back up / move machines / merge collectors.",
   backup_title:"Backup & Sync",
-  btn_export:"Export JSON", btn_import:"Import / Merge JSON",
+  btn_import:"Import / Merge JSON",
   // Step 0 — screening
   s0:"Project screening", s0_short:"Screening",
   s0_lead:"Before capturing anything: is this project actually a fit for Action Mapping? Answer 7 questions, the verdict is computed live.",
   scr_questions:"7 screening questions", scr_note:"Note (optional)",
   ans_yes:"Yes", ans_no:"No", ans_unclear:"Unclear",
+  ans_yes7:"Yes", ans_no7:"No", ans_unclear7:"Unclear",
   q1:"Is the project about changing what people DO on the job (not just what they “know” or are “aware of”)?",
   q2:"Is there a measurable business goal — or is the sponsor willing to agree one with you?",
   q3:"Can you name the specific group who does the work, with behavior that is observable on the job?",
@@ -1022,21 +950,44 @@ en:{
   // --- v2 refactor ---
   nav_back:"Back", nav_next:"Next", nav_incomplete:"{n} required field(s) left:", scr_q_short:"Q",
   s2_lead:"Collect real operational data and record the numbers/observations.",
-  s3_lead:"Interview front-line staff & managers. Notes, transcript, recording.",
+  s3_lead:"Diagnose why the behavior happens — most performance problems are NOT a knowledge gap. Interview front-line staff & managers: notes, transcript, recording.",
   s5_lead:"Interview SMEs & high performers for real situations.",
   s2_ops:"Operational data log", s2_ops_hint:"Content + source + frequency/severity",
   f_ops_content:"Content", f_ops_source:"Source", f_ops_level:"Frequency / Severity",
   ph_ops_content:"e.g. 15 wrong-address delivery complaints in June", ph_ops_level:"e.g. 15/month · severe",
-  f_attach:"Attachment", btn_upload:"Upload file", btn_download:"Download",
+  f_attach:"Attachment", btn_upload:"Upload file", 
   file_toobig:"File exceeds 5MB — cannot attach.", file_none:"No file",
   file_idb_fail:"Couldn't save file (browser blocked IndexedDB).",
-  iv_session:"Interview session", f_iv_notes:"Notes", f_iv_transcript:"Transcript", iv_add:"Add interview session",
+  iv_session:"Interview session", f_iv_notes:"Notes", f_iv_transcript:"Transcript", 
+  iv_guide_title:"Suggested interview questions", iv_guide_hint:"Click to open · insert into notes / editable",
+  iv_insert:"Insert into notes", iv_inserted:"Question inserted into notes.", iv_target:"Insert into",
+  iv_no_session:"— (a session will be created) —", iv_edit:"Edit", iv_done:"Done",
+  iv_add_q:"Add question", iv_add_grp:"Add group", iv_reset:"Reset to default",
+  iv_grp_ph:"Group name", iv_q_ph:"Question text",
+  iv_q_label:"Q", iv_a_label:"A",
+  readiness_idle:"Getting started",
+  s2_file_hint:"When you hand the TNA package to the AI, attach these files to the same chat. Claude/ChatGPT can read xlsx/pdf/csv, so you don't need to retype any numbers.",
+  tna_file_note:"Attach the following files to the same AI chat so it can read their contents directly.",
+  nav_constraints:"Constraints", constraints_lead:"Delivery constraints (optional) — helps make the draft Action Map realistic.", constraints_optional:"Optional — leave blank if not known yet.",
+  dm_sample:"Load sample", dm_sample_note:"Load a sample project (Auréa Bay) to explore. Overwrites current data.", dm_sample_loaded:"Sample data loaded.",
   rec_start:"Record", rec_pause:"Pause", rec_resume:"Resume", rec_stop:"Stop",
   rec_recording:"Recording", rec_download:"Download audio", rec_delete:"Delete recording", rec_saved:"Recording saved",
   rec_perm_denied:"You denied microphone access — can't record. You can still type the transcript by hand.",
   rec_no_support:"This browser doesn't support recording (MediaRecorder).",
+  rec_audio_label:"Audio",
+  rec_upload_audio:"Upload mp3",
+  rec_audio_only:"Audio files only (mp3, m4a, wav…).",
+  audio_uploaded:"Audio file uploaded.",
+  rec_empty:"No audio captured — check your microphone and try again (serve via http://localhost, not file://).",
+  rec_file_warn:"You opened this via file:// — mic and auto-transcript may not work. Serve via http://localhost for full features. If the interviewee declines recording, use Upload mp3 or Upload note photo below.",
+  note_label:"Note photos",
+  note_upload:"Upload note photo",
+  note_img_only:"Image files only (jpg, png…).",
+  note_uploaded:"Note photo uploaded.",
+  tna_noteimg_note:"Photos of handwritten interview notes — attach these images to the same AI chat so it can READ their content.",
   stt_listening:"🔴 Listening & transcribing…",
   stt_unavailable:"Automatic transcript unavailable (needs Chrome/Edge + internet) — the recording is still saved; you can type the transcript by hand later.",
+  stt_network:"Auto-transcript needs internet & an http/https origin — the recording is still saved; you can type the transcript by hand.",
   export_with_files:"Export with files (base64)", export_data_only:"Export data only", export_files_warn:"Including files makes the JSON much larger.",
   dh_level:"Frequency / Severity", dh_content:"Content",
   d4_s:"Operational data, by source — Step 2",
@@ -1058,28 +1009,140 @@ en:{
   dm_partial_h:"Delete selected parts", dm_partial_desc:"Pick what to delete; the rest stays intact.",
   dm_part_files:"Attachments", dm_part_audio:"Recordings",
   dm_delete_selected:"Delete selected parts", dm_none_selected:"Nothing selected.",
-  dm_pconfirm_h:"Confirm deletion of:", dm_confirm_delete:"Confirm delete", dm_deleted:"Selected parts deleted."
+  dm_pconfirm_h:"Confirm deletion of:", dm_confirm_delete:"Confirm delete", dm_deleted:"Selected parts deleted.",
+  // --- Batch B: save state · edge · onboarding ---
+  save_failed:"Save failed",
+  saveerr_title:"Your data was NOT saved",
+  saveerr_desc:"Your browser storage is full, so Discovery Hub couldn't save your changes. Rescue your data now before closing the tab.",
+  saveerr_export:"Export JSON to rescue data",
+  saveerr_manage:"Delete audio/files to free space",
+  storage_warn:"Browser storage is nearly full — export a JSON backup now.",
+  rec_blocked:"The browser blocked the mic. Open site settings (the lock icon by the URL) to re-grant permission, then Try again.",
+  rec_retry:"Try again",
+  import_result_title:"Import result",
+  import_added:"Imported & merged",
+  import_skipped:"Skipped / unreadable",
+  import_none_added:"No list items were added (file was empty or held only invalid fields).",
+  import_not_dh:"This isn't a Discovery Hub JSON file — missing the expected structure (meta/step…). Skipped.",
+  import_bad_json2:"Couldn't read the file — not valid JSON.",
+  welcome_lead:"The starting point for every Training Needs Analysis project.",
+  welcome_eyebrow:"Get started",
+  welcome_title:"Welcome to Discovery Hub",
+  welcome_desc:"Collect structured Training Needs Analysis data, then export one .md package for an AI to build the Action Map. Enter once — data flows into every document.",
+  welcome_new:"Start a new project",
+  welcome_sample:"See a sample project",
+  welcome_privacy:"Data stays on your device only — export a JSON backup after each session.",
+  welcome_sample_confirm:"Load the Auréa Bay sample project to explore?",
+  sample_banner:"You're viewing a sample project (Auréa Bay) — demo data, not your real project.",
+  sample_clear:"Clear sample & start my project",
+  empty_dr:"No data to request yet. e.g. “Q2 inspection log”, “Customer complaint list” — with who provides it & the due date.",
+  empty_ops:"No operational data logged. Start with one real number: “15 wrong-address delivery complaints in June”.",
+  empty_iv3:"No interviews yet. Sit with a front-line worker and ask: “Which step is easiest to get wrong? What do you skip when busy?”",
+  empty_iv5:"No SMEs yet. Find the best performer on the team — they hold the “tricks” that aren't in the official docs.",
+  empty_scn:"No situations yet. Ask the SME: “Tell me about a recent time someone got it wrong — what did they decide, and what happened?”",
+  tna_h_screening:"GO/NO-GO SCREENING",
+  tna_h_goal:"BUSINESS GOAL",
+  tna_h_ops:"OPERATIONAL DATA",
+  tna_h_interviews:"FRONT-LINE INTERVIEWS",
+  tna_h_learner:"LEARNER PROFILE",
+  tna_h_sme:"SME INTERVIEWS & SCENARIO BANK",
+  tna_h_constraints:"DELIVERY CONSTRAINTS (optional)"
 }
 };
 let LANG = "vi";
 function t(k){ const d=I18N[LANG]; return (d&&d[k]!=null)?d[k]:(I18N.vi[k]!=null?I18N.vi[k]:k); }
 function tf(k,map){ let s=t(k); for(const x in map) s=s.replace("{"+x+"}",map[x]); return s; }
+/* screening answer label — Q7 uses Đúng/Sai (VI); value stays yes/no/unclear so verdict logic is unchanged */
+function ansLabel(v,q){ return t(q==="q7" ? "ans_"+v+"7" : "ans_"+v); }
 
 /* ------------------------------------------------------------------ *
  *  Constants
  * ------------------------------------------------------------------ */
-const TAGS = ["environment","knowledge","skill","confidence"];
 const DEVICES = ["dev_phone","dev_shared","dev_tablet","dev_desktop","dev_kiosk"];
 const IV_ROLES = ["role_employee","role_supervisor","role_teamlead","role_deptmanager","role_board","role_other"];
+/* suggested interview question bank (reference only — not collected/exported) */
+const IV_GUIDE = {
+  vi:{
+    front:[
+      {g:"Công việc thực tế", q:["Mô tả một ca làm việc điển hình của bạn từ đầu đến cuối.","Bước nào khó nhất hoặc dễ sai nhất? Vì sao?","Khi bận / cao điểm, bạn thường làm tắt hoặc bỏ bước nào?"]},
+      {g:"Rào cản & môi trường", q:["Điều gì khiến bạn khó làm đúng dù bạn muốn? (công cụ, thời gian, quy trình…)","Bạn có đủ công cụ / thiết bị / tài liệu ngay lúc cần không?","Quy trình hoặc hướng dẫn hiện tại có rõ ràng, dễ làm theo không?","Làm đúng (hoặc làm sai) thì bạn nhận được phản hồi / khen thưởng / hệ quả gì?"]},
+      {g:"Kiến thức & kỹ năng", q:["Có phần nào của công việc bạn chưa được hướng dẫn hoặc chưa chắc cách làm?","Nếu làm lại, bạn có tự tin làm đúng mà không cần hỏi ai không?","Khi mới vào, bạn được đào tạo / kèm cặp như thế nào?"]},
+      {g:"Động lực & tự tin", q:["Bạn thấy việc làm đúng bước này quan trọng không? Vì sao?","Điều gì khiến bạn ngại hoặc không muốn làm theo đúng quy trình?"]}
+    ],
+    sme:[
+      {g:"Tình huống thật", q:["Kể một tình huống khó gần đây bạn phải xử lý trong công việc.","Bối cảnh lúc đó thế nào? Có áp lực gì (thời gian, khách, quản lý…)?"]},
+      {g:"Quyết định khó", q:["Bạn phải quyết định điều gì? Có những lựa chọn nào?","Điều gì giúp bạn chọn đúng? Bạn nhìn vào dấu hiệu nào?"]},
+      {g:"Sai lầm phổ biến", q:["Người mới / người làm chưa tốt thường sai ở chỗ nào trong tình huống này?","Đâu là lựa chọn “nghe có vẻ đúng” nhưng thực ra sai? (dùng làm distractor)"]},
+      {g:"Hậu quả thật", q:["Nếu làm sai thì điều gì thực sự xảy ra? Ai / việc gì bị ảnh hưởng?"]},
+      {g:"Bí quyết & nguyên tắc", q:["Bạn có nguyên tắc hay “mẹo” tự đúc kết mà tài liệu chính thức không ghi không?","Nếu chỉ dạy người mới một điều để làm đúng, đó sẽ là gì?"]}
+    ]
+  },
+  en:{
+    front:[
+      {g:"The actual job", q:["Walk me through a typical shift from start to finish.","Which step is the hardest or easiest to get wrong? Why?","When it's busy or peak, which steps do you cut or skip?"]},
+      {g:"Obstacles & environment", q:["What makes it hard to do it right even when you want to? (tools, time, process…)","Do you have the tools / equipment / documents right when you need them?","Is the current process or guidance clear and easy to follow?","When you do it right (or wrong), what feedback / reward / consequence do you get?"]},
+      {g:"Knowledge & skill", q:["Is there any part of the job you weren't shown or aren't sure how to do?","If you did it again, could you do it right without asking anyone?","How were you trained or coached when you started?"]},
+      {g:"Motivation & confidence", q:["Do you think doing this step correctly matters? Why?","What makes you reluctant or unwilling to follow the process?"]}
+    ],
+    sme:[
+      {g:"A real situation", q:["Tell me about a tough situation you recently had to handle on the job.","What was the context? Any pressure (time, guests, managers…)?"]},
+      {g:"The hard decision", q:["What did you have to decide? What were the options?","What helped you choose right? What signals did you look for?"]},
+      {g:"Common mistakes", q:["Where do newcomers or weaker performers usually go wrong here?","Which option “sounds right” but is actually wrong? (use as a distractor)"]},
+      {g:"Real consequences", q:["If it's done wrong, what actually happens? Who or what is affected?"]},
+      {g:"Tips & rules of thumb", q:["Do you have a rule or “trick” you figured out that isn't in the official docs?","If you could teach a newcomer just one thing to get it right, what would it be?"]}
+    ]
+  }
+};
+function questionIcon(){return '<svg class="g-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 15a2 2 0 01-2 2H8l-4 4V5a2 2 0 012-2h13a2 2 0 012 2z"/><path d="M9.2 8.8a2.8 2.8 0 015.4 1c0 1.8-2.6 2.2-2.6 3.7"/><path d="M12 16.4v.2"/></svg>';}
+function plusIcon(){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>';}
+function guideDefault(kind){ return (IV_GUIDE[LANG]||IV_GUIDE.vi)[kind]; }
+function guideData(kind){ return (state.ivGuide&&state.ivGuide[LANG]&&state.ivGuide[LANG][kind]) ? state.ivGuide[LANG][kind] : guideDefault(kind); }
+function guideFork(kind){   // copy the default into state on first edit, so custom edits persist
+  if(!state.ivGuide) state.ivGuide={};
+  if(!state.ivGuide[LANG]) state.ivGuide[LANG]={};
+  if(!state.ivGuide[LANG][kind]) state.ivGuide[LANG][kind]=JSON.parse(JSON.stringify(guideDefault(kind)));
+  return state.ivGuide[LANG][kind];
+}
+function ivListPath(kind){ return kind==="front"?"step3.interviews":"step5.interviews"; }
+function interviewGuide(kind){
+  const data=guideData(kind), edit=!!ui.ivEdit[kind], open=!!ui.ivOpen[kind];
+  const ivs=getPath(state,ivListPath(kind));
+  const tgt=Math.min(Math.max(+ui.ivTarget[kind]||0,0), Math.max(0,ivs.length-1));
+  // toolbar
+  let tools;
+  if(edit){
+    tools=`<div class="guide-tools"><button class="btn sm primary" data-action="iv-edit" data-kind="${kind}" type="button">${esc(t("iv_done"))}</button>
+      <button class="btn sm" data-action="iv-add-grp" data-kind="${kind}" type="button">＋ ${esc(t("iv_add_grp"))}</button>
+      <button class="btn sm danger-ghost" data-action="iv-reset" data-kind="${kind}" type="button">${esc(t("iv_reset"))}</button></div>`;
+  }else{
+    const opts = ivs.length
+      ? ivs.map((iv,i)=>`<option value="${i}"${i===tgt?" selected":""}>${esc((iv.person&&iv.person.trim())||t("iv_session")+" "+(i+1))}</option>`).join("")
+      : `<option value="0">${esc(t("iv_no_session"))}</option>`;
+    tools=`<div class="guide-tools"><label>${esc(t("iv_target"))}: <select data-action="iv-target" data-kind="${kind}">${opts}</select></label>
+      <button class="btn sm" data-action="iv-edit" data-kind="${kind}" type="button">${pencilIcon()} ${esc(t("iv_edit"))}</button></div>`;
+  }
+  // groups
+  const groups=data.map((grp,gi)=>{
+    if(edit){
+      const qs=grp.q.map((q,qi)=>`<li class="gq-edit"><input class="control" data-model="ivGuide.${LANG}.${kind}.${gi}.q.${qi}" value="${esc(q)}" placeholder="${esc(t("iv_q_ph"))}"><button class="iconbtn" data-action="iv-del-q" data-kind="${kind}" data-gi="${gi}" data-qi="${qi}" type="button" aria-label="${esc(t("btn_remove"))}">${TRASH}</button></li>`).join("");
+      return `<div class="guide-grp">
+        <div class="gg-head"><input class="control" data-model="ivGuide.${LANG}.${kind}.${gi}.g" value="${esc(grp.g)}" placeholder="${esc(t("iv_grp_ph"))}"><button class="iconbtn" data-action="iv-del-grp" data-kind="${kind}" data-gi="${gi}" type="button" aria-label="${esc(t("btn_remove"))}">${TRASH}</button></div>
+        <ul>${qs}</ul>
+        <button class="btn sm ghost" data-action="iv-add-q" data-kind="${kind}" data-gi="${gi}" type="button">＋ ${esc(t("iv_add_q"))}</button></div>`;
+    }
+    const qs=grp.q.map((q,qi)=>`<li><span class="gq-txt">${esc(q)}</span><button class="gq-ins" data-action="iv-insert-q" data-kind="${kind}" data-gi="${gi}" data-qi="${qi}" title="${esc(t("iv_insert"))}" type="button">${plusIcon()}</button></li>`).join("");
+    return `<div class="guide-grp"><h4>${esc(grp.g)}</h4><ul>${qs}</ul></div>`;
+  }).join("");
+  return `<details class="guide" data-kind="${kind}"${open?" open":""}><summary>${questionIcon()}<span>${esc(t("iv_guide_title"))}</span><span class="g-hint">${esc(t("iv_guide_hint"))}</span></summary>
+    <div class="guide-body">${tools}<div class="guide-groups${edit?" editing":""}">${groups}</div></div></details>`;
+}
+function pencilIcon(){return '<svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>';}
 const DR_STATUS = ["dr_pending","dr_partial","dr_received"];
-const CS_STATUS = ["cs_committed","cs_progress","cs_done","cs_atrisk"];
-const ENV_FACTORS = ["tools","process","people","policy","reward"];
-const ENV_LABEL = {tools:"env_tools",process:"env_process",people:"env_people",policy:"env_policy",reward:"env_reward"};
-const ENV_STATUS = ["ok","issue"];
 
 // nav / step order (TNA data collection: Step 0–5 only)
 const STEPS = [0,1,2,3,4,5];
 const NAV = [
+  {id:"welcome", grp:"flow", key:"nav_welcome", icon:"home"},
   {id:"dashboard", grp:"flow", key:"nav_dashboard", icon:"grid"},
   {id:"step0", grp:"flow", step:0, key:"s0", icon:"filter"},
   {id:"step1", grp:"flow", step:1, key:"s1", icon:"target"},
@@ -1087,9 +1150,11 @@ const NAV = [
   {id:"step3", grp:"flow", step:3, key:"s3", icon:"search"},
   {id:"step4", grp:"flow", step:4, key:"s4", icon:"user"},
   {id:"step5", grp:"flow", step:5, key:"s5", icon:"book"},
+  {id:"constraints", grp:"flow", key:"nav_constraints", icon:"lock"},
   {id:"docs", grp:"tools", key:"nav_docs", icon:"docs"}
 ];
 const ICONS = {
+  home:'<path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V20h12V9.5"/>',
   grid:'<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>',
   target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/>',
   activity:'<path d="M3 12h4l3 8 4-16 3 8h4"/>',
@@ -1097,12 +1162,8 @@ const ICONS = {
   user:'<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>',
   book:'<path d="M5 4h11a2 2 0 012 2v14H7a2 2 0 01-2-2z"/><path d="M5 4v14"/>',
   lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',
-  check:'<path d="M4 12l5 5L20 6"/>',
-  spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
   docs:'<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 12h5M10 16h5"/>',
-  filter:'<path d="M3 5h18l-7 8v6l-4-2v-4z"/>',
-  rca:'<circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="12" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/><path d="M12 7.4v4M12 11.4H5v4M12 11.4h7v4M12 11.4v4"/>',
-  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/>'
+  filter:'<path d="M3 5h18l-7 8v6l-4-2v-4z"/>'
 };
 const DOCS = ["d0","d1","d2","d3","d4","d7","d8"];
 
@@ -1111,7 +1172,7 @@ const ROW_FACTORY = {
   "step2.dataRequests":()=>normDR({}),
   "step2.opsData":()=>normOps({}),
   "step3.interviews":()=>normIv({}),
-  "step5.interviews":()=>normIv({}),
+  "step5.interviews":()=>normIv({role:"role_teamlead"}),
   "step5.scenarios":()=>normScn({})
 };
 
@@ -1131,7 +1192,7 @@ function stepPct(n){const r=REQUIRED[n](state);return r.total?Math.round(r.done/
 /* ------------------------------------------------------------------ *
  *  State — the single source of truth (persisted to localStorage)
  * ------------------------------------------------------------------ */
-const APP_VERSION = "1.0.0";   // single source of truth for the app version
+const APP_VERSION = "1.1.0";   // single source of truth for the app version
 const APP_PREFIX = "dhub_";
 const LS_KEY = APP_PREFIX + "state";
 const LS_KEY_OLD = "discoveryHub.v1";   // pre-prefix key — migrated on load
@@ -1154,12 +1215,46 @@ function defaults(){
     step2:{dataRequests:[],opsData:[]},
     step3:{interviews:[]},
     step4:{role:"",size:"",tenure:"",turnover:"",shift:"",devices:[],freeTime:"",priorTraining:"",baseKnowledge:""},
-    step5:{interviews:[],scenarios:[]}
+    step5:{interviews:[],scenarios:[]},
+    constraints:{maxTime:"",infra:"",budget:"",authoring:""},   // optional delivery constraints
+    ivGuide:{}   // per-language custom interview-question banks (empty = use defaults)
   };
 }
 let state = defaults();
+/* built-in sample project (Auréa Bay housekeeping) — loadable from Data management */
+const SAMPLE = {
+  meta:{projectName:"TNA – Chất lượng dọn phòng (Housekeeping) Auréa Bay", client:"Auréa Bay Hotels & Resorts", collector:"Trang Ngo", startDate:"2026-07-01", lang:"vi"},
+  screening:{answers:{q1:"yes",q2:"yes",q3:"yes",q4:"yes",q5:"yes",q6:"yes",q7:"yes"},
+    notes:{q1:"Mục tiêu là thay đổi cách nhân viên kiểm tra phòng, không chỉ 'biết quy trình'.",q2:"",q3:"",q4:"",q5:"",q6:"",q7:""},handled:{}},
+  step1:{sponsorName:"Nguyễn Thị Bích", sponsorTitle:"Executive Housekeeper",
+    successAnswer:"Nếu thành công, tỷ lệ phòng fail inspection lần đầu sẽ giảm và điểm Room Cleanliness trên khảo sát khách tăng.",
+    metric:"Tỷ lệ phòng fail inspection lần đầu", baseline:"14%", target:"2%", deadline:"2026-10-29",
+    confirmed:true, confirmDate:"2026-07-10", confirmForm:"Email",
+    kickoffAttendees:"GM\nHSK Manager\nL&D Manager", kickoffDecisions:"Chốt business goal đo lường được\nThống nhất hình thức tiếp cận", isSolutionRequest:false},
+  step2:{dataRequests:[{item:"Inspection log Q2/2026", provider:"HSK Manager", deadline:"2026-07-05", status:"dr_received"},
+                       {item:"Phàn nàn khách về vệ sinh phòng", provider:"Front Office", status:"dr_received"}],
+    opsData:[{content:"Tỷ lệ fail inspection lần đầu trung bình 14%, cao điểm cuối tuần lên 22%.", source:"Inspection log Q2", level:"14–22% · nặng"},
+             {content:"32 phàn nàn về tóc / bụi trong phòng tắm trong quý 2.", source:"Complaint log", level:"32 vụ / quý"}]},
+  step3:{interviews:[{person:"Trần Văn Ba", role:"role_employee", date:"2026-07-08", notes:"Room Attendant, 2 năm kinh nghiệm.",
+    transcript:"Khi cao điểm mỗi người phải làm 18–20 phòng một ca, gần như không đủ thời gian quay lại kiểm tra phòng tắm. Checklist có nhưng dán ở kho, không mang theo. Quản lý chủ yếu nhắc tốc độ chứ ít khi nhắc chất lượng."},
+    {person:"Lê Thị Hoa", role:"role_supervisor", date:"2026-07-09", notes:"Giám sát tầng.",
+    transcript:"Nhân viên mới hay bỏ bước lau gương và kiểm tra dưới gầm giường. Em có nhắc nhưng không đủ thời gian kèm từng người."}]},
+  step4:{role:"Nhân viên buồng phòng (Room Attendant)", size:"36", tenure:"1.5", turnover:"28",
+    shift:"3 ca luân phiên, đứng và di chuyển liên tục", devices:["dev_phone","dev_kiosk"], freeTime:"15",
+    priorTraining:"Định hướng ngày đầu; chưa có đào tạo chuẩn hoá.", baseKnowledge:"THPT; một số đọc hiểu tiếng Anh cơ bản."},
+  step5:{interviews:[{person:"Nguyễn Thị Mai", role:"role_teamlead", date:"2026-07-11", notes:"Tổ trưởng, 8 năm, high performer.",
+    transcript:"Bí quyết là làm theo một trình tự cố định và luôn soi đèn pin kiểm tra phòng tắm sau cùng. Người mới hay tin vào mắt thường nên bỏ sót vết bẩn ở rãnh sàn và gương."}],
+    scenarios:[{sme:"Nguyễn Thị Mai", context:"Cao điểm trả phòng 12h, còn 6 phòng phải xong, quản lý giục.",
+      decision:"Bỏ bước soi đèn phòng tắm để kịp giờ?", mistake:"Bỏ soi đèn, tin vào mắt thường.",
+      consequence:"Phòng fail inspection vì tóc ở rãnh sàn; khách phàn nàn.", quote:"Lúc bận thì cái đèn pin là thứ đầu tiên bị bỏ.", isDistractor:true},
+     {sme:"Nguyễn Thị Mai", context:"Nhận phòng khách vừa trả, ga giường có vết bẩn nhỏ.",
+      decision:"Thay toàn bộ ga hay chỉ lau chỗ bẩn?", mistake:"Chỉ lau, không thay ga.",
+      consequence:"Khách kế tiếp phát hiện, chấm 1 sao mục vệ sinh.", quote:"", isDistractor:false}]},
+  constraints:{maxTime:"20 phút / người / tháng", infra:"LMS nội bộ + app trên điện thoại", budget:"~40 triệu", authoring:"Articulate Rise"}
+};
 // transient UI state (not persisted)
-const ui = {view:"dashboard"};
+const ui = {view:"dashboard", ivOpen:{front:false,sme:false}, ivEdit:{front:false,sme:false}, ivTarget:{front:0,sme:0},
+  saveError:false, storageWarned:false, micDenied:{}};
 let _seq = Date.now();
 function uid(){ return "i"+(_seq++).toString(36); }
 
@@ -1180,20 +1275,9 @@ function hydrate(saved){
   migrateLoaded(saved, base);
   return base;
 }
-/* Pain point — classification (tag) happens in RCA, not at capture.
-   Migrates old "insights" (which had a tag) into classified pain points. */
-function normPain(o){
-  let src=o.source;
-  if(typeof src==="string") src={view:"", label:src};
-  else if(!src||typeof src!=="object") src={view:"",label:""};
-  return {id:o.id||uid(), text:String(o.text||""), quote:String(o.quote||""),
-    source:{view:src.view||"", label:String(src.label||"")},
-    tag:TAGS.includes(o.tag)?o.tag:"", isDistractor:!!o.isDistractor, inBank:!!o.inBank,
-    tagSuggested:TAGS.includes(o.tagSuggested)?o.tagSuggested:"", origin:o.origin||"manual", ts:o.ts||Date.now()};
-}
 function normDR(o){o=o||{};return {id:o.id||uid(),item:String(o.item||""),provider:String(o.provider||""),deadline:String(o.deadline||""),status:DR_STATUS.includes(o.status)?o.status:"dr_pending",file:o.file||null};}
-function normOps(o){o=o||{};return {id:o.id||uid(),content:String(o.content||""),source:String(o.source||""),level:String(o.level||"")};}
-function normIv(o){o=o||{};return {id:o.id||uid(),person:String(o.person||""),role:IV_ROLES.includes(o.role)?o.role:"role_employee",date:String(o.date||""),notes:String(o.notes||""),transcript:String(o.transcript||""),audio:o.audio||null};}
+function normOps(o){o=o||{};return {id:o.id||uid(),content:sanitizeHTML(o.content),source:String(o.source||""),level:String(o.level||"")};}
+function normIv(o){o=o||{};return {id:o.id||uid(),person:String(o.person||""),role:IV_ROLES.includes(o.role)?o.role:"role_employee",date:String(o.date||""),notes:sanitizeHTML(o.notes),transcript:sanitizeHTML(o.transcript),audio:o.audio||null,audioUploaded:!!o.audioUploaded,noteImages:Array.isArray(o.noteImages)?o.noteImages.map(n=>({id:String(n.id||uid()),name:String(n.name||"note"),type:String(n.type||"image/*"),size:+n.size||0})):[]};}
 function normScn(o){o=o||{};return {id:o.id||uid(),sme:String(o.sme||""),context:String(o.context||""),decision:String(o.decision||""),mistake:String(o.mistake||""),consequence:String(o.consequence||""),quote:String(o.quote||""),isDistractor:!!o.isDistractor};}
 function migrateLoaded(saved,base){
   // NOTE: old painPoints / rca / step6 / step7 fields are intentionally ignored (TNA-only app now).
@@ -1206,6 +1290,10 @@ function migrateLoaded(saved,base){
   if(saved.step5&&Array.isArray(saved.step5.interviews)) base.step5.interviews=saved.step5.interviews.map(normIv);
   else if(saved.step5&&Array.isArray(saved.step5.smes)) base.step5.interviews=saved.step5.smes.map(m=>normIv({person:m.name,role:m.role}));
   if(saved.step5&&Array.isArray(saved.step5.scenarios)) base.step5.scenarios=saved.step5.scenarios.map(normScn);
+  if(saved.ivGuide&&typeof saved.ivGuide==="object"&&!Array.isArray(saved.ivGuide)) base.ivGuide=JSON.parse(JSON.stringify(saved.ivGuide));
+  // constraints from new field, else from old step6
+  const c=saved.constraints||saved.step6;
+  if(c){ ["maxTime","infra","budget","authoring"].forEach(k=>{ if(c[k]!=null) base.constraints[k]=String(c[k]); }); }
 }
 
 /* path get/set (supports numeric array indices: "step2.behaviors.0.desc") */
@@ -1216,18 +1304,42 @@ function setPath(root,path,val){
   o[p[p.length-1]]=val;
 }
 
-/* autosave (debounced) */
+/* autosave (debounced) — with hard-failure handling when localStorage is full */
 let saveTimer=null;
+const LS_SOFT_LIMIT=4000000;   // ~4MB soft budget for the state JSON (blobs live in IndexedDB, not here)
 function scheduleSave(){
-  setSaveFlag(true);
+  setSaveFlag("saving");
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>{ persist(); setSaveFlag(false); }, 500);
+  saveTimer=setTimeout(()=>{ const ok=persist(); setSaveFlag(ok?"saved":"error"); renderSaveErrorBar(); }, 500);
 }
-function persist(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
-function setSaveFlag(saving){
+function persist(){
+  try{
+    const json=JSON.stringify(state);
+    localStorage.setItem(LS_KEY, json);
+    ui.saveError=false;
+    if(json.length>LS_SOFT_LIMIT*0.8 && !ui.storageWarned){ ui.storageWarned=true; toast(t("storage_warn"),true); }
+    return true;
+  }catch(e){ ui.saveError=true; return false; }   // QuotaExceededError etc. — DO NOT report as saved
+}
+function setSaveFlag(st){   // st: "saving" | "saved" | "error"  (true/false accepted for back-compat)
+  if(st===true) st="saving"; else if(st===false) st="saved";
+  if(ui.saveError && st!=="saving") st="error";
   const el=document.getElementById("saveFlag"); if(!el) return;
-  el.classList.toggle("saving",saving);
-  el.querySelector("span:last-child").textContent = saving? t("save_saving"):t("save_saved");
+  el.classList.toggle("saving",st==="saving");
+  el.classList.toggle("error",st==="error");
+  el.querySelector("span:last-child").textContent = st==="saving"?t("save_saving"):(st==="error"?t("save_failed"):t("save_saved"));
+}
+/* fixed banner at top of content while a save is failing — does not auto-dismiss */
+function renderSaveErrorBar(){
+  const bar=document.getElementById("saveErrorBar"); if(!bar) return;
+  if(!ui.saveError){ bar.className="saveerr-bar no-print"; bar.innerHTML=""; return; }
+  bar.className="saveerr-bar no-print on";
+  bar.innerHTML=`<div class="saveerr-box"><h3>${warnIcon()} ${esc(t("saveerr_title"))}</h3>
+    <p>${esc(t("saveerr_desc"))}</p>
+    <div class="btn-row">
+      <button class="btn danger" data-action="export-data" type="button">${downIcon()} ${esc(t("saveerr_export"))}</button>
+      <button class="btn" data-action="open-data" type="button">${esc(t("saveerr_manage"))}</button>
+    </div></div>`;
 }
 function load(){
   try{
@@ -1244,7 +1356,8 @@ function counts(){
     dataItems: state.step2.dataRequests.filter(r=>r.item&&r.item.trim()).length + state.step2.opsData.filter(r=>r.content&&r.content.trim()).length,
     interviews: state.step3.interviews.filter(r=>r.person&&r.person.trim()).length + state.step5.interviews.filter(r=>r.person&&r.person.trim()).length,
     scenarios: state.step5.scenarios.filter(s=>s.context&&s.context.trim()).length,
-    files: state.step2.dataRequests.filter(r=>r.file).length + state.step3.interviews.filter(r=>r.audio).length + state.step5.interviews.filter(r=>r.audio).length
+    files: state.step2.dataRequests.filter(r=>r.file).length
+      + [...state.step3.interviews,...state.step5.interviews].reduce((n,iv)=>n+(iv.audio?1:0)+((iv.noteImages&&iv.noteImages.length)||0),0)
   };
 }
 function step2HasData(){ return state.step2.dataRequests.some(r=>r.item.trim()) || state.step2.opsData.some(r=>r.content.trim()); }
@@ -1271,11 +1384,12 @@ function mergeState(incoming){
       const dv=dst[k], sv=src[k];
       if(Array.isArray(dv)) continue;
       if(dv && typeof dv==="object"){ fillScalars(dv,sv||{}); }
-      else if((dv===""||dv===false||dv==null) && sv!=null && sv!=="" ){ dst[k]=sv; }
+      else if((dv===""||dv==null) && sv!=null && sv!=="" ){ dst[k]=sv; }   // fill only empty string/null; NEVER auto-flip a boolean (confirmed / isSolutionRequest / handled)
     }
   };
   fillScalars(state.meta, inc.meta);
   fillScalars(state.screening, inc.screening);
+  fillScalars(state.constraints, inc.constraints);
   [ "step1","step4" ].forEach(s=>fillScalars(state[s], inc[s]));
   // append list items
   state.step2.dataRequests.push(...inc.step2.dataRequests);
@@ -1283,6 +1397,7 @@ function mergeState(incoming){
   state.step3.interviews.push(...inc.step3.interviews);
   state.step5.interviews.push(...inc.step5.interviews);
   state.step5.scenarios.push(...inc.step5.scenarios);
+  if(inc.ivGuide && Object.keys(inc.ivGuide).length && !Object.keys(state.ivGuide||{}).length) state.ivGuide=JSON.parse(JSON.stringify(inc.ivGuide));
   persist();
 }
 
@@ -1290,6 +1405,34 @@ function mergeState(incoming){
  *  Render helpers
  * ------------------------------------------------------------------ */
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+/* Sanitize rich-text (contenteditable notes/transcript/ops) before it is stored OR injected as innerHTML.
+   Parsed inertly via DOMParser (no image loads / no script exec), keeps a small formatting whitelist,
+   strips ALL attributes (kills on*-handlers, style, href/src, javascript: URLs), drops dangerous tags. */
+const CE_ALLOWED_TAGS = {B:1,STRONG:1,I:1,EM:1,U:1,BR:1,DIV:1,P:1,UL:1,OL:1,LI:1,SPAN:1};
+const CE_DROP_TAGS = {SCRIPT:1,STYLE:1,NOSCRIPT:1,IFRAME:1,OBJECT:1,EMBED:1,TEMPLATE:1,LINK:1,META:1,SVG:1,MATH:1,IMG:1,VIDEO:1,AUDIO:1,SOURCE:1,FORM:1,INPUT:1,BUTTON:1,TITLE:1,HEAD:1};
+function sanitizeHTML(html){
+  html=String(html==null?"":html);
+  if(!html || html.indexOf("<")<0) return html;   // plain text — nothing to strip
+  let doc;
+  try{ doc=new DOMParser().parseFromString(html,"text/html"); }catch(e){ return esc(html); }
+  const walk=(node)=>{
+    [...node.childNodes].forEach(child=>{
+      if(child.nodeType===1){                       // element
+        const tag=child.tagName;
+        if(CE_DROP_TAGS[tag]){ node.removeChild(child); return; }
+        if(!CE_ALLOWED_TAGS[tag]){                   // not whitelisted → unwrap, keep cleaned text/children
+          walk(child);
+          while(child.firstChild) node.insertBefore(child.firstChild, child);
+          node.removeChild(child); return;
+        }
+        [...child.attributes].forEach(a=>child.removeAttribute(a.name));
+        walk(child);
+      } else if(child.nodeType===8){ node.removeChild(child); }   // comment
+    });
+  };
+  walk(doc.body);
+  return doc.body.innerHTML;
+}
 function val(p){const v=getPath(state,p);return v==null?"":v;}
 function phAttr(k){return k?` placeholder="${esc(t(k))}"`:"";}
 function optsEnum(keys){return keys.map(k=>({v:k,label:t(k)}));}
@@ -1327,25 +1470,6 @@ function checkField(path,labelKey,o){o=o||{};
 function addBtn(path){return `<button class="btn sm" data-action="add" data-list="${path}">＋ ${esc(t("btn_add"))}</button>`;}
 function delBtn(path,i){return `<button class="iconbtn" data-action="del" data-list="${path}" data-index="${i}" aria-label="${esc(t("btn_remove"))}">${TRASH}</button>`;}
 
-/* generic scrollable data table for list state */
-function dtable(path,cols){
-  const arr=getPath(state,path);
-  const head=cols.map(c=>`<th${c.width?` style="min-width:${c.width}"`:""}>${esc(t(c.labelKey))}</th>`).join("")+`<th class="act"></th>`;
-  let body;
-  if(!arr.length){ body=`<tr><td colspan="${cols.length+1}" style="border:0"><div class="empty">${esc(t("none_yet"))}</div></td></tr>`; }
-  else body=arr.map((row,i)=>{
-    const tds=cols.map(c=>{
-      const p=`${path}.${i}.${c.key}`, rv=row[c.key];
-      let ctrl;
-      if(c.opts) ctrl=`<select class="control" data-model="${p}">${c.opts.map(op=>`<option value="${op.v}"${op.v===rv?" selected":""}>${esc(op.label)}</option>`).join("")}</select>`;
-      else if(c.area) ctrl=`<textarea class="control" data-model="${p}" rows="2"${phAttr(c.ph)}>${esc(rv)}</textarea>`;
-      else ctrl=`<input class="control" type="${c.type||"text"}" data-model="${p}" value="${esc(rv)}"${phAttr(c.ph)}>`;
-      return `<td>${ctrl}</td>`;
-    }).join("");
-    return `<tr>${tds}<td class="act">${delBtn(path,i)}</td></tr>`;
-  }).join("");
-  return `<div class="dtable-wrap"><table class="dtable"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
-}
 function sectionHead(num,titleKey,hintKey){
   return `<div class="sec-head">${num?`<span class="sec-num">${num}</span>`:""}<h2>${esc(t(titleKey))}</h2>${hintKey?`<span class="hint">${esc(t(hintKey))}</span>`:""}</div>`;
 }
@@ -1385,14 +1509,14 @@ function verdictPanel(sv){
 function renderStep0(){
   const a=state.screening.answers, sv=screeningVerdict();
   const qs=["q1","q2","q3","q4","q5","q6","q7"].map((q,i)=>{
-    const seg=["yes","no","unclear"].map(v=>`<button class="segbtn ${v}${a[q]===v?" on":""}" data-action="screen-ans" data-q="${q}" data-v="${v}" type="button"><span class="sd"></span>${esc(t("ans_"+v))}</button>`).join("");
+    const seg=["yes","no","unclear"].map(v=>`<button class="segbtn ${v}${a[q]===v?" on":""}" data-action="screen-ans" data-q="${q}" data-v="${v}" type="button"><span class="sd"></span>${esc(ansLabel(v,q))}</button>`).join("");
     return `<div class="scr-q">
       <div class="q-txt"><span class="q-n">${i+1}</span><span>${esc(t(q))}</span></div>
       <div class="seg">${seg}</div>
       <textarea class="control" data-model="screening.notes.${q}" rows="2" placeholder="${esc(t("scr_note"))}">${esc(state.screening.notes[q])}</textarea>
     </div>`;
   }).join("");
-  return `<div class="view-head"><div class="step-tag"><span class="n" style="background:var(--moss)">${t("step_word")} 0</span><span class="of">${esc(t("s0_short"))}</span></div>
+  return `<div class="view-head"><div class="step-tag"><span class="n" style="background:var(--moss)">${esc(t("s0_short"))}</span></div>
     <h1>${esc(t("s0"))}</h1><p class="lead">${esc(t("s0_lead"))}</p></div>
     ${verdictPanel(sv)}
     <div class="section" style="margin-top:18px">${sectionHead("0.1","scr_questions")}${qs}</div>`;
@@ -1401,13 +1525,12 @@ function renderStep0(){
 /* ------------------------------------------------------------------ *
  *  Interview sessions (record + transcript) + contenteditable field
  * ------------------------------------------------------------------ */
-function srcIcon(){return '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:-1px"><path d="M4 5h16M4 12h16M4 19h10"/></svg>';}
 /* contenteditable rich field bound to a state HTML string (notes / transcript / ops content) */
 function ceField(path,o){o=o||{};
   const html=getPath(state,path)||"";
   return `<div class="control ce" contenteditable="true" role="textbox" aria-label="${esc(t(o.label||"f_iv_notes"))}"
     data-ce="${path}" data-ph="${esc(t(o.ph||""))}"
-    ${o.minh?`style="min-height:${o.minh}px"`:""}>${html}</div>`;
+    ${o.minh?`style="min-height:${o.minh}px"`:""}>${sanitizeHTML(html)}</div>`;
 }
 /* interview session card (used in Step 3 and Step 5) */
 function interviewCard(listPath,view,iv,i){
@@ -1428,24 +1551,73 @@ function interviewCard(listPath,view,iv,i){
       <div class="stt-note" id="stt-${iv.id}"></div></div>
   </div>`;
 }
+/* file:// warning: mic capture & auto-transcript are unreliable off a real http(s) origin */
+function isFileOrigin(){ return location.protocol==="file:"; }
+function recFileWarn(){ return isFileOrigin() ? `<div class="rec-warn">${warnIcon()}<span>${esc(t("rec_file_warn"))}</span></div>` : ""; }
+/* handwritten-note photos (uploaded when the interviewee declines recording) */
+function noteImagesBlock(listPath,i,iv){
+  const imgs=(iv.noteImages||[]).map(n=>`<div class="note-thumb" data-action="note-view" data-id="${esc(n.id)}" data-name="${esc(n.name)}" title="${esc(n.name)}">
+      <img data-note-img="${esc(n.id)}" alt="${esc(n.name)}">
+      <button class="ndel" data-action="note-delete" data-list="${listPath}" data-index="${i}" data-id="${esc(n.id)}" type="button" aria-label="${esc(t("btn_remove"))}">${TRASH}</button>
+      <span class="nname">${esc(n.name)}</span></div>`).join("");
+  return `<div class="mrow">
+    <span class="mlbl">${esc(t("note_label"))}</span>
+    <label class="btn sm file-up"><input type="file" accept="image/*" data-action="note-upload" data-list="${listPath}" data-index="${i}" data-iv="${iv.id}" style="display:none">${upIcon()} ${esc(t("note_upload"))}</label>
+  </div>${imgs?`<div class="note-grid">${imgs}</div>`:""}`;
+}
 function recordBlock(listPath,i,iv){
   const audio = iv.audio ? `<div class="rec-audio"><audio controls data-audio-iv="${iv.id}" preload="none" style="height:36px"></audio>
       <button class="btn sm" data-action="rec-download" data-iv="${iv.id}" data-name="${esc(iv.audio.name||"recording.webm")}" type="button">${downIcon()} ${esc(t("rec_download"))}</button>
       <button class="btn sm danger-ghost" data-action="rec-delete" data-list="${listPath}" data-index="${i}" data-iv="${iv.id}" type="button">${esc(t("rec_delete"))}</button></div>` : "";
-  return `<div class="recbar" data-recbar="${iv.id}">
-    <button class="btn sm" data-action="rec-start" data-list="${listPath}" data-index="${i}" data-iv="${iv.id}" type="button"><span class="rec-dot"></span> ${esc(t("rec_start"))}</button>
-    <span class="rec-timer mono" id="rec-timer-${iv.id}"></span>
-  </div>${audio}`;
+  const uploadAudio = `<label class="btn sm file-up"><input type="file" accept="audio/*,.mp3,.m4a,.wav" data-action="audio-upload" data-list="${listPath}" data-index="${i}" data-iv="${iv.id}" style="display:none">${upIcon()} ${esc(t("rec_upload_audio"))}</label>`;
+  let audioArea;
+  if(REC.active && REC.active.ivId===iv.id){   // a recording is in progress for THIS interview — keep Stop/Pause visible across re-renders
+    audioArea=`<div class="recbar" data-recbar="${iv.id}">${recControlsHTML(iv.id)}</div>`;
+  } else if(ui.micDenied[iv.id]){   // permission was refused — explain in place + offer retry + still allow mp3 upload
+    audioArea=`<div class="recbar rec-blocked" data-recbar="${iv.id}">
+      <div class="rb-msg">${esc(t("rec_blocked"))}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn sm" type="button" disabled><span class="rec-dot"></span> ${esc(t("rec_start"))}</button>
+        <button class="btn sm primary" data-action="rec-retry" data-list="${listPath}" data-index="${i}" data-iv="${iv.id}" type="button">${esc(t("rec_retry"))}</button>
+        <span class="msep"></span>${uploadAudio}
+      </div>
+    </div>`;
+  } else if(iv.audio){
+    audioArea=`<div class="recbar" data-recbar="${iv.id}">${audio}</div>`;
+  } else {
+    audioArea=`<div class="recbar" data-recbar="${iv.id}">
+      <span class="mlbl">${esc(t("rec_audio_label"))}</span>
+      <button class="btn sm" data-action="rec-start" data-list="${listPath}" data-index="${i}" data-iv="${iv.id}" type="button"><span class="rec-dot"></span> ${esc(t("rec_start"))}</button>
+      ${uploadAudio}
+      <span class="rec-timer mono" id="rec-timer-${iv.id}"></span>
+    </div>`;
+  }
+  return `<div class="ivmedia">${recFileWarn()}${audioArea}${noteImagesBlock(listPath,i,iv)}</div>`;
 }
 
 /* ------------------------------------------------------------------ *
  *  Views
  * ------------------------------------------------------------------ */
+function shieldIcon(){return '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" style="vertical-align:-2px"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>';}
+function renderWelcome(){
+  return `<div class="view-head"><h1>${esc(t("nav_welcome"))}</h1><p class="lead">${esc(t("welcome_lead"))}</p></div>
+  <div class="welcome">
+    <div class="eyebrow">${esc(t("welcome_eyebrow"))}</div>
+    <h2>${esc(t("welcome_title"))}</h2>
+    <p class="wd">${esc(t("welcome_desc"))}</p>
+    <div class="wbtns">
+      <button class="btn primary lg" data-action="welcome-new" type="button">${esc(t("welcome_new"))} →</button>
+      <button class="btn lg" data-action="welcome-sample" type="button">${sparkIcon()} ${esc(t("welcome_sample"))}</button>
+    </div>
+    <div class="wprivacy">${shieldIcon()} ${esc(t("welcome_privacy"))}</div>
+  </div>`;
+}
 function renderDashboard(){
   const c=counts(), ready=isReady(), sv=screeningVerdict(), svMeta=verdictMeta(sv.v);
+  const sampleBar = isSampleData()? `<div class="sample-banner">${sparkIcon()}<span class="sb-txt">${esc(t("sample_banner"))}</span><button class="btn sm" data-action="sample-clear" type="button">${esc(t("sample_clear"))}</button></div>`:"";
   const scrMark = sv.v==="go"?"✓":(sv.v==="nogo"?"✕":(sv.v==="conditional"?"!":"…"));
   const okBox=(done,label)=>`<div class="gr${done?" done":""}"><span class="p">${done?"✓":"…"}</span>${label}</div>`;
-  const gateReq=`<div class="gr${sv.v==="go"?" done":""}"><span class="p">${scrMark}</span>${t("step_word")} 0</div>`
+  const gateReq=`<div class="gr${sv.v==="go"?" done":""}"><span class="p">${scrMark}</span>${esc(t("s0_short"))}</div>`
     +`<div class="gr${stepPct(1)===100?" done":""}"><span class="p">${stepPct(1)}%</span>${t("step_word")} 1</div>`
     +okBox(step2HasData(),t("step_word")+" 2")
     +okBox(step3HasData(),t("step_word")+" 3")
@@ -1454,14 +1626,15 @@ function renderDashboard(){
     <div class="vb"><div class="vlamp"><div class="c"></div></div>
       <div><div class="eyebrow">${esc(t("s0"))} · ${esc(t("scr_verdict"))}</div><h3>${esc(svMeta.label)}</h3></div></div></div>`;
   const progressRows=STEPS.map(n=>{const p=stepPct(n);const rq=(n>=1&&n<=3)||n===0||n===5;
+    const pn=n===0?`<span class="pn" style="color:var(--moss)" title="${esc(t("s0_short"))}"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.9">${ICONS.filter}</svg></span>`:`<span class="pn">${n}</span>`;
     return `<div class="prow${rq?" req":""}" data-action="nav" data-view="step${n}">
-      <span class="pn">${n}</span>
+      ${pn}
       <div class="ptxt"><div class="pt">${esc(t("s"+n))}${rq?` <span style="color:var(--brand);font-size:10px;font-weight:800;font-family:var(--font-mono)">${t("req_badge")}</span>`:""}</div>
         <div class="bar"><i class="${p===100?"full":""}" style="width:${p}%"></i></div></div>
       <span class="pp">${p}%</span></div>`;}).join("");
   const solWarn = state.step1.isSolutionRequest ? `<div class="callout danger" style="margin-bottom:18px">${warnIcon()}<div>${esc(t("s1_warn_solution"))}</div></div>`:"";
   return `<div class="view-head"><h1>${esc(t("dash_title"))}</h1><p class="lead">${esc(t("dash_lead"))}</p></div>
-  ${dashVerdict}${solWarn}
+  ${sampleBar}${dashVerdict}${solWarn}
   <div class="card tna-cta">
     <div class="tna-body"><div class="eyebrow">${esc(t("tna_cta_eyebrow"))}</div>
       <h3>${esc(t("tna_cta_title"))}</h3><p>${esc(t("tna_cta_desc"))}</p></div>
@@ -1470,10 +1643,10 @@ function renderDashboard(){
   <div class="dash-grid">
     <div>
       <div class="stat-wall" style="margin-bottom:18px">
-        <div class="stat t-env"><span class="sk" style="background:var(--terracotta)"></span><div class="sv">${c.dataItems}</div><div class="sl">${esc(t("c_dataitems"))}</div></div>
-        <div class="stat t-know"><span class="sk" style="background:var(--teal)"></span><div class="sv">${c.interviews}</div><div class="sl">${esc(t("c_interviews"))}</div></div>
-        <div class="stat t-skill"><span class="sk" style="background:var(--moss)"></span><div class="sv">${c.scenarios}</div><div class="sl">${esc(t("c_scenarios"))}</div></div>
-        <div class="stat t-conf"><span class="sk" style="background:var(--gold)"></span><div class="sv">${c.files}</div><div class="sl">${esc(t("c_files"))}</div></div>
+        <div class="stat t-data"><span class="sk" style="background:var(--terracotta)"></span><div class="sv">${c.dataItems}</div><div class="sl">${esc(t("c_dataitems"))}</div></div>
+        <div class="stat t-iv"><span class="sk" style="background:var(--teal)"></span><div class="sv">${c.interviews}</div><div class="sl">${esc(t("c_interviews"))}</div></div>
+        <div class="stat t-scn"><span class="sk" style="background:var(--moss)"></span><div class="sv">${c.scenarios}</div><div class="sl">${esc(t("c_scenarios"))}</div></div>
+        <div class="stat t-file"><span class="sk" style="background:var(--gold)"></span><div class="sv">${c.files}</div><div class="sl">${esc(t("c_files"))}</div></div>
       </div>
       <div class="section">
         ${sectionHead("",("progress_title"),"progress_hint")}
@@ -1556,7 +1729,7 @@ function fileRow(row,i){
 }
 function renderStep2(){
   const drs=state.step2.dataRequests;
-  const drList = drs.length? drs.map((r,i)=>fileRow(r,i)).join("") : `<div class="empty">${esc(t("none_yet"))}</div>`;
+  const drList = drs.length? drs.map((r,i)=>fileRow(r,i)).join("") : `<div class="empty">${esc(t("empty_dr"))}</div>`;
   const ops=state.step2.opsData;
   const opsList = ops.length? ops.map((r,i)=>`<div class="rowcard">
       <div class="rc-head"><span class="rc-n">#${i+1}</span>${delBtn("step2.opsData",i)}</div>
@@ -1565,20 +1738,22 @@ function renderStep2(){
       <div class="grid g2">
         ${field("f_ops_source",`<input class="control" data-model="step2.opsData.${i}.source" value="${esc(r.source)}">`)}
         ${field("f_ops_level",`<input class="control" data-model="step2.opsData.${i}.level" value="${esc(r.level)}" placeholder="${esc(t("ph_ops_level"))}">`)}
-      </div></div>`).join("") : `<div class="empty">${esc(t("none_yet"))}</div>`;
+      </div></div>`).join("") : `<div class="empty">${esc(t("empty_ops"))}</div>`;
   return stepHeader(2,"s2_lead")+`
   <div class="section">${sectionHead("2.1","s2_drl","s2_drl_hint")}
     <div class="rowlist">${drList}</div>
-    <div style="margin-top:12px">${addBtn("step2.dataRequests")}</div></div>
+    <div style="margin-top:12px">${addBtn("step2.dataRequests")}</div>
+    <div class="callout info" style="margin-top:14px">${sparkIcon()}<div>${esc(t("s2_file_hint"))}</div></div></div>
   <div class="section">${sectionHead("2.2","s2_ops","s2_ops_hint")}
     <div class="rowlist">${opsList}</div>
     <div style="margin-top:12px">${addBtn("step2.opsData")}</div></div>`;
 }
 function renderStep3(){
   const ivs=state.step3.interviews;
-  const cards = ivs.length? ivs.map((iv,i)=>interviewCard("step3.interviews",("step3"),iv,i)).join("") : `<div class="empty">${esc(t("none_yet"))}</div>`;
+  const cards = ivs.length? ivs.map((iv,i)=>interviewCard("step3.interviews",("step3"),iv,i)).join("") : `<div class="empty">${esc(t("empty_iv3"))}</div>`;
   return stepHeader(3,"s3_lead")+`
   <div class="section">${sectionHead("3.1","s3_interviews")}
+    ${interviewGuide("front")}
     <div class="rowlist">${cards}</div>
     <div style="margin-top:12px">${addBtn("step3.interviews")}</div></div>`;
 }
@@ -1621,14 +1796,15 @@ function renderStep5(){
     </div>`;}).join("");
   const smeDL=`<datalist id="smeList">${state.step5.interviews.filter(m=>m.person.trim()).map(m=>`<option value="${esc(m.person)}">`).join("")}</datalist>`;
   const ivs=state.step5.interviews;
-  const cards = ivs.length? ivs.map((iv,i)=>interviewCard("step5.interviews",("step5"),iv,i)).join("") : `<div class="empty">${esc(t("none_yet"))}</div>`;
+  const cards = ivs.length? ivs.map((iv,i)=>interviewCard("step5.interviews",("step5"),iv,i)).join("") : `<div class="empty">${esc(t("empty_iv5"))}</div>`;
   return stepHeader(5,"s5_lead")+`
   <div class="section">${sectionHead("5.1","s5_smes")}
+    ${interviewGuide("sme")}
     <div class="rowlist">${cards}</div>
     <div style="margin-top:12px">${addBtn("step5.interviews")}</div></div>
   <div class="section">${sectionHead("5.2","s5_scenarios","s5_scn_hint")}
     ${smeDL}
-    ${state.step5.scenarios.length?scn:`<div class="empty">${esc(t("none_yet"))}</div>`}
+    ${state.step5.scenarios.length?scn:`<div class="empty">${esc(t("empty_scn"))}</div>`}
     <div style="margin-top:12px">${addBtn("step5.scenarios")}</div></div>`;
 }
 function tf5(i,key,ph){
@@ -1637,13 +1813,24 @@ function tf5(i,key,ph){
 }
 function renderDocs(){
   const cards=DOCS.map((d,i)=>`<div class="doc-card">
-    <div class="dnum">${i}</div>
+    <div class="dnum" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8">${ICONS.docs}</svg></div>
     <div class="dc-body"><div class="dc-t">${esc(t(d))}</div><div class="dc-s">${esc(t(d+"_s"))}</div>
       <div class="dc-act"><button class="btn sm" data-action="view-doc" data-doc="${d}">${eyeIcon()} ${esc(t("btn_view"))}</button>
       <button class="btn sm" data-action="print-doc-direct" data-doc="${d}">${esc(t("btn_print"))}</button></div>
     </div></div>`).join("");
   return `<div class="view-head"><h1>${esc(t("docs_title"))}</h1><p class="lead">${esc(t("docs_lead"))}</p></div>
     <div class="doc-list">${cards}</div>`;
+}
+function renderConstraints(){
+  return `<div class="view-head"><div class="step-tag"><span class="n" style="background:var(--ink-3)">${esc(t("nav_constraints"))}</span><span class="of">${esc(t("constraints_optional"))}</span></div>
+    <h1>${esc(t("constraints_title"))}</h1><p class="lead">${esc(t("constraints_lead"))}</p></div>
+  <div class="section">${sectionHead("",("constraints_title"))}
+    <div class="grid g2">
+      ${tField("constraints.maxTime","f_maxTime",{ph:"ph_maxTime"})}
+      ${tField("constraints.infra","f_infra",{ph:"ph_infra"})}
+      ${tField("constraints.budget","f_budget",{ph:"ph_budget"})}
+      ${tField("constraints.authoring","f_authoring",{ph:"ph_authoring"})}
+    </div></div>`;
 }
 function eyeIcon(){return '<svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';}
 /* names of the required fields still empty in a step (for the reminder line) */
@@ -1670,7 +1857,7 @@ function stepNav(step){
     : `<div class="stepnav-hint"></div>`;
   return `<div class="stepnav">${prev}${hint}${next}</div>`;
 }
-const VIEWS={dashboard:renderDashboard,step0:renderStep0,step1:renderStep1,step2:renderStep2,step3:renderStep3,step4:renderStep4,step5:renderStep5,docs:renderDocs};
+const VIEWS={welcome:renderWelcome,dashboard:renderDashboard,step0:renderStep0,step1:renderStep1,step2:renderStep2,step3:renderStep3,step4:renderStep4,step5:renderStep5,constraints:renderConstraints,docs:renderDocs};
 
 /* ------------------------------------------------------------------ *
  *  Document generators (10) — assembled from state, in current language
@@ -1707,7 +1894,7 @@ function buildDoc(id){
   case "d0":{
     const a=s.screening.answers, n=s.screening.notes, sv=screeningVerdict(), meta=verdictMeta(sv.v);
     const rows=["q1","q2","q3","q4","q5","q6","q7"].map((q,i)=>
-      `<tr><td style="width:8mm;text-align:center;font-weight:700">${i+1}</td><td>${esc(t(q))}</td><td style="width:22mm;font-weight:600">${a[q]?esc(t("ans_"+a[q])):`<span class="doc-empty">—</span>`}</td><td>${docv(n[q])}</td></tr>`).join("");
+      `<tr><td style="width:8mm;text-align:center;font-weight:700">${i+1}</td><td>${esc(t(q))}</td><td style="width:22mm;font-weight:600">${a[q]?esc(ansLabel(a[q],q)):`<span class="doc-empty">—</span>`}</td><td>${docv(n[q])}</td></tr>`).join("");
     let extra="";
     if(sv.v==="conditional"){
       extra=`<div class="doc-section"><h2>${esc(t("dh_scr_conditions"))}</h2><table class="doc-table"><thead><tr><th>${esc(t("dh_scr_question"))}</th><th>${esc(t("scr_conditions"))}</th><th style="width:24mm;text-align:center">${esc(t("scr_handled"))}</th></tr></thead><tbody>`
@@ -1814,18 +2001,24 @@ function aiInstructions(){
 return `# HƯỚNG DẪN CHO AI (đọc trước khi xử lý)
 Bạn là Instructional Designer theo phương pháp Action Mapping (Cathy Moore). Từ dữ liệu TNA thô bên dưới, hãy tạo MỘT file HTML Action Map flowchart có cấu trúc 4 phần:
 - 01 BUSINESS GOAL: goal chính đo lường được (chỉ số, baseline → target, deadline) + các chỉ số theo dõi.
-- 02 PHÂN TÍCH "TRAINING CÓ GIẢI QUYẾT ĐƯỢC KHÔNG?": tự phân tích nguyên nhân gốc từ dữ liệu vận hành + transcript phỏng vấn; mỗi vấn đề 1 hàng: Vấn đề → Nguyên nhân gốc (gắn tag MÔI TRƯỜNG/KIẾN THỨC/KỸ NĂNG/TỰ TIN) → Verdict (✓ Training / ◐ Một phần / ✕ Ngoài training, kèm điều kiện tiên quyết nếu có).
-- 03 ACTION MAP: chỉ với các vấn đề training giải quyết được — Goal node bên trái, các nhánh Behavior (hành vi quan sát được trên ca) → Practice Activity (ưu tiên branching scenario, distractors lấy từ sai lầm thật trong dữ liệu, feedback theo hậu quả tự nhiên consequence-first) → Minimum Info Required. Tận dụng Scenario Bank làm nguyên liệu practice.
+- 02 PHÂN TÍCH "TRAINING CÓ GIẢI QUYẾT ĐƯỢC KHÔNG?": tự phân tích nguyên nhân gốc từ dữ liệu vận hành + transcript phỏng vấn + CÁC FILE ĐÍNH KÈM (nếu có file xlsx/pdf/csv đính kèm trong cuộc trò chuyện, hãy MỞ VÀ ĐỌC chúng để lấy số liệu thô); mỗi vấn đề 1 hàng: Vấn đề → Nguyên nhân gốc (gắn tag MÔI TRƯỜNG/KIẾN THỨC/KỸ NĂNG/TỰ TIN) → Verdict (✓ Training / ◐ Một phần / ✕ Ngoài training, kèm điều kiện tiên quyết nếu có).
+- 03 ACTION MAP: chỉ với các vấn đề training giải quyết được — Goal node bên trái, các nhánh Behavior (hành vi quan sát được trên ca) → Practice Activity (ưu tiên branching scenario, distractors lấy từ sai lầm thật trong dữ liệu, feedback theo hậu quả tự nhiên consequence-first) → Minimum Info Required. Tận dụng Scenario Bank làm nguyên liệu practice. Practice phải vừa với Ràng buộc phân phối ở phần 6 (thời gian học, hạ tầng, công cụ) nếu có.
 - 04 NGOÀI TRAINING: các nguyên nhân môi trường bàn giao stakeholder (kèm owner đề xuất) + khung đo lường New World Kirkpatrick (trọng tâm Level 3-4).
-Thiết kế thị giác: theo đúng file template HTML đính kèm hoặc file style guide đính kèm (nếu có); nếu không có template: nền ivory #F6F3EC, navy #16324F, gold #B9862E, xanh rêu #3E6B4F, terracotta #A4462D, heading Georgia serif, không gradient. Trước khi vẽ, nếu dữ liệu thiếu nghiêm trọng (không có goal đo được, không có dữ liệu hành vi), hãy chỉ ra thiếu gì thay vì bịa.`;
+Thiết kế thị giác: theo đúng file template HTML đính kèm hoặc file style guide đính kèm (nếu có); nếu không có template: nền ivory #F6F3EC, navy #16324F, gold #B9862E, xanh rêu #3E6B4F, teal #2F6D75, terracotta #A4462D, heading dùng serif Cambria → "Times New Roman" (KHÔNG dùng Georgia: thiếu glyph tiếng Việt, dấu bị tách rời khỏi ký tự), không gradient. Trước khi vẽ, nếu dữ liệu thiếu nghiêm trọng (không có goal đo được, không có dữ liệu hành vi), hãy chỉ ra thiếu gì thay vì bịa.`;
   }
 return `# INSTRUCTIONS FOR THE AI (read before processing)
 You are an Instructional Designer using Action Mapping (Cathy Moore). From the raw TNA data below, create ONE HTML Action Map flowchart with 4 sections:
 - 01 BUSINESS GOAL: the measurable primary goal (metric, baseline → target, deadline) + tracking indicators.
-- 02 "CAN TRAINING SOLVE IT?" ANALYSIS: derive root causes yourself from the operational data + interview transcripts; one row per problem: Problem → Root cause (tag ENVIRONMENT/KNOWLEDGE/SKILL/CONFIDENCE) → Verdict (✓ Training / ◐ Partial / ✕ Outside training, with prerequisites if any).
-- 03 ACTION MAP: only for training-solvable problems — Goal node on the left, Behavior branches (observable on-shift behaviors) → Practice Activity (prefer branching scenarios, distractors drawn from real mistakes in the data, consequence-first feedback) → Minimum Info Required. Use the Scenario Bank as practice raw material.
+- 02 "CAN TRAINING SOLVE IT?" ANALYSIS: derive root causes yourself from the operational data + interview transcripts + ANY ATTACHED FILES (if xlsx/pdf/csv files are attached to the chat, OPEN AND READ them for the raw numbers); one row per problem: Problem → Root cause (tag ENVIRONMENT/KNOWLEDGE/SKILL/CONFIDENCE) → Verdict (✓ Training / ◐ Partial / ✕ Outside training, with prerequisites if any).
+- 03 ACTION MAP: only for training-solvable problems — Goal node on the left, Behavior branches (observable on-shift behaviors) → Practice Activity (prefer branching scenarios, distractors drawn from real mistakes in the data, consequence-first feedback) → Minimum Info Required. Use the Scenario Bank as practice raw material. Practice must fit the Delivery Constraints in section 6 (learning time, infrastructure, tools) if present.
 - 04 OUTSIDE TRAINING: environment root causes to hand off to stakeholders (with a suggested owner) + a New World Kirkpatrick measurement frame (focus on Levels 3–4).
-Visual design: follow the attached HTML template or style-guide file if provided; if none: ivory background #F6F3EC, navy #16324F, gold #B9862E, moss #3E6B4F, terracotta #A4462D, Georgia serif headings, no gradients. Before drawing, if the data is severely lacking (no measurable goal, no behavior data), state what's missing instead of inventing it.`;
+Visual design: follow the attached HTML template or style-guide file if provided; if none: ivory background #F6F3EC, navy #16324F, gold #B9862E, moss #3E6B4F, teal #2F6D75, terracotta #A4462D, serif headings using Cambria → "Times New Roman" (do NOT use Georgia — it lacks Vietnamese glyphs and detaches diacritics from letters), no gradients. Before drawing, if the data is severely lacking (no measurable goal, no behavior data), state what's missing instead of inventing it.`;
+}
+/* interview attachments (uploaded mp3 / handwritten-note photos) as markdown lines */
+function ivMediaLines(iv,H){
+  if(iv.audio){ const up=iv.audioUploaded?" ("+t("rec_upload_audio")+")":""; H(`**${t("rec_audio_label")}:** ${iv.audio.name} (${fmtSize(iv.audio.size)})${up}`); }
+  const imgs=(iv.noteImages||[]);
+  if(imgs.length){ H(`**${t("note_label")}:** _(${t("tna_noteimg_note")})_`); imgs.forEach(n=>H(`- ${n.name} (${fmtSize(n.size)})`)); }
 }
 function buildTNAPackage(){
   const s=state, L=[];
@@ -1834,17 +2027,17 @@ function buildTNAPackage(){
   H(aiInstructions()); H("");
   // 0. Screening
   const sv=screeningVerdict(), vm=verdictMeta(sv.v);
-  H("# 0. "+(LANG==="vi"?"SCREENING GO/NO-GO":"GO/NO-GO SCREENING"));
+  H("# 0. "+t("tna_h_screening"));
   ["q1","q2","q3","q4","q5","q6","q7"].forEach((q,i)=>{
     H(`**Q${i+1}. ${t(q)}**`);
-    H(`- ${t("dh_scr_answer")}: ${s.screening.answers[q]?t("ans_"+s.screening.answers[q]):t("tna_empty")}`);
+    H(`- ${t("dh_scr_answer")}: ${s.screening.answers[q]?ansLabel(s.screening.answers[q],q):t("tna_empty")}`);
     if((s.screening.notes[q]||"").trim()) H(`- ${t("dh_scr_note")}: ${s.screening.notes[q].trim()}`);
   });
   H(""); H(`**${t("scr_verdict")}: ${vm.label}** — ${vm.desc}`);
   if(sv.v==="conditional") sv.unmet.forEach(q=>H(`- ${t("cond_"+q)} ${s.screening.handled[q]?"["+t("scr_handled")+" ✓]":""}`));
   H("");
   // 1. Business goal
-  H("# 1. "+(LANG==="vi"?"BUSINESS GOAL":"BUSINESS GOAL"));
+  H("# 1. "+t("tna_h_goal"));
   H(`- ${t("dh_sponsor")}: ${nz(s.step1.sponsorName)}${s.step1.sponsorTitle?" — "+s.step1.sponsorTitle:""}`);
   H(`- ${t("dh_success_metric")}: ${nz(s.step1.successAnswer)}`);
   H(`- ${t("dh_goal_formula")}: ${nz(s.step1.metric)} | ${t("dh_baseline")}: ${nz(s.step1.baseline)} → ${t("dh_target")}: ${nz(s.step1.target)} | ${t("dh_deadline")}: ${nz(s.step1.deadline)}`);
@@ -1854,26 +2047,27 @@ function buildTNAPackage(){
   H(`- ${t("dh_kickoff")} — ${t("dh_decisions")}: ${nz(s.step1.kickoffDecisions)}`);
   H("");
   // 2. Operational data
-  H("# 2. "+(LANG==="vi"?"DỮ LIỆU VẬN HÀNH":"OPERATIONAL DATA"));
+  H("# 2. "+t("tna_h_ops"));
   if(!s.step2.opsData.length) H("("+t("tna_empty")+")");
   s.step2.opsData.forEach((r,i)=>{ H(`## 2.${i+1}`);
     H(`- ${t("dh_content")}: ${nz(htmlToText(r.content))}`);
     H(`- ${t("dh_source")}: ${nz(r.source)}`);
     H(`- ${t("dh_level")}: ${nz(r.level)}`); });
-  H(""); H(`**${t("f_attach")}:**`);
+  H("");
   const files=s.step2.dataRequests.filter(r=>r.file);
-  if(!files.length) H("- ("+t("tna_empty")+")");
-  s.step2.dataRequests.forEach(r=>{ if(r.file) H(`- ${r.file.name} (${fmtSize(r.file.size)})${r.item?" — "+r.item:""}`); });
+  if(!files.length){ H(`**${t("f_attach")}:** (${t("tna_empty")})`); }
+  else{ H(`**${t("f_attach")}:** _(${t("tna_file_note")})_`);
+    files.forEach(r=>H(`- ${r.file.name} (${fmtSize(r.file.size)})${r.item?" — "+r.item:""}`)); }
   H("");
   // 3. Front-line interviews
-  H("# 3. "+(LANG==="vi"?"PHỎNG VẤN TRỰC TIẾP":"FRONT-LINE INTERVIEWS"));
+  H("# 3. "+t("tna_h_interviews"));
   if(!s.step3.interviews.length) H("("+t("tna_empty")+")");
   s.step3.interviews.forEach((iv,i)=>{ H(`## 3.${i+1} ${nz(iv.person)} — ${t(iv.role)}${iv.date?" ("+iv.date+")":""}`);
     H(`**${t("f_iv_notes")}:**`); H(nz(htmlToText(iv.notes)));
-    H(`**${t("f_iv_transcript")}:**`); H(nz(htmlToText(iv.transcript))); H(""); });
+    H(`**${t("f_iv_transcript")}:**`); H(nz(htmlToText(iv.transcript))); ivMediaLines(iv,H); H(""); });
   H("");
   // 4. Learner profile
-  H("# 4. "+(LANG==="vi"?"LEARNER PROFILE":"LEARNER PROFILE"));
+  H("# 4. "+t("tna_h_learner"));
   H(`- ${t("dh_learner_role")}: ${nz(s.step4.role)}`);
   H(`- ${t("dh_learner_size")}: ${nz(s.step4.size)}`);
   H(`- ${t("dh_tenure")}: ${nz(s.step4.tenure)}`);
@@ -1885,11 +2079,11 @@ function buildTNAPackage(){
   H(`- ${t("dh_baseknow")}: ${nz(s.step4.baseKnowledge)}`);
   H("");
   // 5. SME interviews + scenario bank
-  H("# 5. "+(LANG==="vi"?"PHỎNG VẤN SME & SCENARIO BANK":"SME INTERVIEWS & SCENARIO BANK"));
+  H("# 5. "+t("tna_h_sme"));
   if(!s.step5.interviews.length) H("("+t("tna_empty")+")");
   s.step5.interviews.forEach((iv,i)=>{ H(`## 5.${i+1} ${nz(iv.person)} — ${t(iv.role)}${iv.date?" ("+iv.date+")":""}`);
     H(`**${t("f_iv_notes")}:**`); H(nz(htmlToText(iv.notes)));
-    H(`**${t("f_iv_transcript")}:**`); H(nz(htmlToText(iv.transcript))); H(""); });
+    H(`**${t("f_iv_transcript")}:**`); H(nz(htmlToText(iv.transcript))); ivMediaLines(iv,H); H(""); });
   H("### "+t("s5_scenarios"));
   if(!s.step5.scenarios.length) H("("+t("tna_empty")+")");
   s.step5.scenarios.forEach((sc,i)=>{ H(`**${t("scn_word")} ${i+1}${sc.sme?" — "+sc.sme:""}${sc.isDistractor?" [⭐ "+t("f_scn_distractor")+"]":""}**`);
@@ -1898,6 +2092,16 @@ function buildTNAPackage(){
     H(`- ${t("dh_mistake")}: ${nz(sc.mistake)}`);
     H(`- ${t("dh_consequence")}: ${nz(sc.consequence)}`);
     H(`- ${t("dh_quote")}: ${nz(sc.quote)}`); H(""); });
+  // 6. Delivery constraints (optional)
+  const cc=s.constraints, hasC=cc.maxTime||cc.infra||cc.budget||cc.authoring;
+  H("# 6. "+t("tna_h_constraints"));
+  if(!hasC) H("("+t("tna_empty")+")");
+  else{
+    H(`- ${t("dh_max_time")}: ${nz(cc.maxTime)}`);
+    H(`- ${t("dh_infra")}: ${nz(cc.infra)}`);
+    H(`- ${t("dh_budget")}: ${nz(cc.budget)}`);
+    H(`- ${t("dh_authoring")}: ${nz(cc.authoring)}`);
+  }
   return L.join("\n");
 }
 function exportTNA(){
@@ -1930,7 +2134,6 @@ function refreshNav(){
   const tabs=[
     {a:"nav",v:"dashboard",icon:"grid",key:"bt_home",on:cur==="dashboard"},
     {a:"open-sheet",icon:"target",key:"bt_steps",on:isStep},
-    {a:"nav",v:"ai",icon:"spark",key:"bt_ai",on:cur==="ai"},
     {a:"nav",v:"docs",icon:"docs",key:"bt_docs",on:cur==="docs"}
   ];
   document.getElementById("bottomBar").innerHTML=tabs.map(tb=>`<button class="btab${tb.on?" on":""}" data-action="${tb.a}"${tb.v?` data-view="${tb.v}"`:""}><span class="bi">${svg(tb.icon)}</span>${esc(t(tb.key))}</button>`).join("");
@@ -1939,10 +2142,14 @@ function refreshTop(){
   const tp=document.getElementById("topProject");
   tp.innerHTML=(state.meta.projectName||state.meta.client)
     ? `<div class="pn">${esc(state.meta.projectName||"—")}</div><div class="pc">${esc(state.meta.client||"")}</div>` : "";
-  const ready=isReady(), pill=document.getElementById("readPill");
-  pill.className="readpill "+(ready?"go":"lock");
-  document.getElementById("readPillText").textContent=ready?t("readiness_go"):t("readiness_lock");
+  const ready=isReady(), started=projectStarted(), pill=document.getElementById("readPill");
+  pill.className="readpill "+(ready?"go":(started?"lock":"idle"));
+  document.getElementById("readPillText").textContent = ready?t("readiness_go"):(started?t("readiness_lock"):t("readiness_idle"));
 }
+function projectStarted(){ return Object.values(state.screening.answers).some(v=>v) || stepPct(1)>0 || step2HasData() || step3HasData() || step5HasData(); }
+/* is the current data the built-in Auréa Bay sample? (signature match, survives reload) */
+function isSampleData(){ return !!state.meta.projectName && state.meta.projectName===SAMPLE.meta.projectName && state.meta.client===SAMPLE.meta.client; }
+function loadSample(){ state=hydrate(SAMPLE); LANG=state.meta.lang||LANG; persist(); applyStaticI18n(); showView("dashboard"); toast(t("dm_sample_loaded")); }
 function refreshMeters(){ refreshNav(); refreshTop(); }
 function refreshStepNav(){ const m=/^step(\d)$/.exec(ui.view); if(!m) return; const el=document.querySelector(".stepnav"); if(el) el.outerHTML=stepNav(+m[1]); }
 
@@ -1962,7 +2169,9 @@ function renderContent(){
   let html=VIEWS[ui.view]();
   const m=/^step(\d)$/.exec(ui.view);
   if(m) html+=stepNav(+m[1]);
+  releaseMediaURLs();   // revoke blob URLs from the outgoing render before it is discarded (no leak)
   document.getElementById("view").innerHTML=html;
+  renderSaveErrorBar();
   hydrateMedia();
 }
 function rerender(){ renderContent(); refreshNav(); refreshTop(); }
@@ -2043,23 +2252,24 @@ function pad2(n){ return (n<10?"0":"")+n; }
 function fmtDur(s){ s=Math.max(0,Math.floor(s)); return pad2(Math.floor(s/60))+":"+pad2(s%60); }
 function recElapsed(){ let ms=Date.now()-REC.startTs-REC.pausedMs; if(REC.pauseStart) ms-=Date.now()-REC.pauseStart; return ms/1000; }
 function updateRecTimer(ivId){ const el=document.getElementById("rec-timer-"+ivId); if(el) el.textContent=fmtDur(recElapsed()); }
-function renderRecControls(ivId,mode){
-  const bar=document.querySelector('[data-recbar="'+ivId+'"]'); if(!bar) return;
-  const a=REC.active;
-  if(mode==="recording"){
-    const paused=!!REC.pauseStart;
-    bar.innerHTML=`<button class="btn sm rec-live${paused?" paused":""}" data-action="rec-pause" data-iv="${ivId}" type="button"><span class="rec-dot on"></span> ${esc(paused?t("rec_resume"):t("rec_pause"))}</button>
+/* markup for the live pause/stop/timer bar — shared by renderRecControls (DOM patch) and recordBlock (full render) */
+function recControlsHTML(ivId){
+  const paused=!!REC.pauseStart;
+  return `<button class="btn sm rec-live${paused?" paused":""}" data-action="rec-pause" data-iv="${ivId}" type="button"><span class="rec-dot on"></span> ${esc(paused?t("rec_resume"):t("rec_pause"))}</button>
       <button class="btn sm primary" data-action="rec-stop" data-iv="${ivId}" type="button">${esc(t("rec_stop"))}</button>
       <span class="rec-timer mono" id="rec-timer-${ivId}"></span><span class="rec-badge">${esc(t("rec_recording"))}</span>`;
-    updateRecTimer(ivId);
-  }
+}
+function renderRecControls(ivId,mode){
+  const bar=document.querySelector('[data-recbar="'+ivId+'"]'); if(!bar) return;
+  if(mode==="recording"){ bar.innerHTML=recControlsHTML(ivId); updateRecTimer(ivId); }
 }
 async function recStart(listPath,i,ivId){
   if(REC.active){ return; }
   if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)||typeof window.MediaRecorder==="undefined"){ toast(t("rec_no_support"),true); setSttNote(ivId,t("stt_unavailable")); return; }
   let stream;
   try{ stream=await navigator.mediaDevices.getUserMedia({audio:true}); }
-  catch(e){ toast(t("rec_perm_denied"),true); return; }
+  catch(e){ ui.micDenied[ivId]=true; toast(t("rec_perm_denied"),true); rerender(); return; }
+  delete ui.micDenied[ivId];   // permission granted (possibly after a retry)
   let mr; try{ mr=new MediaRecorder(stream); }catch(e){ stream.getTracks().forEach(x=>x.stop()); toast(t("rec_no_support"),true); return; }
   const chunks=[];
   mr.ondataavailable=e=>{ if(e.data&&e.data.size) chunks.push(e.data); };
@@ -2068,14 +2278,16 @@ async function recStart(listPath,i,ivId){
     const blob=new Blob(chunks,{type});
     const dur=Math.round(recElapsed());
     const name="interview-"+ivId+".webm";
-    try{ await IDB.put("audio", ivId, {blob, name, type, size:blob.size, duration:dur});
-      const iv=getPath(state,listPath)&&getPath(state,listPath)[i];
-      if(iv){ iv.audio={id:ivId, name, type, size:blob.size, duration:dur}; persist(); }
-      toast(t("rec_saved"));
-    }catch(e){ toast(t("file_idb_fail"),true); }
     stream.getTracks().forEach(x=>x.stop());
     stopSTT();
     clearInterval(REC.timer); REC.active=null; REC.pauseStart=0; REC.pausedMs=0;
+    // Empty/near-empty blob = nothing was actually captured (common on file:// or a blocked/silent mic)
+    if(blob.size < 1024){ toast(t("rec_empty"),true); rerender(); return; }
+    try{ await IDB.put("audio", ivId, {blob, name, type, size:blob.size, duration:dur});
+      const arr=getPath(state,listPath)||[]; const iv=arr.find(x=>x&&x.id===ivId);   // find by id, not stale index
+      if(iv){ iv.audio={id:ivId, name, type, size:blob.size, duration:dur}; iv.audioUploaded=false; persist(); }
+      toast(t("rec_saved"));
+    }catch(e){ toast(t("file_idb_fail"),true); }
     rerender();
   };
   REC.active={mr,stream,ivId,listPath,i}; REC.startTs=Date.now(); REC.pausedMs=0; REC.pauseStart=0;
@@ -2118,7 +2330,7 @@ function startSTT(ivId,listPath,i){
     r.lang = LANG==="vi" ? "vi-VN" : "en-US";
     r.continuous=true; r.interimResults=false;
     r.onresult=e=>{ for(let k=e.resultIndex;k<e.results.length;k++){ if(e.results[k].isFinal){ const txt=e.results[k][0].transcript.trim(); if(txt) appendTranscript(listPath,i,txt); } } };
-    r.onerror=ev=>{ if(ev.error==="not-allowed"||ev.error==="service-not-allowed") setSttNote(ivId,t("stt_unavailable")); };
+    r.onerror=ev=>{ if(ev.error==="network") setSttNote(ivId,t("stt_network")); else if(ev.error==="not-allowed"||ev.error==="service-not-allowed") setSttNote(ivId,t("stt_unavailable")); };
     r.onend=()=>{ if(REC.active&&REC.active.ivId===ivId&&!REC.pauseStart){ try{ r.start(); }catch(e){} } };
     r.start();
     REC.recog=r; setSttNote(ivId,t("stt_listening"));
@@ -2127,18 +2339,61 @@ function startSTT(ivId,listPath,i){
 function stopSTT(){ if(REC.recog){ try{ REC.recog.onend=null; REC.recog.stop(); }catch(e){} REC.recog=null; } }
 async function recDelete(listPath,i,ivId){
   try{ await IDB.del("audio",ivId); }catch(e){}
-  const iv=getPath(state,listPath)&&getPath(state,listPath)[i]; if(iv){ iv.audio=null; persist(); }
+  const iv=getPath(state,listPath)&&getPath(state,listPath)[i]; if(iv){ iv.audio=null; iv.audioUploaded=false; persist(); }
   rerender();
 }
 async function recDownload(ivId,name){
   try{ const rec=await IDB.get("audio",ivId); if(!rec||!rec.blob){ toast(t("file_none"),true); return; } triggerDownload(rec.blob,name||"recording.webm"); }
   catch(e){ toast(t("file_idb_fail"),true); }
 }
+/* ---- upload an existing audio file (mp3/m4a/wav) instead of recording live ---- */
+async function audioUpload(listPath,i,ivId,file){
+  if(!file) return;
+  if(!/^audio\//.test(file.type) && !/\.(mp3|m4a|wav|ogg|aac|webm)$/i.test(file.name)){ toast(t("rec_audio_only"),true); return; }
+  if(file.size>MAX_FILE){ toast(t("file_toobig"),true); return; }
+  try{ await IDB.put("audio", ivId, {blob:file, name:file.name, type:file.type||"audio/mpeg", size:file.size, duration:0}); }
+  catch(e){ toast(t("file_idb_fail"),true); return; }
+  const iv=getPath(state,listPath)&&getPath(state,listPath)[i]; if(!iv) return;
+  iv.audio={id:ivId, name:file.name, type:file.type||"audio/mpeg", size:file.size, duration:0}; iv.audioUploaded=true;
+  persist(); toast(t("audio_uploaded")); rerender();
+}
+/* ---- upload a photo of handwritten interview notes (multiple allowed) ---- */
+async function noteUpload(listPath,i,ivId,file){
+  if(!file) return;
+  if(!/^image\//.test(file.type)){ toast(t("note_img_only"),true); return; }
+  if(file.size>MAX_FILE){ toast(t("file_toobig"),true); return; }
+  const id=uid();
+  try{ await IDB.put("files", id, {blob:file, name:file.name, type:file.type, size:file.size}); }
+  catch(e){ toast(t("file_idb_fail"),true); return; }
+  const iv=getPath(state,listPath)&&getPath(state,listPath)[i]; if(!iv) return;
+  if(!Array.isArray(iv.noteImages)) iv.noteImages=[];
+  iv.noteImages.push({id, name:file.name, type:file.type, size:file.size});
+  persist(); toast(t("note_uploaded")); rerender();
+}
+async function noteDelete(listPath,i,id){
+  try{ await IDB.del("files",id); }catch(e){}
+  const iv=getPath(state,listPath)&&getPath(state,listPath)[i];
+  if(iv&&Array.isArray(iv.noteImages)){ iv.noteImages=iv.noteImages.filter(n=>n.id!==id); persist(); }
+  rerender();
+}
+async function noteView(id,name){
+  try{ const rec=await IDB.get("files",id); if(!rec||!rec.blob){ toast(t("file_none"),true); return; }
+    const url=URL.createObjectURL(rec.blob); const w=window.open(url,"_blank");
+    if(!w) triggerDownload(rec.blob,name||"note"); setTimeout(()=>URL.revokeObjectURL(url),60000);
+  }catch(e){ toast(t("file_idb_fail"),true); }
+}
 /* load audio blobs into <audio> players after each render */
+/* object URLs created for the current render's media — revoked before the next render replaces #view */
+let _mediaURLs=[];
+function releaseMediaURLs(){ _mediaURLs.forEach(u=>{ try{ URL.revokeObjectURL(u); }catch(e){} }); _mediaURLs=[]; }
 function hydrateMedia(){
   document.querySelectorAll("audio[data-audio-iv]").forEach(async el=>{
     if(el.dataset.loaded) return; el.dataset.loaded="1";
-    try{ const rec=await IDB.get("audio", el.dataset.audioIv); if(rec&&rec.blob){ el.src=URL.createObjectURL(rec.blob); } }catch(e){}
+    try{ const rec=await IDB.get("audio", el.dataset.audioIv); if(rec&&rec.blob){ const u=URL.createObjectURL(rec.blob); _mediaURLs.push(u); el.src=u; } }catch(e){}
+  });
+  document.querySelectorAll("img[data-note-img]").forEach(async el=>{
+    if(el.dataset.loaded) return; el.dataset.loaded="1";
+    try{ const rec=await IDB.get("files", el.dataset.noteImg); if(rec&&rec.blob){ const u=URL.createObjectURL(rec.blob); _mediaURLs.push(u); el.src=u; } }catch(e){}
   });
 }
 
@@ -2156,7 +2411,10 @@ async function exportJSON(withFiles){
   if(withFiles){
     const att={files:{},audio:{}};
     for(const r of state.step2.dataRequests){ if(r.file&&r.file.id){ try{ const rec=await IDB.get("files",r.file.id); if(rec&&rec.blob) att.files[r.file.id]={name:r.file.name,type:r.file.type,b64:await blobToB64(rec.blob)}; }catch(e){} } }
-    for(const iv of [...state.step3.interviews,...state.step5.interviews]){ if(iv.audio&&iv.audio.id){ try{ const rec=await IDB.get("audio",iv.audio.id); if(rec&&rec.blob) att.audio[iv.audio.id]={name:iv.audio.name,type:iv.audio.type,b64:await blobToB64(rec.blob)}; }catch(e){} } }
+    for(const iv of [...state.step3.interviews,...state.step5.interviews]){
+      if(iv.audio&&iv.audio.id){ try{ const rec=await IDB.get("audio",iv.audio.id); if(rec&&rec.blob) att.audio[iv.audio.id]={name:iv.audio.name,type:iv.audio.type,b64:await blobToB64(rec.blob)}; }catch(e){} }
+      for(const n of (iv.noteImages||[])){ if(n&&n.id){ try{ const rec=await IDB.get("files",n.id); if(rec&&rec.blob) att.files[n.id]={name:n.name,type:n.type,b64:await blobToB64(rec.blob)}; }catch(e){} } }
+    }
     data._attachments=att;
   }
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
@@ -2168,6 +2426,23 @@ async function restoreAttachments(att){
     if(att.files) for(const id in att.files){ const f=att.files[id]; const blob=b64ToBlob(f.b64,f.type); await IDB.put("files",id,{blob,name:f.name,type:f.type,size:blob.size}); }
     if(att.audio) for(const id in att.audio){ const a=att.audio[id]; const blob=b64ToBlob(a.b64,a.type); await IDB.put("audio",id,{blob,name:a.name,type:a.type,size:blob.size,duration:0}); }
   }catch(e){}
+}
+/* Import merge appends lists, so re-importing a file (or one sharing ids with current data) would collide:
+   duplicate DOM ids + audio store keyed by iv.id would clash. Give every incoming record a fresh id and
+   re-key its media blobs (in the _attachments bags, which restoreAttachments then writes) to match. */
+function remapImportIds(obj){
+  const att=obj._attachments||{}, files=att.files||{}, audio=att.audio||{};
+  const move=(bag,oldId,newId)=>{ if(oldId!=null && bag[oldId]!=null){ bag[newId]=bag[oldId]; if(newId!==oldId) delete bag[oldId]; } };
+  const remapIv=(iv)=>{ if(!iv) return; const newIv=uid();
+    if(iv.audio){ move(audio, iv.audio.id, newIv); iv.audio.id=newIv; }   // audio store key must equal iv.id
+    if(Array.isArray(iv.noteImages)) iv.noteImages.forEach(n=>{ if(!n) return; const nn=uid(); move(files, n.id, nn); n.id=nn; });
+    iv.id=newIv;
+  };
+  if(obj.step3&&Array.isArray(obj.step3.interviews)) obj.step3.interviews.forEach(remapIv);
+  if(obj.step5&&Array.isArray(obj.step5.interviews)) obj.step5.interviews.forEach(remapIv);
+  if(obj.step2&&Array.isArray(obj.step2.dataRequests)) obj.step2.dataRequests.forEach(r=>{ if(!r) return; if(r.file){ const nf=uid(); move(files, r.file.id, nf); r.file.id=nf; } r.id=uid(); });
+  if(obj.step2&&Array.isArray(obj.step2.opsData)) obj.step2.opsData.forEach(o=>{ if(o) o.id=uid(); });
+  if(obj.step5&&Array.isArray(obj.step5.scenarios)) obj.step5.scenarios.forEach(s=>{ if(s) s.id=uid(); });
 }
 function openDoc(id){
   document.getElementById("docPaper").innerHTML=buildDoc(id);
@@ -2185,7 +2460,6 @@ function toast(msg,bad){
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>{ el.style.transition="opacity .4s"; el.style.opacity="0"; },2600);
 }
 function calloutHTML(type,icon,msg){ return `<div class="callout ${type}" style="margin-top:12px">${icon}<div>${esc(msg)}</div></div>`; }
-function okIcon(){ return '<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 6"/></svg>'; }
 
 /* ------------------------------------------------------------------ *
  *  Data management (new project / partial delete)
@@ -2203,6 +2477,10 @@ function renderDataModal(){
     const parts=PART_KEYS.map(k=>`<label class="part-chk"><input type="checkbox" data-dm-part="${k}"${DM.parts.indexOf(k)>=0?" checked":""}><span>${esc(partLabel(k))}</span></label>`).join("");
     box.innerHTML=head(t("dm_title"))
       +`<div class="m-card">
+          <h3>${esc(t("dm_sample"))}</h3><p>${esc(t("dm_sample_note"))}</p>
+          <button class="btn primary" data-action="load-sample" type="button">${sparkIcon()} ${esc(t("dm_sample"))}</button>
+        </div>
+        <div class="m-card">
           <h3>${esc(t("dm_new_h"))}</h3><p>${esc(t("dm_new_desc"))}</p>
           <button class="btn danger" data-action="dm-new" type="button">${esc(t("dm_new_btn"))}</button>
         </div>
@@ -2260,6 +2538,8 @@ async function doPartialDelete(){
   if(has("files")||has("s2")){ for(const r of state.step2.dataRequests){ if(r.file&&r.file.id) await IDB.del("files",r.file.id).catch(()=>{}); } }
   if(has("audio")||has("s3")){ for(const r of state.step3.interviews){ if(r.audio&&r.audio.id) await IDB.del("audio",r.audio.id).catch(()=>{}); } }
   if(has("audio")||has("s5")){ for(const r of state.step5.interviews){ if(r.audio&&r.audio.id) await IDB.del("audio",r.audio.id).catch(()=>{}); } }
+  if(has("files")||has("s3")){ for(const r of state.step3.interviews){ for(const n of (r.noteImages||[])){ if(n.id) await IDB.del("files",n.id).catch(()=>{}); } } }
+  if(has("files")||has("s5")){ for(const r of state.step5.interviews){ for(const n of (r.noteImages||[])){ if(n.id) await IDB.del("files",n.id).catch(()=>{}); } } }
   // reset selected step slices
   if(has("s0")) state.screening=d.screening;
   if(has("s1")) state.step1=d.step1;
@@ -2270,6 +2550,7 @@ async function doPartialDelete(){
   // media-only selections (when their step wasn't fully reset)
   if(has("files")&&!has("s2")) state.step2.dataRequests.forEach(r=>r.file=null);
   if(has("audio")){ if(!has("s3")) state.step3.interviews.forEach(r=>r.audio=null); if(!has("s5")) state.step5.interviews.forEach(r=>r.audio=null); }
+  if(has("files")){ if(!has("s3")) state.step3.interviews.forEach(r=>r.noteImages=[]); if(!has("s5")) state.step5.interviews.forEach(r=>r.noteImages=[]); }
   persist(); closeDataModal(); showView("dashboard"); toast(t("dm_deleted"));
 }
 
@@ -2284,22 +2565,50 @@ function handleAction(act,el){
     case "close-sheet": closeSheet(); break;
     case "screen-ans":{ state.screening.answers[el.dataset.q]=el.dataset.v; persist(); rerender(); break; }
     case "add":{ const list=el.dataset.list; getPath(state,list).push(ROW_FACTORY[list]()); persist(); rerender(); break; }
-    case "del":{ const list=el.dataset.list, i=+el.dataset.index; getPath(state,list).splice(i,1); persist(); rerender(); break; }
+    case "del":{ const list=el.dataset.list, i=+el.dataset.index; const arr=getPath(state,list); const gone=arr[i];
+      if(gone&&/\.interviews$/.test(list)){ if(gone.audio&&gone.audio.id) IDB.del("audio",gone.audio.id).catch(()=>{}); (gone.noteImages||[]).forEach(n=>{ if(n.id) IDB.del("files",n.id).catch(()=>{}); }); }
+      arr.splice(i,1); persist(); rerender(); break; }
     case "device":{ const d=el.dataset.device, arr=state.step4.devices, k=arr.indexOf(d);
       if(k>=0) arr.splice(k,1); else arr.push(d); persist(); rerender(); break; }
+    // interview question guide
+    case "iv-target":{ ui.ivTarget[el.dataset.kind]=+el.value; break; }
+    case "iv-edit":{ const k=el.dataset.kind; if(!ui.ivEdit[k]) guideFork(k); ui.ivEdit[k]=!ui.ivEdit[k]; ui.ivOpen[k]=true; persist(); rerender(); break; }
+    case "iv-add-grp":{ const k=el.dataset.kind; guideFork(k).push({g:"",q:[""]}); ui.ivOpen[k]=true; persist(); rerender(); break; }
+    case "iv-del-grp":{ const k=el.dataset.kind; guideFork(k).splice(+el.dataset.gi,1); ui.ivOpen[k]=true; persist(); rerender(); break; }
+    case "iv-add-q":{ const k=el.dataset.kind; guideFork(k)[+el.dataset.gi].q.push(""); ui.ivOpen[k]=true; persist(); rerender(); break; }
+    case "iv-del-q":{ const k=el.dataset.kind; guideFork(k)[+el.dataset.gi].q.splice(+el.dataset.qi,1); ui.ivOpen[k]=true; persist(); rerender(); break; }
+    case "iv-reset":{ const k=el.dataset.kind; if(state.ivGuide&&state.ivGuide[LANG]) delete state.ivGuide[LANG][k]; ui.ivOpen[k]=true; persist(); rerender(); break; }
+    case "iv-insert-q":{
+      const k=el.dataset.kind, q=(guideData(k)[+el.dataset.gi].q[+el.dataset.qi]||"").trim(); if(!q) break;
+      const listPath=ivListPath(k), arr=getPath(state,listPath);
+      if(!arr.length) arr.push(ROW_FACTORY[listPath]());
+      let ti=Math.min(Math.max(+ui.ivTarget[k]||0,0), arr.length-1);
+      const notePath=listPath+"."+ti+".notes", cur=getPath(state,notePath)||"";
+      setPath(state,notePath, cur+`<div><b>${esc(t("iv_q_label"))}:</b> ${esc(q)}</div><div><b>${esc(t("iv_a_label"))}:</b> </div><div><br></div>`);
+      ui.ivOpen[k]=true; persist(); rerender(); toast(t("iv_inserted")); break; }
     // files
     case "file-upload": fileUpload(+el.dataset.index, el.files&&el.files[0]); break;
     case "file-download": fileDownload(state.step2.dataRequests[+el.dataset.index] && state.step2.dataRequests[+el.dataset.index].file); break;
     case "file-delete":{ const row=state.step2.dataRequests[+el.dataset.index]; if(row&&row.file){ if(row.file.id) IDB.del("files",row.file.id).catch(()=>{}); row.file=null; persist(); rerender(); } break; }
     // recording
     case "rec-start": recStart(el.dataset.list, +el.dataset.index, el.dataset.iv); break;
+    case "rec-retry":{ delete ui.micDenied[el.dataset.iv]; rerender(); recStart(el.dataset.list, +el.dataset.index, el.dataset.iv); break; }
     case "rec-pause": recPauseToggle(); break;
     case "rec-stop": recStop(); break;
     case "rec-download": recDownload(el.dataset.iv, el.dataset.name); break;
     case "rec-delete": recDelete(el.dataset.list, +el.dataset.index, el.dataset.iv); break;
+    case "audio-upload": audioUpload(el.dataset.list, +el.dataset.index, el.dataset.iv, el.files&&el.files[0]); break;
+    // handwritten-note photos
+    case "note-upload": noteUpload(el.dataset.list, +el.dataset.index, el.dataset.iv, el.files&&el.files[0]); break;
+    case "note-view": noteView(el.dataset.id, el.dataset.name); break;
+    case "note-delete": noteDelete(el.dataset.list, +el.dataset.index, el.dataset.id); break;
     // data management
     case "open-data": openDataModal(); break;
     case "close-data": closeDataModal(); break;
+    case "load-sample":{ closeDataModal(); loadSample(); break; }
+    case "welcome-sample":{ if(!projectStarted() || confirm(t("welcome_sample_confirm"))) loadSample(); break; }
+    case "welcome-new": showView("step0"); break;
+    case "sample-clear": openDataModal(); DM.view="new1"; renderDataModal(); break;
     case "dm-new": DM.view="new1"; renderDataModal(); break;
     case "dm-back": DM.view = (DM.view==="new2")?"new1":"main"; renderDataModal(); break;
     case "dm-backup": exportJSON(true); break;
@@ -2319,6 +2628,7 @@ function handleAction(act,el){
     case "print-doc-direct": openDoc(el.dataset.doc); setTimeout(()=>window.print(),150); break;
     case "print-doc": window.print(); break;
     case "close-doc": closeDoc(); break;
+    case "close-import": closeImportModal(); break;
   }
 }
 
@@ -2336,7 +2646,7 @@ document.addEventListener("input",e=>{
   const el=e.target;
   if(el.dataset&&el.dataset.dm==="confirmText"){ DM.confirmText=el.value; const b=document.getElementById("dmConfirmBtn");
     if(b){ if(el.value.trim().toUpperCase()===t("dm_confirm_word").toUpperCase()) b.removeAttribute("disabled"); else b.setAttribute("disabled",""); } return; }
-  if(el.dataset&&el.dataset.ce){ setPath(state, el.dataset.ce, el.innerHTML); scheduleSave(); return; }
+  if(el.dataset&&el.dataset.ce){ setPath(state, el.dataset.ce, sanitizeHTML(el.innerHTML)); scheduleSave(); refreshMeters(); refreshStepNav(); return; }
   if(el.matches&&el.matches("[data-model]")){ setModel(el.dataset.model, el.type==="checkbox"?el.checked:el.value); scheduleSave();
     if(el.dataset.req) el.classList.toggle("req-miss", !String(el.value||"").trim());
     refreshMeters(); refreshStepNav(); return; }
@@ -2356,30 +2666,68 @@ document.addEventListener("change",e=>{
 });
 document.addEventListener("keydown",e=>{
   if(e.key==="Escape"){
-    if(document.getElementById("dataModal").classList.contains("open")) closeDataModal();
+    if(document.getElementById("importModal").classList.contains("open")) closeImportModal();
+    else if(document.getElementById("dataModal").classList.contains("open")) closeDataModal();
     else if(document.getElementById("docOverlay").classList.contains("open")) closeDoc();
     else closeSheet();
   }
 });
 document.getElementById("dataModal").addEventListener("click",e=>{ if(e.target.id==="dataModal") closeDataModal(); });
+document.getElementById("importModal").addEventListener("click",e=>{ if(e.target.id==="importModal") closeImportModal(); });
+// remember interview-guide open/closed state across re-renders
+document.addEventListener("click",e=>{ const s=e.target.closest("details.guide>summary"); if(s){ const d=s.parentNode; setTimeout(()=>{ if(d.dataset.kind) ui.ivOpen[d.dataset.kind]=d.open; },0); } });
 document.getElementById("importFile").addEventListener("change",e=>{
   const f=e.target.files&&e.target.files[0]; if(!f) return;
   const rd=new FileReader();
-  rd.onload=async()=>{ try{ const obj=JSON.parse(rd.result);
-      const fileVer=(obj&&obj._app&&obj._app.version)||null;
+  rd.onerror=()=>showImportResult({badJson:true});
+  rd.onload=async()=>{
+    let obj;
+    try{ obj=JSON.parse(rd.result); }
+    catch(err){ showImportResult({badJson:true}); return; }
+    const looksDH = obj && typeof obj==="object" && !Array.isArray(obj)
+      && (obj.meta||obj.screening||obj.step1||obj.step2||obj.step3||obj.step5||obj._app);
+    if(!looksDH){ showImportResult({notDH:true}); return; }
+    try{
+      const before=counts();
+      const fileVer=(obj._app&&obj._app.version)||null;
       if(fileVer && fileVer!==APP_VERSION) console.warn("[Discovery Hub] Importing data created with v"+fileVer+" (this app is v"+APP_VERSION+"). Loading anyway.");
-      if(obj&&obj._attachments) await restoreAttachments(obj._attachments);
-      mergeState(obj); LANG=state.meta.lang||LANG; applyStaticI18n(); showView(ui.view); toast(t("imported_ok")); }
-      catch(err){ toast(t("import_bad"),true); } };
+      remapImportIds(obj);   // fresh ids + re-keyed blobs so a re-import can't collide with existing data
+      if(obj._attachments) await restoreAttachments(obj._attachments);
+      mergeState(obj); LANG=state.meta.lang||LANG; applyStaticI18n(); showView(ui.view);
+      const after=counts();
+      showImportResult({ok:true, fileVer, added:{interviews:after.interviews-before.interviews, dataItems:after.dataItems-before.dataItems, scenarios:after.scenarios-before.scenarios}});
+    }catch(err){ showImportResult({badJson:true}); }
+  };
   rd.readAsText(f); e.target.value="";
 });
+/* import-result modal: says what was imported, what was skipped and why */
+function showImportResult(info){
+  const box=document.getElementById("importModalBox");
+  let body;
+  if(info.badJson){ body=`<div class="m-warn">${warnIcon()} ${esc(t("import_bad_json2"))}</div>`; }
+  else if(info.notDH){ body=`<div class="m-warn">${warnIcon()} ${esc(t("import_not_dh"))}</div>`; }
+  else {
+    const a=info.added, total=a.interviews+a.dataItems+a.scenarios;
+    if(total<=0){ body=`<div class="callout warn">${warnIcon()}<div>${esc(t("import_none_added"))}</div></div>`; }
+    else{
+      const rows=[[t("c_interviews"),a.interviews],[t("c_dataitems"),a.dataItems],[t("c_scenarios"),a.scenarios]]
+        .filter(r=>r[1]>0).map(r=>`<li><b class="mono">+${r[1]}</b> ${esc(r[0])}</li>`).join("");
+      body=`<div class="callout ok"><svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 6"/></svg><div><b>${esc(t("import_added"))}</b></div></div>
+        <ul style="margin:12px 0 4px 20px;font-size:14px;line-height:1.9">${rows}</ul>`;
+    }
+    if(info.fileVer && info.fileVer!==APP_VERSION){ body+=`<p class="doc-note" style="margin-top:10px;font-size:11.5px;color:var(--ink-3)">File v${esc(info.fileVer)} · app v${esc(APP_VERSION)}</p>`; }
+  }
+  box.innerHTML=`<div class="m-head"><h2>${esc(t("import_result_title"))}</h2><button class="btn sm" data-action="close-import" type="button">${esc(t("btn_close"))}</button></div>${body}`;
+  document.getElementById("importModal").classList.add("open");
+}
+function closeImportModal(){ document.getElementById("importModal").classList.remove("open"); }
 
 /* ------------------------------------------------------------------ *
  *  Boot
  * ------------------------------------------------------------------ */
 load();
 applyStaticI18n();
-showView("dashboard");
+showView(projectStarted()?"dashboard":"welcome");
 setSaveFlag(false);
 </script>
 </body>
