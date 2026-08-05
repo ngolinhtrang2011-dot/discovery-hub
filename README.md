@@ -19,7 +19,7 @@ Discovery Hub brings everything into one place under a single principle: **enter
 
 - **Step 0 — Go/No-Go Screening:** 7 screening questions that confirm whether Action Mapping fits your project, with an automatic verdict (GO / GO WITH CONDITIONS / NO-GO) and alternative recommendations when it doesn't
 - **Steps 1–5 — Structured collection:** Business Goal → Operational Data (with file uploads) → Staff Interviews → Learner Profile → SME Interviews & Scenario Bank
-- **Interview recording + automatic transcription** (Chrome/Edge, internet required) offline recording still works; paste transcripts later
+- **Interview capture, three ways:** live recording + automatic transcription (Chrome/Edge, internet required), **upload an existing MP3**, or **upload photos of handwritten notes** — for when an interviewee declines to be recorded
 - **TNA Package export:** a single `.md` file containing all collected data plus embedded AI instructions, drop it into Claude to generate a complete Action Map
 - **Bilingual Vietnamese–English UI**, instant switching
 - **Runs on smartphone, tablet, and desktop** optimized for note-taking during live interviews
@@ -71,7 +71,7 @@ flowchart LR
 ## Quick troubleshooting
 
 - **"All my data is gone!"** → Are you in the same browser as before? Incognito mode? Re-import your latest JSON backup.
-- **Record button doesn't work** → Use the hosted (HTTPS) link instead of opening the file directly; check the browser's microphone permission.
+- **Record button doesn't work** → Use the hosted (HTTPS) link instead of opening the file directly; check the browser's microphone permission. As a fallback, **upload an MP3 or a photo of your handwritten notes** on the interview instead.
 - **Transcription doesn't run** → Chrome/Edge + internet only. Workaround: record normally, paste the transcript later.
 - **Opening the file shows raw code** → It opened in a text editor. Right-click → Open with → Chrome.
 - **File received via chat apps won't open on iPhone** → Share the web link instead of the file.
